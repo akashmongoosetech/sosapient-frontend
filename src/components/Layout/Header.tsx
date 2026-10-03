@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Moon, Sun, ChevronDown, ArrowRight, Info, Newspaper, Briefcase, Mail } from 'lucide-react';
+import { Menu, X, Moon, Sun, ChevronDown, ArrowRight, Info, Newspaper, Briefcase, Mail, Facebook, Linkedin, Instagram, Twitter } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { SERVICE_CATEGORIES, servicesByCategory } from '../../data/services';
@@ -116,6 +116,21 @@ const Header: React.FC = () => {
             <Link to="/careers" className="transition hover:text-white">Careers</Link>
             <Link to="/blog" className="transition hover:text-white">Blog</Link>
             <Link to="/contact" className="transition hover:text-white">Contact</Link>
+            <span className="h-3.5 w-px bg-white/30" aria-hidden="true" />
+            <div className="flex items-center gap-3">
+              <a href="https://www.facebook.com/profile.php?id=61553017931533" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="transition hover:text-white">
+                <Facebook className="h-3.5 w-3.5" />
+              </a>
+              <a href="https://www.linkedin.com/company/100043699/admin/page-posts/published/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="transition hover:text-white">
+                <Linkedin className="h-3.5 w-3.5" />
+              </a>
+              <a href="https://www.instagram.com/sosapient/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="transition hover:text-white">
+                <Instagram className="h-3.5 w-3.5" />
+              </a>
+              <a href="https://x.com/SoSapient_tech" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="transition hover:text-white">
+                <Twitter className="h-3.5 w-3.5" />
+              </a>
+            </div>
           </div>
         </div>
       </div>
