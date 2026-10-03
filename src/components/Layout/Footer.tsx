@@ -48,10 +48,11 @@ const Footer: React.FC = () => {
       { name: 'Contact', path: '/contact' },
     ],
     Services: [
-      { name: 'Web Development', path: '/services#web' },
-      { name: 'Mobile Apps', path: '/services#mobile' },
-      { name: 'UI/UX Design', path: '/services#design' },
-      { name: 'Consulting', path: '/services#consulting' },
+      { name: 'Frontend Development', path: '/services/frontend-development' },
+      { name: 'AI Development', path: '/services/ai-development' },
+      { name: 'Custom CRM Development', path: '/services/custom-crm-development' },
+      { name: 'SaaS Product Development', path: '/services/saas-product-development' },
+      { name: 'View All Services →', path: '/services' },
     ],
     Resources: [
       { name: 'Blog', path: '/blog' },

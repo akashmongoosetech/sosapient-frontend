@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Menu, X, Moon, Sun, LogOut } from 'lucide-react';
+import { Menu, X, Moon, Sun, LogOut, ChevronDown } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { SERVICE_CATEGORIES, servicesByCategory } from '../../data/services';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
+  const closeTimer = useRef<number | null>(null);
   const { theme, toggleTheme } = useTheme();
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
@@ -27,17 +31,34 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    };
+  }, []);
+
+  const openServices = () => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    setServicesOpen(true);
+  };
+
+  const scheduleCloseServices = () => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    closeTimer.current = window.setTimeout(() => setServicesOpen(false), 150);
+  };
+
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
-    { name: 'Services', path: '/services' },
+    { name: 'Services', path: '/services', hasMenu: true },
     { name: 'Blog', path: '/blog' },
     { name: 'Careers', path: '/careers' },
     { name: 'Contact', path: '/contact' },
   ];
 
   const isActive = (path: string) => {
-    return location.pathname === path;
+    if (path === '/') return location.pathname === '/';
+    return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
   return (
@@ -59,25 +80,92 @@ const Header: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center space-x-8" aria-label="Primary">
             {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={`text-sm font-medium transition-colors duration-200 relative ${
-                  isActive(item.path)
-                    ? 'text-primary-600 dark:text-primary-400'
-                    : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
-                }`}
-              >
-                {item.name}
-                {isActive(item.path) && (
-                  <motion.div
-                    layoutId="activeTab"
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-500 to-secondary-500"
-                  />
-                )}
-              </Link>
+              item.hasMenu ? (
+                <div
+                  key={item.name}
+                  className="relative"
+                  onMouseEnter={openServices}
+                  onMouseLeave={scheduleCloseServices}
+                >
+                  <Link
+                    to={item.path}
+                    aria-expanded={servicesOpen}
+                    aria-haspopup="true"
+                    onFocus={openServices}
+                    className={`flex items-center gap-1 text-sm font-medium transition-colors duration-200 relative ${
+                      isActive(item.path)
+                        ? 'text-primary-600 dark:text-primary-400'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
+                    }`}
+                  >
+                    {item.name}
+                    <ChevronDown className={`h-4 w-4 transition-transform ${servicesOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+                    {isActive(item.path) && (
+                      <motion.div
+                        layoutId="activeTab"
+                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-500 to-secondary-500"
+                      />
+                    )}
+                  </Link>
+                  {servicesOpen && (
+                    <div
+                      className="absolute left-1/2 top-full z-50 w-[640px] -translate-x-1/2 pt-3"
+                      onMouseEnter={openServices}
+                      onMouseLeave={scheduleCloseServices}
+                    >
+                      <div className="grid grid-cols-2 gap-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+                        {SERVICE_CATEGORIES.map((cat) => (
+                          <div key={cat.id}>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                              {cat.label}
+                            </p>
+                            <ul className="mt-2 space-y-1">
+                              {servicesByCategory(cat.id).map((s) => (
+                                <li key={s.slug}>
+                                  <Link
+                                    to={`/services/${s.slug}`}
+                                    onClick={() => setServicesOpen(false)}
+                                    className="block rounded-lg px-2 py-1.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-700 dark:text-gray-300 dark:hover:bg-primary-800/20 dark:hover:text-primary-300"
+                                  >
+                                    {s.name}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                        <Link
+                          to="/services"
+                          onClick={() => setServicesOpen(false)}
+                          className="col-span-2 rounded-lg bg-primary-50 px-4 py-2.5 text-center text-sm font-semibold text-primary-700 hover:bg-primary-100 dark:bg-primary-800/30 dark:text-primary-300"
+                        >
+                          View All Services →
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className={`text-sm font-medium transition-colors duration-200 relative ${
+                    isActive(item.path)
+                      ? 'text-primary-600 dark:text-primary-400'
+                      : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
+                  }`}
+                >
+                  {item.name}
+                  {isActive(item.path) && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-500 to-secondary-500"
+                    />
+                  )}
+                </Link>
+              )
             ))}
           </nav>
 
@@ -140,18 +228,66 @@ const Header: React.FC = () => {
           >
             <div className="py-4 space-y-2">
               {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`block px-4 py-2 text-sm font-medium transition-colors duration-200 ${
-                    isActive(item.path)
-                      ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-800/20'
-                      : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-800'
-                  }`}
-                >
-                  {item.name}
-                </Link>
+                item.hasMenu ? (
+                  <div key={item.name}>
+                    <button
+                      type="button"
+                      onClick={() => setMobileServicesOpen((o) => !o)}
+                      aria-expanded={mobileServicesOpen}
+                      className={`flex w-full items-center justify-between px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                        isActive(item.path)
+                          ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-800/20'
+                          : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-800'
+                      }`}
+                    >
+                      <span onClick={(e) => { e.stopPropagation(); setIsMenuOpen(false); navigate(item.path); }}>
+                        {item.name}
+                      </span>
+                      <ChevronDown className={`h-4 w-4 transition-transform ${mobileServicesOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+                    </button>
+                    {mobileServicesOpen && (
+                      <div className="ml-2 border-l-2 border-primary-100 dark:border-primary-800">
+                        <Link
+                          to="/services"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="block px-4 py-2 text-sm font-semibold text-primary-600 dark:text-primary-400"
+                        >
+                          View All Services
+                        </Link>
+                        {SERVICE_CATEGORIES.map((cat) => (
+                          <div key={cat.id} className="mt-1">
+                            <p className="px-4 py-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                              {cat.label}
+                            </p>
+                            {servicesByCategory(cat.id).map((s) => (
+                              <Link
+                                key={s.slug}
+                                to={`/services/${s.slug}`}
+                                onClick={() => setIsMenuOpen(false)}
+                                className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600"
+                              >
+                                {s.name}
+                              </Link>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Link
+                    key={item.name}
+                    to={item.path}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`block px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                      isActive(item.path)
+                        ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-800/20'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-800'
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                )
               ))}
               {isAuthenticated && user ? (
                 <>

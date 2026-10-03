@@ -28,6 +28,7 @@ const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const AdminProfile = lazy(() => import('./pages/admin/AdminProfile'));
+const ServiceDetail = lazy(() => import('./pages/ServiceDetail'));
 
 const RouteFallback: React.FC = () => (
   <div className="flex min-h-screen items-center justify-center text-gray-500">Loading…</div>
@@ -47,6 +48,7 @@ function App() {
                   <Route index element={<Home />} />
                   <Route path="about" element={<About />} />
                   <Route path="services" element={<Services />} />
+                  <Route path="services/:slug" element={<ServiceDetail />} />
                   <Route path="blog" element={<Blog />} />
                   <Route path="blog/:slug" element={<BlogPost />} />
                   <Route path="careers" element={<Careers />} />
