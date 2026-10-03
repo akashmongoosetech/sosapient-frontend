@@ -101,16 +101,29 @@ const Header: React.FC = () => {
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-white/95 dark:bg-primary-900/95 backdrop-blur-md shadow-lg' 
+        isScrolled
+          ? 'bg-white/95 dark:bg-primary-900/95 backdrop-blur-md shadow-lg'
           : 'bg-transparent'
       }`}
     >
+      {/* Utility strip — desktop only, hides on scroll */}
+      <div className={`hidden overflow-hidden bg-gradient-to-r from-primary-700 via-primary-600 to-secondary-600 transition-all duration-300 lg:block ${
+        isScrolled ? 'max-h-0' : 'max-h-10'
+      }`}>
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 text-xs font-medium text-white/90 sm:px-6 lg:px-8">
+          <p className="font-display tracking-wide">AI-powered software, delivered end-to-end</p>
+          <div className="flex items-center gap-5">
+            <Link to="/careers" className="transition hover:text-white">Careers</Link>
+            <Link to="/blog" className="transition hover:text-white">Blog</Link>
+            <Link to="/contact" className="transition hover:text-white">Contact</Link>
+          </div>
+        </div>
+      </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 lg:h-20">
+        <div className="flex justify-between items-center h-[72px] lg:h-24">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <img src="https://ik.imagekit.io/sentyaztie/Dlogo.png?updatedAt=1749928182723" className='w-48' alt="logo" />
+          <Link to="/" className="flex shrink-0 items-center space-x-2" aria-label="SoSapient home">
+            <img src="https://ik.imagekit.io/sentyaztie/Dlogo.png?updatedAt=1749928182723" className='w-52 lg:w-64' alt="SoSapient logo" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -130,7 +143,7 @@ const Header: React.FC = () => {
                     aria-haspopup="true"
                     onFocus={openAbout}
                     onClick={() => setAboutOpen(false)}
-                    className={`flex items-center gap-1 text-sm font-medium transition-colors duration-200 relative ${
+                    className={`flex items-center gap-1.5 font-display text-[15px] font-semibold tracking-tight transition-colors duration-200 relative ${
                       isActive(item.path)
                         ? 'text-primary-600 dark:text-primary-400'
                         : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
@@ -141,7 +154,7 @@ const Header: React.FC = () => {
                     {isActive(item.path) && (
                       <motion.div
                         layoutId="activeTab"
-                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-500 to-secondary-500"
+                        className="absolute -bottom-1 left-0 right-0 h-1 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500"
                       />
                     )}
                   </Link>
@@ -156,7 +169,8 @@ const Header: React.FC = () => {
                         onMouseEnter={openAbout}
                         onMouseLeave={scheduleCloseAbout}
                       >
-                        <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+                        <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+                          <div className="h-1 bg-gradient-to-r from-primary-500 via-secondary-500 to-primary-500" aria-hidden="true" />
                           <ul className="p-3">
                             {aboutMenuItems.map((sub) => (
                               <li key={sub.path + sub.name}>
@@ -198,7 +212,7 @@ const Header: React.FC = () => {
                     aria-haspopup="true"
                     onFocus={openServices}
                     onClick={() => setServicesOpen(false)}
-                    className={`flex items-center gap-1 text-sm font-medium transition-colors duration-200 relative ${
+                    className={`flex items-center gap-1.5 font-display text-[15px] font-semibold tracking-tight transition-colors duration-200 relative ${
                       isActive(item.path)
                         ? 'text-primary-600 dark:text-primary-400'
                         : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
@@ -209,7 +223,7 @@ const Header: React.FC = () => {
                     {isActive(item.path) && (
                       <motion.div
                         layoutId="activeTab"
-                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-500 to-secondary-500"
+                        className="absolute -bottom-1 left-0 right-0 h-1 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500"
                       />
                     )}
                   </Link>
@@ -225,11 +239,12 @@ const Header: React.FC = () => {
                         onMouseLeave={scheduleCloseServices}
                       >
                         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                          <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
-                            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-gray-700">
-                              <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                        <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+                          <div className="h-1 bg-gradient-to-r from-primary-500 via-secondary-500 to-primary-500" aria-hidden="true" />
+                            <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+                              <p className="font-display text-base font-bold text-gray-900 dark:text-white">
                                 Explore our services
-                                <span className="ml-2 font-normal text-gray-500 dark:text-gray-400">
+                                <span className="ml-2 font-inter font-normal text-sm text-gray-500 dark:text-gray-400">
                                   15 specialized offerings across 5 categories
                                 </span>
                               </p>
@@ -243,10 +258,10 @@ const Header: React.FC = () => {
                             </div>
                             <div className="grid grid-cols-5 gap-6 p-6">
                               {SERVICE_CATEGORIES.map((cat) => (
-                                <div key={cat.id}>
-                                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-                                    {cat.label}
-                                  </p>
+                              <div key={cat.id}>
+                                <p className="font-display text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+                                  {cat.label}
+                                </p>
                                   <ul className="mt-3 space-y-1">
                                     {servicesByCategory(cat.id).map((s) => {
                                       const Icon = serviceIcon(s.icon);
@@ -257,11 +272,11 @@ const Header: React.FC = () => {
                                             onClick={() => setServicesOpen(false)}
                                             className="group flex items-start gap-2.5 rounded-xl p-2 transition-colors hover:bg-primary-50 dark:hover:bg-primary-800/20"
                                           >
-                                            <span className={`mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-r ${s.gradient} text-white shadow-sm`}>
-                                              <Icon className="h-4 w-4" aria-hidden="true" />
+                                            <span className={`mt-0.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-r ${s.gradient} text-white shadow-md`}>
+                                              <Icon className="h-5 w-5" aria-hidden="true" />
                                             </span>
                                             <span className="min-w-0">
-                                              <span className="block truncate text-sm font-semibold text-gray-900 group-hover:text-primary-700 dark:text-gray-100 dark:group-hover:text-primary-300">
+                                              <span className="block truncate font-display text-[15px] font-bold text-gray-900 group-hover:text-primary-700 dark:text-gray-100 dark:group-hover:text-primary-300">
                                                 {s.shortName}
                                               </span>
                                               <span className="block truncate text-xs text-gray-500 dark:text-gray-400">
@@ -293,17 +308,17 @@ const Header: React.FC = () => {
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`text-sm font-medium transition-colors duration-200 relative ${
+                  className={`font-display text-[15px] font-semibold tracking-tight transition-colors duration-200 relative ${
                     isActive(item.path)
                       ? 'text-primary-600 dark:text-primary-400'
-                      : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
+                      : 'text-gray-800 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400'
                   }`}
                 >
                   {item.name}
                   {isActive(item.path) && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-500 to-secondary-500"
+                      className="absolute -bottom-1 left-0 right-0 h-1 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500"
                     />
                   )}
                 </Link>
@@ -312,38 +327,41 @@ const Header: React.FC = () => {
           </nav>
 
           {/* Theme Toggle & Auth & Mobile Menu */}
-          <div className="flex items-center space-x-3 sm:space-x-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             {!isAuthenticated && (
-              <div className="hidden lg:flex items-center space-x-3">
-                <Link to="/login" className="text-sm font-medium text-gray-700 hover:text-primary-600 dark:text-gray-300">Login</Link>
-                <Link to="/signup" className="rounded bg-primary-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-primary-700">Sign up</Link>
+              <div className="hidden items-center gap-4 lg:flex">
+                <Link to="/login" className="font-display text-[15px] font-semibold text-gray-800 hover:text-primary-600 dark:text-gray-200">Login</Link>
+                <Link to="/signup" className="rounded-lg bg-gray-900 px-4 py-2 text-[15px] font-semibold text-white transition hover:bg-gray-700 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200">Sign up</Link>
               </div>
             )}
             <Link
               to="/contact"
-              className="hidden sm:inline-flex min-h-[40px] items-center gap-1.5 rounded-lg bg-gradient-to-r from-primary-600 to-secondary-600 px-4 sm:px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:shadow-lg hover:brightness-110"
+              className="hidden sm:inline-flex min-h-[48px] items-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-secondary-600 px-6 sm:px-7 py-2.5 font-display text-[15px] font-bold text-white shadow-lg shadow-primary-600/25 transition hover:shadow-xl hover:brightness-110"
             >
               Get in Touch <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-primary-50 dark:bg-primary-800 hover:bg-primary-100 dark:hover:bg-primary-700 transition-colors"
+              aria-label="Toggle theme"
+              className="rounded-full border border-gray-200 p-2.5 text-gray-700 transition hover:border-primary-300 hover:text-primary-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-primary-600"
             >
               {theme === 'light' ? (
-                <Moon className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                <Moon className="h-5 w-5" />
               ) : (
-                <Sun className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                <Sun className="h-5 w-5" />
               )}
             </button>
 
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 rounded-lg bg-primary-50 dark:bg-primary-800 hover:bg-primary-100 dark:hover:bg-primary-700 transition-colors"
+              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isMenuOpen}
+              className="rounded-xl bg-gray-900 p-2.5 text-white transition hover:bg-gray-700 dark:bg-white dark:text-gray-900 lg:hidden"
             >
               {isMenuOpen ? (
-                <X className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                <X className="h-5 w-5" />
               ) : (
-                <Menu className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                <Menu className="h-5 w-5" />
               )}
             </button>
           </div>
@@ -355,9 +373,9 @@ const Header: React.FC = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-white dark:bg-primary-900 border-t border-primary-200 dark:border-primary-700"
+            className="lg:hidden overflow-hidden rounded-b-3xl bg-white shadow-2xl dark:bg-primary-900 border-t border-primary-200 dark:border-primary-700"
           >
-            <div className="py-4 space-y-2">
+            <div className="max-h-[calc(100dvh-96px)] overflow-y-auto px-2 py-4 space-y-1">
               {navItems.map((item) => (
                 item.hasAboutMenu ? (
                   <div key={item.name}>
@@ -365,7 +383,7 @@ const Header: React.FC = () => {
                       type="button"
                       onClick={() => setMobileAboutOpen((o) => !o)}
                       aria-expanded={mobileAboutOpen}
-                      className={`flex w-full items-center justify-between px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                      className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-display text-base font-bold tracking-tight transition-colors duration-200 ${
                         isActive(item.path)
                           ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-800/20'
                           : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-800'
@@ -405,7 +423,7 @@ const Header: React.FC = () => {
                       type="button"
                       onClick={() => setMobileServicesOpen((o) => !o)}
                       aria-expanded={mobileServicesOpen}
-                      className={`flex w-full items-center justify-between px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                      className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-display text-base font-bold tracking-tight transition-colors duration-200 ${
                         isActive(item.path)
                           ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-800/20'
                           : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-800'
@@ -461,10 +479,10 @@ const Header: React.FC = () => {
                     key={item.name}
                     to={item.path}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`block px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                    className={`block rounded-xl px-4 py-3 font-display text-lg font-bold tracking-tight transition-colors duration-200 ${
                       isActive(item.path)
                         ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-800/20'
-                        : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-800'
+                        : 'text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-800'
                     }`}
                   >
                     {item.name}
@@ -481,13 +499,13 @@ const Header: React.FC = () => {
                   </Link>
                 </>
               )}
-              <div className="px-4 pt-2">
+              <div className="sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent px-2 pb-2 pt-6 dark:from-primary-900 dark:via-primary-900">
                 <Link
                   to="/contact"
                   onClick={() => setIsMenuOpen(false)}
-                  className="flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-primary-600 to-secondary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md"
+                  className="flex min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary-600 to-secondary-600 px-4 py-3 font-display text-base font-bold text-white shadow-lg"
                 >
-                  Get in Touch <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  Get in Touch <ArrowRight className="h-5 w-5" aria-hidden="true" />
                 </Link>
               </div>
             </div>

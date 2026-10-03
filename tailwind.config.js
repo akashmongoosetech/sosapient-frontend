@@ -6,6 +6,7 @@ export default {
     extend: {
       fontFamily: {
         'inter': ['Inter', 'sans-serif'],
+        'display': ['Sora', 'Inter', 'sans-serif'],
       },
       colors: {
         primary: {
