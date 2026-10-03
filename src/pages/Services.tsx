@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 import HeroSection from "./Service/HeroSection";
 import ServiceSection from "./Service/ServiceSection";
 import StrategicExecution from "./Service/StrategicExecution";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 const Services: React.FC = () => {
   const navigate = useNavigate();

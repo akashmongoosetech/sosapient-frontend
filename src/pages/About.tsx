@@ -12,7 +12,7 @@ import {
 import CoreValues from './About/CoreValues';
 import ServicesSection from './About/ServicesSection';
 import WhatWeDoSection from './About/WhatWeDoSection';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 
 const About: React.FC = () => {
   const teamMembers = [
