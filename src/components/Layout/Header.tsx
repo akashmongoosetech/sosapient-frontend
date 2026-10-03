@@ -88,6 +88,7 @@ const Header: React.FC = () => {
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about', hasAboutMenu: true },
     { name: 'Services', path: '/services', hasMenu: true },
+    { name: 'Case Studies', path: '/case-studies' },
   ];
 
   const isActive = (path: string) => {

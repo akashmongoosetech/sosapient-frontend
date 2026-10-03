@@ -12,6 +12,8 @@ const titles: Record<string, string> = {
   '/admin/subscriber-table': 'Subscribers',
   '/admin/blog-admin': 'Blog Management',
   '/admin/job-admin': 'Job Management',
+  '/admin/case-studies': 'Case Studies',
+  '/admin/case-studies/new': 'New Case Study',
   '/admin/profile': 'Profile'
 };
 
@@ -54,7 +56,7 @@ const AdminLayout: React.FC = () => {
         onLogout={handleLogout}
       />
       <div className={`transition-all duration-200 ${collapsed ? 'lg:pl-[72px]' : 'lg:pl-64'}`}>
-        <AdminHeader onOpenMobile={() => setMobileOpen(true)} title={titles[pathname] || 'Admin'} />
+        <AdminHeader onOpenMobile={() => setMobileOpen(true)} title={titles[pathname] || (pathname.startsWith('/admin/case-studies') ? 'Case Studies' : 'Admin')} />
         <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6">
           <Outlet />
         </main>

@@ -9,6 +9,9 @@ const labels: Record<string, string> = {
   'subscriber-table': 'Subscribers',
   'blog-admin': 'Blog',
   'job-admin': 'Jobs',
+  'case-studies': 'Case Studies',
+  new: 'New',
+  edit: 'Edit',
   profile: 'Profile'
 };
 

@@ -56,7 +56,7 @@ const Footer: React.FC = () => {
     ],
     Resources: [
       { name: 'Blog', path: '/blog' },
-      { name: 'Case Studies', path: '/blog#case-studies' },
+      { name: 'Case Studies', path: '/case-studies' },
       { name: 'Documentation', path: '#' },
       { name: 'Support', path: '/contact' },
     ],

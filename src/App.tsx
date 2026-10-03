@@ -29,6 +29,12 @@ const Signup = lazy(() => import('./pages/Signup'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const AdminProfile = lazy(() => import('./pages/admin/AdminProfile'));
 const ServiceDetail = lazy(() => import('./pages/ServiceDetail'));
+const CaseStudies = lazy(() => import('./pages/CaseStudies'));
+const CaseStudyDetails = lazy(() => import('./pages/CaseStudyDetails'));
+const CaseStudiesPage = lazy(() => import('./pages/admin/CaseStudiesPage'));
+const CaseStudyNewPage = lazy(() => import('./pages/admin/CaseStudyNewPage'));
+const CaseStudyDetailPage = lazy(() => import('./pages/admin/CaseStudyDetailPage'));
+const CaseStudyEditPage = lazy(() => import('./pages/admin/CaseStudyEditPage'));
 
 const RouteFallback: React.FC = () => (
   <div className="flex min-h-screen items-center justify-center text-gray-500">Loading…</div>
@@ -51,6 +57,8 @@ function App() {
                   <Route path="services/:slug" element={<ServiceDetail />} />
                   <Route path="blog" element={<Blog />} />
                   <Route path="blog/:slug" element={<BlogPost />} />
+                  <Route path="case-studies" element={<CaseStudies />} />
+                  <Route path="case-studies/:slug" element={<CaseStudyDetails />} />
                   <Route path="careers" element={<Careers />} />
                   <Route path="careers/:jobId" element={<JobDetails />} />
                   <Route path="contact" element={<Contact />} />
@@ -73,6 +81,10 @@ function App() {
                   <Route path="subscriber-table" element={<SubscriberTable />} />
                   <Route path="blog-admin" element={<BlogAdmin />} />
                   <Route path="job-admin" element={<JobAdmin />} />
+                  <Route path="case-studies" element={<CaseStudiesPage />} />
+                  <Route path="case-studies/new" element={<CaseStudyNewPage />} />
+                  <Route path="case-studies/:id" element={<CaseStudyDetailPage />} />
+                  <Route path="case-studies/:id/edit" element={<CaseStudyEditPage />} />
                   <Route path="profile" element={<AdminProfile />} />
                 </Route>
 

@@ -38,7 +38,8 @@ export const adminNavSections: { heading: string; items: AdminNavItem[] }[] = [
     heading: 'Content',
     items: [
       { to: '/admin/blog-admin', label: 'Blog', icon: <FileText className="h-5 w-5" /> },
-      { to: '/admin/job-admin', label: 'Jobs', icon: <ClipboardList className="h-5 w-5" /> }
+      { to: '/admin/job-admin', label: 'Jobs', icon: <ClipboardList className="h-5 w-5" /> },
+      { to: '/admin/case-studies', label: 'Case Studies', icon: <Briefcase className="h-5 w-5" /> }
     ]
   },
   {
