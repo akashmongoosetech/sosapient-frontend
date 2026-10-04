@@ -14,6 +14,8 @@ const titles: Record<string, string> = {
   '/admin/job-admin': 'Job Management',
   '/admin/case-studies': 'Case Studies',
   '/admin/case-studies/new': 'New Case Study',
+  '/admin/certificates': 'Certificate Generation',
+  '/admin/certificates/new': 'Generate Certificate',
   '/admin/profile': 'Profile'
 };
 
@@ -56,7 +58,7 @@ const AdminLayout: React.FC = () => {
         onLogout={handleLogout}
       />
       <div className={`transition-all duration-200 ${collapsed ? 'lg:pl-[72px]' : 'lg:pl-64'}`}>
-        <AdminHeader onOpenMobile={() => setMobileOpen(true)} title={titles[pathname] || (pathname.startsWith('/admin/case-studies') ? 'Case Studies' : 'Admin')} />
+        <AdminHeader onOpenMobile={() => setMobileOpen(true)} title={titles[pathname] || (pathname.startsWith('/admin/case-studies') ? 'Case Studies' : pathname.startsWith('/admin/certificates') ? 'Certificate Generation' : 'Admin')} />
         <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6">
           <Outlet />
         </main>

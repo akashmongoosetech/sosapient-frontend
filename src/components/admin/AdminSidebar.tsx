@@ -7,6 +7,7 @@ import {
   Users,
   FileText,
   ClipboardList,
+  Award,
   User,
   LogOut,
   X,
@@ -39,7 +40,8 @@ export const adminNavSections: { heading: string; items: AdminNavItem[] }[] = [
     items: [
       { to: '/admin/blog-admin', label: 'Blog', icon: <FileText className="h-5 w-5" /> },
       { to: '/admin/job-admin', label: 'Jobs', icon: <ClipboardList className="h-5 w-5" /> },
-      { to: '/admin/case-studies', label: 'Case Studies', icon: <Briefcase className="h-5 w-5" /> }
+      { to: '/admin/case-studies', label: 'Case Studies', icon: <Briefcase className="h-5 w-5" /> },
+      { to: '/admin/certificates', label: 'Certificates', icon: <Award className="h-5 w-5" /> }
     ]
   },
   {

@@ -35,6 +35,11 @@ const CaseStudiesPage = lazy(() => import('./pages/admin/CaseStudiesPage'));
 const CaseStudyNewPage = lazy(() => import('./pages/admin/CaseStudyNewPage'));
 const CaseStudyDetailPage = lazy(() => import('./pages/admin/CaseStudyDetailPage'));
 const CaseStudyEditPage = lazy(() => import('./pages/admin/CaseStudyEditPage'));
+const CertificatesPage = lazy(() => import('./pages/admin/CertificatesPage'));
+const CertificateNewPage = lazy(() => import('./pages/admin/CertificateNewPage'));
+const CertificateDetailPage = lazy(() => import('./pages/admin/CertificateDetailPage'));
+const CertificateEditPage = lazy(() => import('./pages/admin/CertificateEditPage'));
+const CertificateVerify = lazy(() => import('./pages/CertificateVerify'));
 
 const RouteFallback: React.FC = () => (
   <div className="flex min-h-screen items-center justify-center text-gray-500">Loading…</div>
@@ -85,8 +90,15 @@ function App() {
                   <Route path="case-studies/new" element={<CaseStudyNewPage />} />
                   <Route path="case-studies/:id" element={<CaseStudyDetailPage />} />
                   <Route path="case-studies/:id/edit" element={<CaseStudyEditPage />} />
+                  <Route path="certificates" element={<CertificatesPage />} />
+                  <Route path="certificates/new" element={<CertificateNewPage />} />
+                  <Route path="certificates/:certificateId" element={<CertificateDetailPage />} />
+                  <Route path="certificates/:certificateId/edit" element={<CertificateEditPage />} />
                   <Route path="profile" element={<AdminProfile />} />
                 </Route>
+
+                {/* Public certificate verification (no login) — must stay last: claims /:a/:b */}
+                <Route path=":candidateSlug/:certificateId" element={<CertificateVerify />} />
 
                 {/* Legacy top-level admin paths redirect into the panel */}
                 <Route path="contact-table" element={<Navigate to="/admin/contact-table" replace />} />

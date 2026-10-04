@@ -10,6 +10,7 @@ const labels: Record<string, string> = {
   'blog-admin': 'Blog',
   'job-admin': 'Jobs',
   'case-studies': 'Case Studies',
+  certificates: 'Certificates',
   new: 'New',
   edit: 'Edit',
   profile: 'Profile'
