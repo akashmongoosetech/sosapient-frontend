@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import {
   Code, Server, Smartphone, Cloud, Palette, ShieldCheck, Brain, Workflow,
   Lightbulb, Bot, Database, Briefcase, Users, Factory, Rocket, ArrowRight,
+  Megaphone, Share2,
   type LucideIcon
 } from 'lucide-react';
 import type { Service } from '../../data/services';
@@ -11,7 +12,7 @@ import { primaryTech } from '../../data/services';
 
 export const serviceIcons: Record<string, LucideIcon> = {
   Code, Server, Smartphone, Cloud, Palette, ShieldCheck, Brain, Workflow,
-  Lightbulb, Bot, Database, Briefcase, Users, Factory, Rocket
+  Lightbulb, Bot, Database, Briefcase, Users, Factory, Rocket, Megaphone, Share2
 };
 
 export const serviceIcon = (name: string): LucideIcon => serviceIcons[name] || Briefcase;

@@ -10,10 +10,11 @@ const ServicesSection: React.FC = () => {
 
           <div className="w-full md:w-5/12 px-4 mb-8 md:mb-0">
             <div className="overflow-hidden rounded-lg hover:scale-105 transition-transform duration-300">
-              <img 
-                src="./about/alt-services-pic1.jpg" 
-                className="w-full h-auto" 
-                alt="alt-services-pic1" 
+              <img
+                src="./about/alt-services-pic1.jpg"
+                className="w-full h-auto"
+                alt="Designer and developers building a responsive website"
+                loading="lazy"
               />
             </div>
           </div>

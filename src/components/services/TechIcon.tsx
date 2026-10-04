@@ -4,8 +4,9 @@ import {
   FlaskConical, Brain, Cpu, Sparkles, Zap, Bot, GitBranch, ArrowLeftRight,
   Webhook, AppWindow, Network, Cog, Megaphone, RefreshCw, Calculator, Boxes,
   BadgeCheck, FileSpreadsheet, LayoutDashboard, Flag, Triangle, Waves, KeyRound,
-  Mail, Lock, Bell, Database, Layers, Building2,
-  BarChart3, FileText, FileUp, type LucideIcon
+  Mail, Lock, Bell, Database, Layers, Building2, Briefcase, Settings, MapPin, Search,
+  Globe, ThumbsUp, Camera, Calendar, DollarSign, TrendingUp, Activity,
+  BarChart3, FileText, FileUp, Users, type LucideIcon
 } from 'lucide-react';
 import { BRAND_ICONS } from './brandIcons.generated';
 
@@ -56,6 +57,22 @@ const FALLBACKS: Record<string, LucideIcon> = {
   'Product Analytics': BarChart3,
   'Multi-tenancy': Building2,
   'Feature Flags': Flag,
+  'SEO Audits': Search,
+  'Technical SEO': Settings,
+  'On-Page SEO': FileText,
+  'Local SEO': MapPin,
+  'AEO': Sparkles,
+  'GEO': Globe,
+  'Content Strategy': PenTool,
+  'Analytics': BarChart3,
+  'Conversion Optimization': TrendingUp,
+  'Facebook Marketing': ThumbsUp,
+  'Instagram Marketing': Camera,
+  'LinkedIn Marketing': Briefcase,
+  'Content Calendars': Calendar,
+  'Paid Social Campaigns': DollarSign,
+  'Community Management': Users,
+  'Social Analytics': Activity,
 };
 
 interface TechIconProps {

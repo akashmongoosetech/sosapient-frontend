@@ -49,12 +49,12 @@ const About: React.FC = () => {
                 transition={{ duration: 0.6 }}
                 viewport={{ once: true }}
               >
-                <h3 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                <p className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
                   About Us
-                </h3>
-                <h4 className="text-2xl font-semibold mt-4 text-gray-900 dark:text-white">
+                </p>
+                <h2 className="text-2xl font-semibold mt-4 text-gray-900 dark:text-white">
                   SoSapient is an offshore development centre located in Ujjain, Madhya Pradesh, India
-                </h4>
+                </h2>
                 <div className="space-y-4 mt-6 text-gray-600 dark:text-gray-300">
                   <p className="leading-relaxed">
                     At SoSapient, we are driven by innovation and committed to delivering cutting-edge technology solutions. 
@@ -175,10 +175,11 @@ const About: React.FC = () => {
                 className="relative"
               >
                 <div className="aspect-w-4 aspect-h-3 rounded-2xl overflow-hidden">
-                  <img 
-                    src="./home/about.png" 
-                    className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500" 
-                    alt="Why Choose Us"
+                  <img
+                    src="./home/about.png"
+                    className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
+                    alt="SoSapient developers collaborating in Ujjain, India office"
+                    loading="lazy"
                   />
                 </div>
               </motion.div>

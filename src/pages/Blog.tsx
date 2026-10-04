@@ -184,9 +184,20 @@ const Blog: React.FC = () => {
         <meta property="og:description" content="Insights, guides and updates on web development, AI/ML, cybersecurity and business from the SoSapient team." />
         <meta property="og:url" content={canonical} />
         <meta property="og:site_name" content="SoSapient" />
+        <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Blog | SoSapient" />
         <meta name="twitter:description" content="Insights, guides and updates on web development, AI/ML, cybersecurity and business from the SoSapient team." />
+        <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            name: 'Blog | SoSapient',
+            description: 'Insights, guides and updates on web development, AI/ML, cybersecurity and business.',
+            url: canonical
+          })}
+        </script>
       </Helmet>
       <BlogHero />
       {featured && !searchTerm && selectedCategory === 'All' && currentPage === 1 && (

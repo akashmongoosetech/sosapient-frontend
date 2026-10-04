@@ -114,35 +114,20 @@ const Contact: React.FC = () => {
   return (
     <>
     <Helmet>
-        <title>Contact Us</title>
-        <meta name="description" content="Contact us for better experience" />
-
-        <meta name="keywords" content="Custom Website Development, Website Development, Web Development, App Development, website designing company in ujjain" />
+        <title>Contact Us | Web Development & AI Solutions | SoSapient</title>
+        <meta name="description" content="Start your project with SoSapient — web development, AI automation, CRM/ERP and digital marketing. Based in Ujjain, India, working worldwide." />
 
         <meta name="robots" content="index, follow" />
         <meta property="og:locale" content="en_US" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="Home" />
-        <meta property="og:description" content="Contact us for better experience" />
-        <meta name="twitter:description" content="SoSapient is the best web design company in India that offers quality web designing and website development services to its clients. Hire our website developers/designers Now!" />
+        <meta property="og:title" content="Contact Us | SoSapient" />
+        <meta property="og:description" content="Start your project with SoSapient — web development, AI automation, CRM/ERP and digital marketing." />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Contact Us | SoSapient" />
+        <meta name="twitter:description" content="Start your project with SoSapient — web development, AI automation, CRM/ERP and digital marketing." />
         <meta property="og:url" content="https://sosapient.in/contact" />
         <meta property="og:site_name" content="SoSapient" />
-        <meta property="article:modified_time" content="2023-10-25T12:22:24+00:00" />
-        <meta name="twitter:card" content="summary_large_image" />
         <link rel="canonical" href="https://sosapient.in/contact" />
-        
-        {/* Google verification */}
-        <meta name="google-site-verification" content="LdQ1ZP-JDJl6atTPL-wChsFTW8nj-mHhiyOHnLswCf4" />
-        <meta name="google-site-verification" content="02oqLWZkwHhC_VBUsg6rW7aLNYaNADmJW6iIMyk0qJg" />
-
-        {/* Google Tag Manager */}
-        <script>
-          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer','GTM-KRM9M9LV');`}
-        </script>
       </Helmet>
     <div className="bg-white dark:bg-gray-900">
       {/* Hero Section */}

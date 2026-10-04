@@ -63,14 +63,16 @@ const ServiceSection: React.FC = () => {
                     <img
                       src="./service/car3.png"
                       className="w-full rounded-2xl shadow-xl"
-                      alt="Car illustration"
+                      alt="IT solutions team delivering managed software services"
+                      loading="lazy"
                     />
                   </div>
                   <div className="absolute -bottom-6 -right-6 z-20">
                     <img
                       src="./service/car22.png"
                       className="w-64 rounded-2xl shadow-xl"
-                      alt="Additional illustration"
+                      alt="Support engineer reviewing client software requirements"
+                      loading="lazy"
                     />
                   </div>
                 </div>

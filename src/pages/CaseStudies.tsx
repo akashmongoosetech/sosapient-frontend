@@ -78,9 +78,20 @@ const CaseStudies: React.FC = () => {
         <meta property="og:description" content="Selected SoSapient client projects: real solutions, measurable outcomes, and the technologies behind them." />
         <meta property="og:url" content={canonical} />
         <meta property="og:site_name" content="SoSapient" />
+        <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Case Studies | SoSapient" />
         <meta name="twitter:description" content="Selected SoSapient client projects: real solutions, measurable outcomes, and the technologies behind them." />
+        <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            name: 'Case Studies | SoSapient',
+            description: 'Selected SoSapient client projects: real solutions, measurable outcomes, and the technologies behind them.',
+            url: canonical
+          })}
+        </script>
       </Helmet>
 
       <section className="bg-gradient-to-br from-primary-50 to-secondary-50 py-16 dark:from-gray-800 dark:to-gray-900 sm:py-20">

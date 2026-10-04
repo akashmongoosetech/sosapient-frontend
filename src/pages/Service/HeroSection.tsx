@@ -28,9 +28,9 @@ const HeroSection: React.FC = () => {
                 <Sparkles className="w-4 h-4 mr-2" />
                 Innovative Solutions
               </span>
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+              <p className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
                 Transforming Technology, <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Empowering Your Business</span>
-              </h1>
+              </p>
               <p className="text-xl text-gray-600 dark:text-gray-300">
                 We believe in using the latest technologies advancements to help you achieve your 
                 goals and improve your overall efficiency.
@@ -100,10 +100,11 @@ const HeroSection: React.FC = () => {
                   ease: "easeInOut"
                 }}
               >
-                <img 
-                  src="./service/changes.png" 
-                  className="w-full rounded-2xl shadow-xl" 
-                  alt="services-pic"
+                <img
+                  src="./service/changes.png"
+                  className="w-full rounded-2xl shadow-xl"
+                  alt="Illustration of digital transformation services for business growth"
+                  loading="lazy"
                 />
               </motion.div>
             </div>

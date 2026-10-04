@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../contexts/AuthContext';
 
 function isValidUrl(value: string): boolean {
@@ -81,6 +82,10 @@ const Signup: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-10">
+      <Helmet>
+        <title>Sign up | SoSapient</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <form onSubmit={handleSubmit} className="w-full max-w-lg rounded-lg bg-white p-6 shadow">
         <h1 className="text-xl font-bold text-gray-900">Create account</h1>
         <p className="mt-1 text-sm text-gray-600">Public signup always creates a USER account.</p>

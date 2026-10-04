@@ -46,6 +46,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, index }) => {
         <motion.img
           src={post.image}
           alt={post.title}
+          loading="lazy"
           className="w-full h-48 object-cover"
           whileHover={{ scale: 1.1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}

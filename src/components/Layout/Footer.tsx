@@ -50,8 +50,12 @@ const Footer: React.FC = () => {
     Services: [
       { name: 'Frontend Development', path: '/services/frontend-development' },
       { name: 'AI Development', path: '/services/ai-development' },
+      { name: 'AI Automations', path: '/services/ai-automations' },
+      { name: 'RAG System Integration', path: '/services/rag-system-integration' },
       { name: 'Custom CRM Development', path: '/services/custom-crm-development' },
       { name: 'SaaS Product Development', path: '/services/saas-product-development' },
+      { name: 'Digital Marketing', path: '/services/digital-marketing' },
+      { name: 'Social Media Promotion', path: '/services/social-media-promotion' },
       { name: 'View All Services →', path: '/services' },
     ],
     Resources: [
@@ -116,7 +120,7 @@ const Footer: React.FC = () => {
           {/* Company Info */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center space-x-2 mb-6">
-              <img src="https://ik.imagekit.io/sentyaztie/Dlogo.png?updatedAt=1749928182723" className='w-48' alt="logo" />
+              <img src="https://ik.imagekit.io/sentyaztie/Dlogo.png?updatedAt=1749928182723" className='w-48' alt="SoSapient logo" width={192} height={48} />
             </Link>
             <p className="text-gray-600 mb-6 max-w-md">
               We're a team of passionate developers and designers creating innovative 

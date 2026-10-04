@@ -35,7 +35,7 @@ const Hero: React.FC = () => {
           >
             <Star className="w-4 h-4 text-yellow-500 fill-current" />
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            We Guarantee Results – 100% Success for Your Business!
+              Web, Mobile, AI & Business Software — Built Around Your Goals
             </span>
           </motion.div>
 
@@ -61,9 +61,9 @@ const Hero: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-10"
           >
-            We create cutting-edge software solutions that transform businesses and 
-            deliver exceptional user experiences. From web applications to mobile apps, 
-            we bring your vision to life.
+            We build MERN stack web apps, AI chatbots and automations, custom CRM/ERP
+            software, and digital marketing that brings customers — from Ujjain, India
+            to clients worldwide.
           </motion.p>
 
           {/* CTA Buttons */}

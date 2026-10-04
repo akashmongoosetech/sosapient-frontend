@@ -72,38 +72,30 @@ const About: React.FC = () => {
     <>
 
 <Helmet>
-        <title>SoSapient - About</title>
-        <meta 
-          name="description" 
-          content="SoSapient is a leading IT software development company dedicated to transforming ideas into cutting-edge 
-          solutions. With a passion for innovation and a commitment to excellence, we specialize in crafting bespoke software 
-          applications that drive business growth and success." 
-        />
-        <meta 
-          name="keywords" 
-          content="Custome Website Development, Website Development, Website Developer, Web Development,
-          Web Development Training, App Development, website designing company in ujjain, website design company, website development company" 
-        />
-        <meta 
-          name="keywords" 
-          content=". Boost your skills in software engineering and web development with our expert training programs. Join our software company for internships and hands-on experience that sets you apart in the tech industry!" 
-        />
-        <meta property="og:locale" content="en_US" />
-        <meta property="og:type" content="article" />
-        <meta property="og:title" content="About Us" />
-        <meta 
-          property="og:description" 
-          content="SoSapient is a leading IT software development company dedicated to transforming ideas into cutting-edge 
-          solutions. With a passion for innovation and a commitment to excellence, we specialize in crafting bespoke software 
-          applications that drive business growth and success." 
-        />
+        <title>About SoSapient | Web Development & AI Company in Ujjain, India</title>
         <meta
-          name="robots" 
-          content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" 
+          name="description"
+          content="SoSapient is a software company in Ujjain, India building custom websites, MERN stack apps, AI automation and CRM/ERP solutions for clients worldwide."
+        />
+        <link rel="canonical" href="https://sosapient.in/about" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="About SoSapient | Web Development & AI Company" />
+        <meta
+          property="og:description"
+          content="Custom websites, MERN stack apps, AI automation and CRM/ERP solutions — from Ujjain, India to clients worldwide."
         />
         <meta property="og:url" content="https://sosapient.in/about" />
         <meta property="og:site_name" content="SoSapient" />
-        <link rel="canonical" href="https://sosapient.in/about" />
+        <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="About SoSapient | Web Development & AI Company" />
+        <meta name="twitter:description" content="Custom websites, MERN stack apps, AI automation and CRM/ERP solutions — from Ujjain, India to clients worldwide." />
+        <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <meta
+          name="robots"
+          content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+        />
       </Helmet>
 
     <div className="bg-white dark:bg-gray-900">

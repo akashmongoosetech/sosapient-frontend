@@ -3,7 +3,8 @@ export type ServiceCategory =
   | 'design-quality'
   | 'cloud-infrastructure'
   | 'ai-automation'
-  | 'business-enterprise';
+  | 'business-enterprise'
+  | 'marketing';
 
 export interface ServiceFaq {
   q: string;
@@ -51,6 +52,7 @@ export const SERVICE_CATEGORIES: { id: ServiceCategory; label: string; descripti
   { id: 'cloud-infrastructure', label: 'Cloud & Infrastructure', description: 'Deploy, scale and stay reliable.' },
   { id: 'ai-automation', label: 'AI & Automation', description: 'Intelligent systems that do the busywork.' },
   { id: 'business-enterprise', label: 'Business & Enterprise', description: 'Software that runs your operations.' },
+  { id: 'marketing', label: 'Marketing & Growth', description: 'Get found, get followed, get customers.' },
 ];
 
 export const categoryLabel = (id: ServiceCategory): string =>
@@ -1050,6 +1052,136 @@ export const SERVICES: Service[] = [
     related: ['frontend-development', 'backend-development', 'custom-crm-development', 'ai-development'],
     seoTitle: 'SaaS Product Development Services | SoSapient',
     seoDescription: 'Launch subscription products — multi-tenancy, Stripe billing, onboarding, admin dashboards and analytics.',
+  },
+  {
+    slug: 'digital-marketing',
+    name: 'Digital Marketing',
+    shortName: 'Marketing',
+    tagline: 'Get Found, Get Traffic, Get Customers',
+    shortDescription: 'SEO, AEO/GEO, content strategy and conversion optimization that grow organic traffic.',
+    description: 'We grow your search visibility with technical SEO, content strategy and conversion optimization — including AEO and GEO so AI search engines cite your business too.',
+    icon: 'Megaphone',
+    gradient: 'from-amber-500 to-orange-600',
+    category: 'marketing',
+    tags: ['SEO', 'AEO', 'GEO', 'Content Strategy'],
+    techIntro: 'Our marketing stack blends crawler-first technical fixes with content users genuinely want: search console data for direction, structured content for AI answers, and analytics that tie every change to traffic and leads.',
+    overview: [
+      'Digital marketing only works when the foundation is sound: a fast site, clean technical SEO, and content that answers real questions better than competing pages. Tactics layered on a broken foundation burn budget.',
+      'We start with a technical audit — crawlability, indexability, Core Web Vitals, metadata, structured data — then build a content plan around the searches your customers actually make, including the conversational queries AI assistants answer (AEO) and the entity signals generative engines use (GEO).',
+      'Every engagement reports in plain language: what changed, what moved in rankings and traffic, and what we do next. No vanity metrics, no ranking guarantees — search engines decide rankings, we maximize your eligibility.',
+    ],
+    whyNeed: [
+      { title: 'Invisible in search means invisible to buyers', text: 'Most B2B journeys start with a search. If competitors own page one for your services, you never enter the conversation.' },
+      { title: 'Ads stop the day you stop paying', text: 'Paid clicks rent attention. Organic visibility compounds — content and authority built this year still bring leads next year.' },
+      { title: 'AI search answers without clicking', text: 'Assistants summarize the web instead of listing links. Structured, factual, well-cited content is what gets referenced.' },
+      { title: 'Traffic without conversion is vanity', text: 'Rankings mean little if visitors bounce. We pair visibility work with landing-page and CTA optimization.' },
+    ],
+    benefits: [
+      'Higher rankings for service-intent searches',
+      'Technical issues fixed at the source',
+      'Content that answers customer questions',
+      'Visibility in AI-generated answers',
+      'Local presence for Ujjain and region',
+      'Clear monthly reporting in plain language',
+      'Conversion improvements alongside traffic',
+    ],
+    deliverables: [
+      'Technical SEO audit with prioritized fixes',
+      'Keyword and search-intent map',
+      'On-page optimization (titles, meta, headings, internal links)',
+      'Content briefs or fully written articles',
+      'Structured data (Organization, Service, FAQ, Breadcrumb)',
+      'Local SEO setup and listings review',
+      'AEO/GEO optimization for AI search',
+      'Monthly traffic, ranking and lead report',
+    ],
+    technologies: [
+      { name: 'SEO Audits', category: 'Search', blurb: 'Best for: finding the crawl and index issues costing rankings.' },
+      { name: 'Technical SEO', category: 'Search' },
+      { name: 'On-Page SEO', category: 'Search' },
+      { name: 'Local SEO', category: 'Search' },
+      { name: 'AEO', category: 'AI Search' },
+      { name: 'GEO', category: 'AI Search' },
+      { name: 'Content Strategy', category: 'Content' },
+      { name: 'Analytics', category: 'Measurement' },
+      { name: 'Conversion Optimization', category: 'Measurement' },
+    ],
+    useCases: ['Startups', 'E-commerce', 'Healthcare', 'Education', 'Real Estate', 'Professional Services', 'Hospitality'],
+    faqs: [
+      { q: 'What digital marketing services do you provide?', a: 'Technical SEO audits and fixes, keyword and content strategy, on-page optimization, local SEO, AEO/GEO for AI search, and conversion optimization — all reported monthly in plain language.' },
+      { q: 'Do you provide SEO?', a: 'Yes — technical, on-page, local and content-driven SEO. We fix foundations first, then build visibility that compounds.' },
+      { q: 'What are AEO and GEO?', a: 'Answer Engine Optimization and Generative Engine Optimization: making your content the cited source when AI assistants and generative search answer customer questions.' },
+      { q: 'How long until we see results?', a: 'Technical fixes often move metrics in 4–8 weeks; competitive keywords typically take 3–6 months of consistent work. We set expectations per keyword, not promises.' },
+      { q: 'Do you guarantee first-page rankings?', a: 'No — and you should distrust anyone who does. Rankings depend on search engines and competition; we maximize your eligibility and report honestly.' },
+      { q: 'Do you provide social media promotion?', a: 'Yes — see our Social Media Promotion service for content, campaigns and community growth across major platforms.' },
+    ],
+    related: ['social-media-promotion', 'frontend-development', 'business-solutions', 'saas-product-development'],
+    seoTitle: 'Digital Marketing & SEO Services | SoSapient',
+    seoDescription: 'Technical SEO, content strategy, local SEO, AEO and GEO — grow organic traffic and leads without ranking gimmicks.',
+  },
+  {
+    slug: 'social-media-promotion',
+    name: 'Social Media Promotion',
+    shortName: 'Social Media',
+    tagline: 'Audiences That Become Customers',
+    shortDescription: 'Content, campaigns and community growth across Facebook, Instagram and LinkedIn.',
+    description: 'We run your social presence end to end — content calendars, creatives, campaigns and community management on the platforms where your customers spend time.',
+    icon: 'Share2',
+    gradient: 'from-pink-500 to-rose-600',
+    category: 'marketing',
+    tags: ['Facebook', 'Instagram', 'LinkedIn', 'Content'],
+    techIntro: 'Each platform rewards different behavior: Facebook communities, Instagram visuals and reels, LinkedIn professional authority. We plan per-platform content from one strategy so every post earns its place.',
+    overview: [
+      'Social media fails when it is random posting. It works when every week has a plan: what we publish, where, why, and what business outcome each piece serves — awareness, trust, traffic or leads.',
+      'We operate the full loop: content calendar, creatives and copy, scheduled publishing, comment and message handling, plus monthly reviews of reach, engagement, profile visits and website clicks.',
+      'Paid promotion is used surgically — boosting proven organic winners and running targeted lead campaigns — never as a substitute for content worth promoting.',
+    ],
+    whyNeed: [
+      { title: 'Silent profiles signal dead businesses', text: 'Buyers check socials before enquiring. An active, recent presence answers the trust question before it is asked.' },
+      { title: 'Consistency beats inspiration', text: 'Posting in bursts then vanishing trains algorithms to ignore you. A steady calendar compounds reach.' },
+      { title: 'Each platform plays different', text: 'LinkedIn authority, Instagram discovery, Facebook community — one-size content underperforms everywhere.' },
+      { title: 'Founders run out of hours', text: 'Content, replies and scheduling eat mornings. Delegating the loop returns focus to the business.' },
+    ],
+    benefits: [
+      'Active profiles that build buyer trust',
+      'Consistent, on-brand publishing cadence',
+      'Platform-native content per channel',
+      'Community replies handled promptly',
+      'Campaigns targeted at real audiences',
+      'Monthly reach and lead reporting',
+      'Content library you keep and reuse',
+    ],
+    deliverables: [
+      'Channel strategy (Facebook, Instagram, LinkedIn)',
+      'Monthly content calendar',
+      'Creatives and copy per post',
+      'Scheduled publishing and management',
+      'Comment and message handling',
+      'Paid campaign setup where useful',
+      'Monthly reach, engagement and lead report',
+      'Reusable content asset library',
+    ],
+    technologies: [
+      { name: 'Facebook Marketing', category: 'Platforms' },
+      { name: 'Instagram Marketing', category: 'Platforms' },
+      { name: 'LinkedIn Marketing', category: 'Platforms' },
+      { name: 'Content Calendars', category: 'Operations' },
+      { name: 'Paid Social Campaigns', category: 'Growth' },
+      { name: 'Community Management', category: 'Operations' },
+      { name: 'Social Analytics', category: 'Measurement' },
+    ],
+    useCases: ['Startups', 'E-commerce', 'Healthcare', 'Education', 'Real Estate', 'Hospitality', 'Professional Services'],
+    faqs: [
+      { q: 'Which platforms do you manage?', a: 'Facebook, Instagram and LinkedIn — the channels where most B2B and local B2C buying decisions get researched. We recommend the mix per business, not all three by default.' },
+      { q: 'Do you create the content?', a: 'Yes — calendar, copy, creatives and scheduling are all included. You approve the monthly plan; we handle execution.' },
+      { q: 'Do you run paid campaigns?', a: 'Yes, where the numbers justify it: boosting proven organic posts and running targeted lead or awareness campaigns with clear budgets.' },
+      { q: 'How do you report results?', a: 'Monthly: reach, engagement, follower quality, profile visits, website clicks and leads — tied back to the content that produced them.' },
+      { q: 'Can you handle customer messages?', a: 'Yes — comment moderation and inbox replies within agreed hours, with escalation rules for sensitive issues.' },
+      { q: 'Do you also do SEO?', a: 'Yes — our Digital Marketing service covers technical SEO, content and AI-search visibility, which pairs naturally with social.' },
+    ],
+    related: ['digital-marketing', 'business-solutions', 'frontend-development', 'ai-automations'],
+    seoTitle: 'Social Media Marketing & Promotion | SoSapient',
+    seoDescription: 'Facebook, Instagram and LinkedIn management — content calendars, campaigns and community growth that bring customers.',
   },
 ];
 

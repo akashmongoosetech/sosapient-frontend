@@ -101,10 +101,11 @@ const WhatWeDoSection: React.FC = () => {
             className="relative"
           >
             <div className="relative z-10">
-              <img 
-                src="./about/Group-132998.png" 
-                className="w-full rounded-2xl shadow-xl" 
-                alt="organization" 
+              <img
+                src="./about/Group-132998.png"
+                className="w-full rounded-2xl shadow-xl"
+                alt="SoSapient team collaborating on a software project"
+                loading="lazy"
               />
             </div>
             <motion.div 
@@ -118,10 +119,11 @@ const WhatWeDoSection: React.FC = () => {
                 ease: "easeInOut"
               }}
             >
-              <img 
-                src="./about/mukka.gif" 
-                width="150px" 
-                alt="mukka" 
+              <img
+                src="./about/mukka.gif"
+                width="150px"
+                alt="Animated illustration of a team member at work"
+                loading="lazy"
                 className="rounded-full shadow-lg"
               />
             </motion.div>

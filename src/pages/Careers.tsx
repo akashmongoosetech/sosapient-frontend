@@ -191,19 +191,24 @@ const Careers: React.FC = () => {
   return (
     <>
     <Helmet>
-        <title>SoSapient - Career</title>
-        <meta name="description" content="Join SoSapient — explore open roles, web development careers and growth opportunities with a leading software company." />
+        <title>Careers at SoSapient | Join Our Team in Ujjain, India</title>
+        <meta name="description" content="Join SoSapient — explore open roles in web development, AI and design with a growing software company in Ujjain, India." />
 
         <meta property="og:locale" content="en_US" />
-        <meta property="og:type" content="article" />
-        <meta property="og:title" content="Career" />
-        <meta property="og:description" content="SoSapient is a cluster of the brightest stars working with cutting-edge technologies. Their purpose is anchored in a single truth – bringing real positive changes in an increasingly virtual world." />
-        <meta property="og:url" content="https://sosapient.in/career" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Careers at SoSapient" />
+        <meta property="og:description" content="Join SoSapient — explore open roles in web development, AI and design." />
+        <meta property="og:url" content="https://sosapient.in/careers" />
         <meta property="og:site_name" content="SoSapient" />
+        <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Careers at SoSapient" />
+        <meta name="twitter:description" content="Join SoSapient — explore open roles in web development, AI and design." />
+        <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
 
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-        
-        <link rel="canonical" href="https://sosapient.in/career" />
+
+        <link rel="canonical" href="https://sosapient.in/careers" />
       </Helmet>
     <div className="bg-white dark:bg-gray-900">
       {/* Hero Section */}

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { MapPin, Clock, IndianRupee, Send, CheckCircle, AlertCircle, Share2, Copy, UploadCloud, FileText   } from 'lucide-react';
+import { siteUrl } from '../utils/blog';
 
 const JobDetails: React.FC = () => {
   const { jobId } = useParams();
@@ -41,7 +43,7 @@ const JobDetails: React.FC = () => {
       await navigator.clipboard.writeText(pageUrl);
       setNotification({ type: 'success', message: 'Link copied to clipboard!' });
       setTimeout(() => setNotification(null), 2000);
-    } catch (_) {
+    } catch {
       setNotification({ type: 'error', message: 'Unable to copy link' });
       setTimeout(() => setNotification(null), 2000);
     }
@@ -54,7 +56,9 @@ const JobDetails: React.FC = () => {
       } else {
         copyLink();
       }
-    } catch (_) {}
+    } catch {
+      // user dismissed the share dialog
+    }
   };
 
   useEffect(() => {
@@ -138,8 +142,49 @@ const JobDetails: React.FC = () => {
     return <div className="max-w-5xl mx-auto p-6 text-red-600">{error || 'Job not found'}</div>;
   }
 
+  const canonical = `${siteUrl()}/careers/${jobId}`;
+  const jobTitle = `${job.title} | Careers at SoSapient`;
+  const jobDescription = `${job.title} (${job.type || 'Full-time'}) in ${job.location || 'Ujjain, India'}. ${job.experience ? `Experience: ${job.experience}. ` : ''}Apply with your resume today.`.slice(0, 160);
+
   return (
     <div className="bg-white dark:bg-gray-900">
+      <Helmet>
+        <title>{jobTitle}</title>
+        <meta name="description" content={jobDescription} />
+        <link rel="canonical" href={canonical} />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={jobTitle} />
+        <meta property="og:description" content={jobDescription} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:site_name" content="SoSapient" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={jobTitle} />
+        <meta name="twitter:description" content={jobDescription} />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'JobPosting',
+            title: job.title,
+            description: job.description,
+            employmentType: job.type,
+            hiringOrganization: {
+              '@type': 'Organization',
+              name: 'SoSapient',
+              sameAs: 'https://sosapient.in/'
+            },
+            jobLocation: {
+              '@type': 'Place',
+              address: {
+                '@type': 'PostalAddress',
+                addressLocality: job.location || 'Ujjain',
+                addressRegion: 'Madhya Pradesh',
+                addressCountry: 'IN'
+              }
+            },
+            datePosted: job.createdAt
+          })}
+        </script>
+      </Helmet>
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
