@@ -36,6 +36,25 @@ export function candidateSlug(firstName: string, lastName: string): string {
   return buildSlugPreview(`${firstName} ${lastName}`) || 'candidate';
 }
 
+// Display-only name normalization: "AKash RaIkwar" -> "Akash Raikwar".
+// Handles hyphenated and apostrophe names: "anne-marie o'connor" -> "Anne-Marie O'Connor".
+// Stored values are never modified — apply at render time only.
+export function formatName(firstName: string, lastName: string): string {
+  const titleWord = (word: string): string =>
+    word
+      .toLowerCase()
+      .split(/(-|')/)
+      .map((part) =>
+        part === '-' || part === "'"
+          ? part
+          : part.charAt(0).toUpperCase() + part.slice(1)
+      )
+      .join('');
+  return `${titleWord(String(firstName || '').trim())} ${titleWord(String(lastName || '').trim())}`
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
 export function toDateInputValue(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
