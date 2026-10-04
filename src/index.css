@@ -11,6 +11,26 @@
 }
 
 /* ------------------------------------------------------------------
+ * AI chatbot launcher float (subtle breathing glow, motion-safe only)
+ * ------------------------------------------------------------------ */
+@keyframes chatbot-float {
+  0%, 100% {
+    transform: translateY(0);
+    box-shadow: 0 10px 25px -5px rgba(109, 77, 148, 0.5);
+  }
+  50% {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px -5px rgba(109, 77, 148, 0.65);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chatbot-float {
+    animation: none !important;
+  }
+}
+
+/* ------------------------------------------------------------------
  * Blog rich-content typography (.blog-content scope only)
  * Renders stored CKEditor HTML faithfully. Scoped so Tailwind Preflight
  * resets (which strip list markers, table borders, heading sizes, etc.)
