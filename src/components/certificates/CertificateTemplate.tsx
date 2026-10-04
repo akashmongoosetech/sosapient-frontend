@@ -200,19 +200,76 @@ const CertificateTemplate = forwardRef<CertificateTemplateHandle, Props>(({ data
           </div>
 
           {/* Body */}
-          <div style={{ position: 'absolute', top: 446, left: 0, right: 0, textAlign: 'center', padding: '0 120px', fontSize: 15.5, lineHeight: 1.7, color: INK }}>
+          <div
+            style={{
+              position: 'absolute',
+              top: 446,
+              left: 0,
+              right: 0,
+              textAlign: 'center',
+              padding: '0 120px',
+              fontSize: 15,
+              lineHeight: 1.65,
+              color: INK,
+            }}
+          >
             <span style={{ fontStyle: 'italic' }}>
               This is to certify that the candidate has successfully completed{' '}
-              <strong style={{ fontStyle: 'normal', color: NAVY }}>{sentenceDuration(data.durationText)}</strong>{' '}
-              of an internship training program in <strong style={{ fontStyle: 'normal', color: NAVY }}>{data.course}</strong>{' '}
-              with wonderful remarks at SOSAPIENT from{' '}
-              <strong style={{ fontStyle: 'normal', color: NAVY }}>{formatDate(data.startDate)}</strong> to{' '}
-              <strong style={{ fontStyle: 'normal', color: NAVY }}>{formatDate(data.endDate)}</strong>.
-              The candidate demonstrated valuable skills and made meaningful contributions to the
-              tasks and projects throughout the internship.
+              <strong
+                style={{
+                  fontStyle: 'normal',
+                  color: NAVY,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {sentenceDuration(data.durationText)}
+              </strong>{' '}
+              of internship training as a{' '}
+              <strong
+                style={{
+                  fontStyle: 'normal',
+                  color: NAVY,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {data.course}
+              </strong>{' '}
+              at{' '}
+              <strong
+                style={{
+                  fontStyle: 'normal',
+                  color: NAVY,
+                }}
+              >
+                SOSAPIENT
+              </strong>{' '}
+              from{' '}
+              <strong style={{ fontStyle: 'normal', color: NAVY }}>
+                {formatDate(data.startDate)}
+              </strong>{' '}
+              to{' '}
+              <strong style={{ fontStyle: 'normal', color: NAVY }}>
+                {formatDate(data.endDate)}
+              </strong>
+              . During the internship, the candidate gained practical knowledge and
+              hands-on experience in the respective field, demonstrated strong
+              problem-solving skills, and contributed effectively to assigned tasks and
+              projects. The candidate displayed professionalism, dedication, and a
+              strong willingness to learn throughout the training period. We appreciate
+              the candidate's valuable contribution and wish them continued success in
+              their future career.
             </span>
+
             {data.college && (
-              <div style={{ marginTop: 10, fontSize: 13.5, fontStyle: 'normal', color: '#6d6890', letterSpacing: 0.4 }}>
+              <div
+                style={{
+                  marginTop: 10,
+                  fontSize: 13.5,
+                  fontStyle: 'normal',
+                  color: '#6d6890',
+                  letterSpacing: 0.4,
+                }}
+              >
                 {data.college}
               </div>
             )}

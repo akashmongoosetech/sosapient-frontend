@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../contexts/AuthContext';
 
 const Login: React.FC = () => {
-  const { login, isAdmin, user } = useAuth();
+  const { login, isAdmin, user, loading } = useAuth();
   const navigate = useNavigate();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -16,9 +16,9 @@ const Login: React.FC = () => {
   };
 
   React.useEffect(() => {
-    if (user) redirectFor(user.role);
+    if (!loading && user) redirectFor(user.role);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loading, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
