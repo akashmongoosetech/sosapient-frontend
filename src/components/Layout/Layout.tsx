@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
 import ScrollToTop from './ScrollToTop';
 import LatestBlogPopup from './LatestBlogPopup';
+
+// Lazy so the chatbot never slows the initial page load
+const ChatbotWidget = lazy(() => import('../chatbot/ChatbotWidget'));
 
 const Layout: React.FC = () => {
   return (
@@ -15,6 +18,9 @@ const Layout: React.FC = () => {
       <Footer />
       <ScrollToTop />
       <LatestBlogPopup />
+      <Suspense fallback={null}>
+        <ChatbotWidget />
+      </Suspense>
     </div>
   );
 };
