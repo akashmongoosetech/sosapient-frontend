@@ -19,10 +19,10 @@ const fadeUp = {
   transition: { duration: 0.5 }
 };
 
-export const IndustrySectionShell: React.FC<{ eyebrow?: string; title: string; subtitle?: string; children: React.ReactNode; tinted?: boolean }> = ({
-  eyebrow, title, subtitle, children, tinted = false
+export const IndustrySectionShell: React.FC<{ eyebrow?: string; title: string; subtitle?: string; children: React.ReactNode; tinted?: boolean; id?: string }> = ({
+  eyebrow, title, subtitle, children, tinted = false, id
 }) => (
-  <section className={`py-14 sm:py-20 ${tinted ? 'bg-gray-50 dark:bg-gray-800/50' : ''}`}>
+  <section id={id} className={`scroll-mt-24 py-14 sm:py-20 ${tinted ? 'bg-gray-50 dark:bg-gray-800/50' : ''}`}>
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <motion.div {...fadeUp} className="mx-auto mb-10 max-w-3xl text-center">
         {eyebrow && (
@@ -35,48 +35,6 @@ export const IndustrySectionShell: React.FC<{ eyebrow?: string; title: string; s
     </div>
   </section>
 );
-
-export const IndustryHero: React.FC<{ industry: Industry }> = ({ industry }) => {
-  const Icon = serviceIcon(industry.icon);
-  return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-secondary-50 py-16 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center">
-          <span className={`inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-r ${industry.gradient} text-white shadow-lg`}>
-            <Icon className="h-8 w-8" aria-hidden="true" />
-          </span>
-          <p className="mt-5 text-sm font-semibold uppercase tracking-wider text-primary-600 dark:text-primary-400">
-            Industry Solutions
-          </p>
-          <h1 className="mt-2 text-3xl font-bold text-gray-900 dark:text-white sm:text-5xl">{industry.name}</h1>
-          <p className="mt-3 text-xl font-medium text-primary-700 dark:text-primary-300">{industry.tagline}</p>
-          <p className="mx-auto mt-4 max-w-2xl text-gray-600 dark:text-gray-300">{industry.description}</p>
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link
-              to="/contact"
-              className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-primary-600 px-8 py-3 font-semibold text-white transition hover:bg-primary-700"
-            >
-              Start Your Project <ArrowRight className="h-5 w-5" aria-hidden="true" />
-            </Link>
-            <Link
-              to="/contact"
-              className="inline-flex min-h-[48px] items-center justify-center rounded-lg border-2 border-primary-600 px-8 py-3 font-semibold text-primary-700 transition hover:bg-primary-50 dark:text-primary-300 dark:hover:bg-primary-800/20"
-            >
-              Talk to an Expert
-            </Link>
-          </div>
-          <nav aria-label="Breadcrumb" className="mt-6 text-sm text-gray-500 dark:text-gray-400">
-            <Link to="/" className="hover:underline">Home</Link>
-            <span className="mx-2" aria-hidden="true">/</span>
-            <Link to="/industries" className="hover:underline">Industries</Link>
-            <span className="mx-2" aria-hidden="true">/</span>
-            <span aria-current="page" className="text-gray-700 dark:text-gray-300">{industry.name}</span>
-          </nav>
-        </motion.div>
-      </div>
-    </section>
-  );
-};
 
 export const IndustryOverview: React.FC<{ industry: Industry }> = ({ industry }) => (
   <IndustrySectionShell eyebrow="Overview" title={`Digital Transformation in ${industry.shortName}`}>
@@ -104,7 +62,7 @@ export const IndustryChallenges: React.FC<{ industry: Industry }> = ({ industry 
 );
 
 export const IndustrySolutions: React.FC<{ industry: Industry }> = ({ industry }) => (
-  <IndustrySectionShell eyebrow="Solutions" title={`Solutions We Build for ${industry.shortName}`}>
+  <IndustrySectionShell eyebrow="Solutions" title={`Solutions We Build for ${industry.shortName}`} id="solutions">
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {industry.solutions.map((s, i) => {
         const Icon = serviceIcon(s.icon);

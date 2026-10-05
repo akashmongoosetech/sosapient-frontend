@@ -15,6 +15,7 @@ import {
   Instagram
 } from 'lucide-react';
 import { Helmet } from "react-helmet-async";
+import PremiumHero from "../components/heroes/PremiumHero";
 
 interface ContactFormData {
   name: string;
@@ -130,28 +131,42 @@ const Contact: React.FC = () => {
         <link rel="canonical" href="https://sosapient.in/contact" />
       </Helmet>
     <div className="bg-white dark:bg-gray-900">
-      {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-primary-50 to-secondary-50 dark:from-gray-800 dark:to-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
-          >
-            <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-              Get In{' '}
-              <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                Touch
-              </span>
-            </h1>
-            <p className="text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Ready to start your next project? We'd love to hear from you. 
-              Send us a message and we'll respond as soon as possible.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      <PremiumHero
+        badgeIcon="Mail"
+        badgeLabel="Contact SoSapient"
+        gradient="from-primary-500 to-secondary-500"
+        headline={
+          <>
+            Get In{' '}
+            <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+              Touch
+            </span>
+          </>
+        }
+        description="Ready to start your next project? We'd love to hear from you. Send us a message and we'll respond as soon as possible."
+        primaryCta={{ label: 'Send a Message', href: '#contact-form' }}
+        secondaryCta={{ label: 'Our Location', href: '#location' }}
+        trust={['Replies Within 24 Hours', 'Ujjain, India · Worldwide', 'No Spam, Ever']}
+        breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'Contact' }]}
+        hero={{
+          headline: 'Get In Touch',
+          description: '',
+          trust: [],
+          visual: {
+            variant: 'message',
+            panelTitle: 'Start a Conversation · Live',
+            stats: [
+              { label: 'Your Message', value: 'Hi! We need a project quote…', sub: 'typical first message' },
+              { label: 'Email Us', value: 'info.sosapient@gmail.com', sub: 'for new projects' },
+              { label: 'Call Us', value: '+91-9685533878', sub: 'Mon–Fri, 10AM–8PM' },
+            ],
+            floats: [
+              { title: 'Message Received', subtitle: 'we reply within 24 hours', icon: 'Send' },
+              { title: 'Ujjain, India', subtitle: 'working worldwide', icon: 'MapPin' },
+            ],
+          },
+        }}
+      />
 
       {/* Contact Info Cards */}
       <section className="py-20">
@@ -185,7 +200,7 @@ const Contact: React.FC = () => {
       </section>
 
       {/* Contact Form & Map */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-800">
+      <section id="contact-form" className="py-20 bg-gray-50 dark:bg-gray-800 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Form */}
@@ -388,7 +403,7 @@ const Contact: React.FC = () => {
               className="space-y-8"
             >
               {/* Map Placeholder */}
-              <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg border border-gray-100 dark:border-gray-700">
+              <div id="location" className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg border border-gray-100 dark:border-gray-700 scroll-mt-20">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                   Our Location
                 </h3>

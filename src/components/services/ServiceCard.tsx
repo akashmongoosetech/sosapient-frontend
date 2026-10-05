@@ -6,6 +6,8 @@ import {
   Lightbulb, Bot, Database, Briefcase, Users, Factory, Rocket, ArrowRight,
   Megaphone, Share2, HeartPulse, ShoppingCart, GraduationCap, Building2,
   Plane, Gamepad2, Scale, Clapperboard, Truck, AppWindow, Plug,
+  ClipboardCheck, Package, HelpCircle, Flame, CheckCircle, KeyRound,
+  Trophy, FileText, BadgeCheck, Send, Mail, MapPin,
   type LucideIcon
 } from 'lucide-react';
 import type { Service } from '../../data/services';
@@ -15,7 +17,8 @@ export const serviceIcons: Record<string, LucideIcon> = {
   Code, Server, Smartphone, Cloud, Palette, ShieldCheck, Brain, Workflow,
   Lightbulb, Bot, Database, Briefcase, Users, Factory, Rocket, Megaphone, Share2,
   HeartPulse, ShoppingCart, GraduationCap, Building2, Plane, Gamepad2, Scale,
-  Clapperboard, Truck, AppWindow, Plug
+  Clapperboard, Truck, AppWindow, Plug, ClipboardCheck, Package, HelpCircle,
+  Flame, CheckCircle, KeyRound, Trophy, FileText, BadgeCheck, Send, Mail, MapPin
 };
 
 export const serviceIcon = (name: string): LucideIcon => serviceIcons[name] || Briefcase;

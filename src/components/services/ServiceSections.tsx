@@ -7,7 +7,9 @@ import {
 } from 'lucide-react';
 import type { Service } from '../../data/services';
 import { relatedServices, categoryLabel, techGroups } from '../../data/services';
-import ServiceCard, { serviceIcon } from './ServiceCard';
+import { getServiceHero } from '../../data/serviceHeros';
+import PremiumHero from '../heroes/PremiumHero';
+import ServiceCard from './ServiceCard';
 import TechIcon from './TechIcon';
 
 const fadeUp = {
@@ -35,44 +37,29 @@ export const SectionShell: React.FC<{ eyebrow?: string; title: string; subtitle?
 );
 
 export const ServiceHero: React.FC<{ service: Service }> = ({ service }) => {
-  const Icon = serviceIcon(service.icon);
+  const hero = getServiceHero(service.slug) || {
+    headline: service.name,
+    description: service.description,
+    trust: [],
+    visual: { variant: 'dashboard' as const, panelTitle: 'Overview', stats: [], floats: [] },
+  };
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-secondary-50 py-16 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center">
-          <span className={`inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-r ${service.gradient} text-white shadow-lg`}>
-            <Icon className="h-8 w-8" aria-hidden="true" />
-          </span>
-          <p className="mt-5 text-sm font-semibold uppercase tracking-wider text-primary-600 dark:text-primary-400">
-            {categoryLabel(service.category)}
-          </p>
-          <h1 className="mt-2 text-3xl font-bold text-gray-900 dark:text-white sm:text-5xl">{service.name}</h1>
-          <p className="mt-3 text-xl font-medium text-primary-700 dark:text-primary-300">{service.tagline}</p>
-          <p className="mx-auto mt-4 max-w-2xl text-gray-600 dark:text-gray-300">{service.description}</p>
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link
-              to="/contact"
-              className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-primary-600 px-8 py-3 font-semibold text-white transition hover:bg-primary-700"
-            >
-              Start Your Project <ArrowRight className="h-5 w-5" aria-hidden="true" />
-            </Link>
-            <Link
-              to="/contact"
-              className="inline-flex min-h-[48px] items-center justify-center rounded-lg border-2 border-primary-600 px-8 py-3 font-semibold text-primary-700 transition hover:bg-primary-50 dark:text-primary-300 dark:hover:bg-primary-800/20"
-            >
-              Contact Us
-            </Link>
-          </div>
-          <nav aria-label="Breadcrumb" className="mt-6 text-sm text-gray-500 dark:text-gray-400">
-            <Link to="/" className="hover:underline">Home</Link>
-            <span className="mx-2" aria-hidden="true">/</span>
-            <Link to="/services" className="hover:underline">Services</Link>
-            <span className="mx-2" aria-hidden="true">/</span>
-            <span aria-current="page" className="text-gray-700 dark:text-gray-300">{service.name}</span>
-          </nav>
-        </motion.div>
-      </div>
-    </section>
+    <PremiumHero
+      badgeIcon={service.icon}
+      badgeLabel={`${categoryLabel(service.category)} · ${service.name}`}
+      gradient={service.gradient}
+      headline={hero.headline}
+      description={hero.description}
+      primaryCta={{ label: 'Start Your Project', to: '/contact' }}
+      secondaryCta={{ label: 'Explore Services', to: '/services' }}
+      trust={hero.trust}
+      breadcrumbs={[
+        { label: 'Home', to: '/' },
+        { label: 'Services', to: '/services' },
+        { label: service.name },
+      ]}
+      hero={hero}
+    />
   );
 };
 

@@ -13,6 +13,7 @@ import CoreValues from './About/CoreValues';
 import ServicesSection from './About/ServicesSection';
 import WhatWeDoSection from './About/WhatWeDoSection';
 import { Helmet } from 'react-helmet-async';
+import PremiumHero from '../components/heroes/PremiumHero';
 
 const About: React.FC = () => {
   const teamMembers = [
@@ -99,28 +100,43 @@ const About: React.FC = () => {
       </Helmet>
 
     <div className="bg-white dark:bg-gray-900">
-      {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-primary-50 to-secondary-50 dark:from-gray-800 dark:to-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
-          >
-            <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-              About{' '}
-              <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                Sosapient
-              </span>
-            </h1>
-            <p className="text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              We're not just a software company – we're your partners in digital transformation, 
-              committed to turning your vision into reality through innovative technology solutions.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      <PremiumHero
+        badgeIcon="Users"
+        badgeLabel="About SoSapient"
+        gradient="from-primary-500 to-secondary-500"
+        headline={
+          <>
+            About{' '}
+            <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+              Sosapient
+            </span>
+          </>
+        }
+        description="We're not just a software company — we're your partners in digital transformation, committed to turning your vision into reality through innovative technology solutions."
+        primaryCta={{ label: "Let's Work Together", to: '/contact' }}
+        secondaryCta={{ label: 'Our Journey', href: '#journey' }}
+        trust={['50+ Projects Delivered', '20+ Happy Clients', '98% Client Satisfaction']}
+        breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'About' }]}
+        hero={{
+          headline: 'About Sosapient',
+          description: '',
+          trust: [],
+          visual: {
+            variant: 'network',
+            panelTitle: 'What Drives Us · Live',
+            stats: [
+              { label: 'Technology', value: 'Core', sub: 'modern stacks, done right' },
+              { label: 'People', value: 'First', sub: 'partners, not vendors' },
+              { label: 'Innovation', value: 'Daily', sub: 'AI-first mindset' },
+              { label: 'Growth', value: 'Yours', sub: 'outcomes over output' },
+            ],
+            floats: [
+              { title: 'Mission-Driven Team', subtitle: 'Ujjain · working worldwide', icon: 'Users' },
+              { title: 'AI-First Mindset', subtitle: 'in every engagement', icon: 'Brain' },
+            ],
+          },
+        }}
+      />
 
       {/* Mission & Vision */}
       <section className="py-20">
@@ -169,7 +185,7 @@ const About: React.FC = () => {
     <ServicesSection/>
 
       {/* Timeline */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-800">
+      <section id="journey" className="py-20 bg-gray-50 dark:bg-gray-800 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

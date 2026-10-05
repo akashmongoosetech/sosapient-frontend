@@ -2,18 +2,15 @@ import React from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  CheckCircle,
-  Star,
-  Users,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import HeroSection from "./Service/HeroSection";
 import ServiceSection from "./Service/ServiceSection";
 import StrategicExecution from "./Service/StrategicExecution";
 import { Helmet } from "react-helmet-async";
 import { SERVICES, SERVICE_CATEGORIES, servicesByCategory } from "../data/services";
 import ServiceCard from "../components/services/ServiceCard";
+import PremiumHero from "../components/heroes/PremiumHero";
 
 const Services: React.FC = () => {
   const navigate = useNavigate();
@@ -75,57 +72,42 @@ const Services: React.FC = () => {
         <link rel="canonical" href="https://sosapient.in/services" />
       </Helmet>
       <div className="bg-white dark:bg-gray-900">
-        {/* Hero Section */}
-        <section className="py-20 bg-gradient-to-br from-primary-50 to-secondary-50 dark:from-gray-800 dark:to-gray-900">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center"
-            >
-              <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-                Digital Solutions{" "}
-                <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                  Built for Growth
-                </span>
-              </h1>
-              <p className="text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
-                End-to-end development, AI, automation, cloud, security and
-                business software — {SERVICES.length} specialized services
-                designed around your business needs.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-                <button
-                  onClick={() => navigate("/contact")}
-                  className="inline-flex min-h-[48px] items-center justify-center gap-2 px-8 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition"
-                >
-                  Start a Project <ArrowRight className="w-5 h-5" aria-hidden="true" />
-                </button>
-                <a
-                  href="#services-categories"
-                  className="inline-flex min-h-[48px] items-center justify-center px-8 py-3 border-2 border-primary-600 text-primary-700 dark:text-primary-300 rounded-lg font-semibold hover:bg-primary-50 dark:hover:bg-primary-800/20 transition"
-                >
-                  Explore Services
-                </a>
-              </div>
-              <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  <span>50+ Projects Delivered</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Star className="w-4 h-4 text-yellow-500" />
-                  <span>98% Client Satisfaction</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Users className="w-4 h-4 text-blue-500" />
-                  <span>25+ Expert Developers</span>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </section>
+        <PremiumHero
+          badgeIcon="Rocket"
+          badgeLabel="Digital Solutions"
+          gradient="from-primary-500 to-secondary-500"
+          headline={
+            <>
+              Digital Solutions{" "}
+              <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                Built for Growth
+              </span>
+            </>
+          }
+          description={`End-to-end development, AI, automation, cloud, security and business software — ${SERVICES.length} specialized services designed around your business needs.`}
+          primaryCta={{ label: "Start a Project", to: "/contact" }}
+          secondaryCta={{ label: "Explore Services", href: "#services-categories" }}
+          trust={["50+ Projects Delivered", "98% Client Satisfaction", "25+ Expert Developers"]}
+          breadcrumbs={[{ label: "Home", to: "/" }, { label: "Services" }]}
+          hero={{
+            headline: "Digital Solutions Built for Growth",
+            description: "",
+            trust: [],
+            visual: {
+              variant: "network",
+              panelTitle: "Service Ecosystem · Live",
+              stats: SERVICE_CATEGORIES.map((cat) => ({
+                label: cat.label,
+                value: String(servicesByCategory(cat.id).length),
+                sub: "services",
+              })),
+              floats: [
+                { title: `${SERVICES.length} Services Live`, subtitle: "across 6 categories", icon: "Rocket" },
+                { title: "AI + Cloud + Web", subtitle: "one team, end to end", icon: "Brain" },
+              ],
+            },
+          }}
+        />
 
         <HeroSection />
 

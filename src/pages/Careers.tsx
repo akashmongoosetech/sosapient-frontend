@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from "react-helmet-async";
-import { 
-  MapPin, 
-  Clock, 
-  IndianRupee, 
-  Users, 
-  Heart, 
+import PremiumHero from '../components/heroes/PremiumHero';
+import {
+  MapPin,
+  Clock,
+  IndianRupee,
+  Heart,
   Coffee,
   Laptop,
   Award,
@@ -211,45 +211,45 @@ const Careers: React.FC = () => {
         <link rel="canonical" href="https://sosapient.in/careers" />
       </Helmet>
     <div className="bg-white dark:bg-gray-900">
-      {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-primary-50 to-secondary-50 dark:from-gray-800 dark:to-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
-          >
-            <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-              Join Our{' '}
-              <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                Team
-              </span>
-            </h1>
-            <p className="text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
-              Be part of a dynamic team that's shaping the future of technology. 
-              We're looking for passionate individuals who want to make a difference.
-            </p>
-            <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-600 dark:text-gray-400">
-              <div className="flex items-center space-x-2">
-                <Users className="w-4 h-4 text-primary-500" />
-                <span>50+ Team Members</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <MapPin className="w-4 h-4 text-primary-500" />
-                <span>Multiple Locations</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Award className="w-4 h-4 text-primary-500" />
-                <span>Award-Winning Culture</span>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      <PremiumHero
+        badgeIcon="Users"
+        badgeLabel="Careers at SoSapient"
+        gradient="from-primary-500 to-secondary-500"
+        headline={
+          <>
+            Join Our{' '}
+            <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+              Team
+            </span>
+          </>
+        }
+        description="Be part of a dynamic team that's shaping the future of technology. We're looking for passionate individuals who want to make a difference."
+        primaryCta={{ label: 'Explore Open Positions', href: '#open-positions' }}
+        secondaryCta={{ label: 'Why Work With Us', href: '#why-us' }}
+        trust={['Modern Stacks & AI Tools', 'Mentorship & Growth', 'Meaningful Products']}
+        breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'Careers' }]}
+        hero={{
+          headline: 'Join Our Team',
+          description: '',
+          trust: [],
+          visual: {
+            variant: 'jobs',
+            panelTitle: 'Teams Hiring · Live',
+            stats: [
+              { label: 'Engineering', value: 'View roles', sub: 'React · Node · AI' },
+              { label: 'Design', value: 'View roles', sub: 'UI/UX · Brand' },
+              { label: 'Growth', value: 'View roles', sub: 'Marketing · Content' },
+            ],
+            floats: [
+              { title: 'New Role Posted', subtitle: 'AI Engineer · Ujjain', icon: 'Briefcase' },
+              { title: 'Applications Open', subtitle: 'we reply to every one', icon: 'Send' },
+            ],
+          },
+        }}
+      />
 
       {/* Why Work With Us */}
-      <section className="py-20">
+      <section id="why-us" className="py-20 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -293,7 +293,7 @@ const Careers: React.FC = () => {
       </section>
 
       {/* Job Openings */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-800">
+      <section id="open-positions" className="py-20 bg-gray-50 dark:bg-gray-800 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

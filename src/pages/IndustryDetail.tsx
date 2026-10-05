@@ -3,8 +3,9 @@ import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { industryBySlug } from '../data/industries';
 import { siteUrl } from '../utils/blog';
+import IndustryHero from '../components/industries/IndustryHero';
 import {
-  IndustryHero, IndustryOverview, IndustryChallenges, IndustrySolutions,
+  IndustryOverview, IndustryChallenges, IndustrySolutions,
   IndustryTechnologies, IndustryBenefits, ServiceProcess, ServiceWhyUs,
   IndustryUseCases, IndustryFaq, RelatedIndustries, IndustryFinalCta
 } from '../components/industries/IndustrySections';

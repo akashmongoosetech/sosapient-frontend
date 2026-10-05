@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Smooth anchor scrolling (e.g. hero "Explore Solutions" -> #solutions),
+   disabled for users who prefer reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 
 .Our-Vision:hover{
    box-shadow: 5px 10px 10px 0px #a78cf1;
