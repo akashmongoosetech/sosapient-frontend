@@ -58,6 +58,16 @@ const Footer: React.FC = () => {
       { name: 'Social Media Promotion', path: '/services/social-media-promotion' },
       { name: 'View All Services →', path: '/services' },
     ],
+    Industries: [
+      { name: 'Healthcare & Telehealth', path: '/industries/healthcare-telehealth' },
+      { name: 'E-commerce & Retail', path: '/industries/ecommerce-retail' },
+      { name: 'AI & Automation', path: '/industries/artificial-intelligence-automation' },
+      { name: 'Cloud & DevOps', path: '/industries/cloud-devops' },
+      { name: 'Cybersecurity', path: '/industries/cybersecurity' },
+      { name: 'Education & EdTech', path: '/industries/education-edtech' },
+      { name: 'Manufacturing & Logistics', path: '/industries/manufacturing-logistics' },
+      { name: 'View All Industries →', path: '/industries' },
+    ],
     Resources: [
       { name: 'Blog', path: '/blog' },
       { name: 'Case Studies', path: '/case-studies' },
@@ -116,7 +126,7 @@ const Footer: React.FC = () => {
 
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
           {/* Company Info */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center space-x-2 mb-6">

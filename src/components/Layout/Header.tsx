@@ -5,6 +5,7 @@ import { Menu, X, Moon, Sun, ChevronDown, ArrowRight, ArrowUpRight, Info, Newspa
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { SERVICES, SERVICE_CATEGORIES, servicesByCategory } from '../../data/services';
+import { INDUSTRIES } from '../../data/industries';
 import { serviceIcon } from '../services/ServiceCard';
 
 const Header: React.FC = () => {
@@ -12,8 +13,10 @@ const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [industriesOpen, setIndustriesOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const [mobileAboutOpen, setMobileAboutOpen] = useState(false);
+  const [mobileIndustriesOpen, setMobileIndustriesOpen] = useState(false);
   const closeTimer = useRef<number | null>(null);
   const { theme, toggleTheme } = useTheme();
   const { isAuthenticated } = useAuth();
@@ -36,28 +39,38 @@ const Header: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!servicesOpen && !aboutOpen) return;
+    if (!servicesOpen && !aboutOpen && !industriesOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setServicesOpen(false);
         setAboutOpen(false);
+        setIndustriesOpen(false);
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [servicesOpen, aboutOpen]);
+  }, [servicesOpen, aboutOpen, industriesOpen]);
 
   // Close the menus on route change
   useEffect(() => {
     setServicesOpen(false);
     setAboutOpen(false);
+    setIndustriesOpen(false);
     setMobileServicesOpen(false);
     setMobileAboutOpen(false);
+    setMobileIndustriesOpen(false);
   }, [location.pathname]);
+
+  const closeAllDropdowns = () => {
+    setAboutOpen(false);
+    setServicesOpen(false);
+    setIndustriesOpen(false);
+  };
 
   const openServices = () => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
     setAboutOpen(false);
+    setIndustriesOpen(false);
     setServicesOpen(true);
   };
 
@@ -69,12 +82,25 @@ const Header: React.FC = () => {
   const openAbout = () => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
     setServicesOpen(false);
+    setIndustriesOpen(false);
     setAboutOpen(true);
   };
 
   const scheduleCloseAbout = () => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
     closeTimer.current = window.setTimeout(() => setAboutOpen(false), 150);
+  };
+
+  const openIndustries = () => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    setServicesOpen(false);
+    setAboutOpen(false);
+    setIndustriesOpen(true);
+  };
+
+  const scheduleCloseIndustries = () => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    closeTimer.current = window.setTimeout(() => setIndustriesOpen(false), 150);
   };
 
   const aboutMenuItems = [
@@ -88,6 +114,7 @@ const Header: React.FC = () => {
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about', hasAboutMenu: true },
     { name: 'Services', path: '/services', hasMenu: true },
+    { name: 'Industries', path: '/industries', hasIndustriesMenu: true },
     { name: 'Case Studies', path: '/case-studies' },
   ];
 
@@ -109,14 +136,14 @@ const Header: React.FC = () => {
     >
       {/* Click-outside backdrop while a dropdown is open */}
       <AnimatePresence>
-        {(servicesOpen || aboutOpen) && (
+        {(servicesOpen || aboutOpen || industriesOpen) && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             aria-hidden="true"
-            onClick={() => { setServicesOpen(false); setAboutOpen(false); }}
+            onClick={closeAllDropdowns}
             className="fixed inset-0 hidden bg-secondary-950/25 backdrop-blur-[2px] dark:bg-black/45 lg:block"
           />
         )}
@@ -375,6 +402,108 @@ const Header: React.FC = () => {
                     )}
                   </AnimatePresence>
                 </div>
+              ) : item.hasIndustriesMenu ? (
+                <div
+                  key={item.name}
+                  className="static"
+                  onMouseEnter={openIndustries}
+                  onMouseLeave={scheduleCloseIndustries}
+                >
+                  <Link
+                    to={item.path}
+                    aria-expanded={industriesOpen}
+                    aria-haspopup="true"
+                    onFocus={openIndustries}
+                    onClick={() => setIndustriesOpen(false)}
+                    className={`flex items-center gap-1.5 font-display text-[15px] font-semibold tracking-tight transition-colors duration-200 relative ${
+                      isActive(item.path)
+                        ? 'text-primary-600 dark:text-primary-400'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
+                    }`}
+                  >
+                    {item.name}
+                    <ChevronDown className={`h-4 w-4 transition-transform ${industriesOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+                    {isActive(item.path) && (
+                      <motion.div
+                        layoutId="activeTab"
+                        className="absolute -bottom-1 left-0 right-0 h-1 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500"
+                      />
+                    )}
+                  </Link>
+                  <AnimatePresence>
+                    {industriesOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 8 }}
+                        transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+                        className="absolute inset-x-0 top-full z-50"
+                        onMouseEnter={openIndustries}
+                        onMouseLeave={scheduleCloseIndustries}
+                      >
+                        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+                          <div className="overflow-hidden rounded-3xl border border-white/50 bg-white/90 shadow-2xl shadow-secondary-900/15 backdrop-blur-xl dark:border-white/10 dark:bg-gray-900/90 dark:shadow-black/50">
+                            <div className="h-1 bg-gradient-to-r from-primary-500 via-secondary-500 to-primary-500" aria-hidden="true" />
+                            <div className="flex items-center justify-between px-6 py-4">
+                              <p className="font-display text-base font-bold text-gray-900 dark:text-white">
+                                Industries we serve
+                                <span className="ml-2 font-inter font-normal text-sm text-gray-500 dark:text-gray-400">
+                                  {INDUSTRIES.length} sectors, tailored solutions
+                                </span>
+                              </p>
+                              <Link
+                                to="/industries"
+                                onClick={() => setIndustriesOpen(false)}
+                                className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600 hover:gap-2.5 hover:text-primary-700 dark:text-primary-400"
+                              >
+                                View All <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                              </Link>
+                            </div>
+                            <div className="grid grid-cols-1 gap-1 px-4 pb-4 sm:grid-cols-2 lg:grid-cols-3">
+                              {INDUSTRIES.map((ind, ii) => {
+                                const Icon = serviceIcon(ind.icon);
+                                return (
+                                  <motion.div
+                                    key={ind.slug}
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.02 * ii, duration: 0.2 }}
+                                  >
+                                    <Link
+                                      to={`/industries/${ind.slug}`}
+                                      onClick={() => setIndustriesOpen(false)}
+                                      title={ind.shortDescription}
+                                      className="group flex items-center gap-3 rounded-xl p-2.5 transition-all duration-150 hover:translate-x-0.5 hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:bg-white/10"
+                                    >
+                                      <span className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${ind.gradient} text-white shadow-md transition-transform duration-150 group-hover:scale-105`}>
+                                        <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
+                                      </span>
+                                      <span className="min-w-0">
+                                        <span className="block truncate text-sm font-bold text-gray-900 group-hover:text-primary-700 dark:text-gray-100 dark:group-hover:text-primary-300">
+                                          {ind.name}
+                                        </span>
+                                        <span className="block truncate text-xs text-gray-500 dark:text-gray-400">
+                                          {ind.shortDescription}
+                                        </span>
+                                      </span>
+                                    </Link>
+                                  </motion.div>
+                                );
+                              })}
+                            </div>
+                            <Link
+                              to="/contact"
+                              onClick={() => setIndustriesOpen(false)}
+                              className="flex items-center justify-center gap-2 bg-gradient-to-r from-primary-600 to-secondary-600 px-6 py-3.5 text-sm font-semibold text-white transition hover:brightness-110"
+                            >
+                              Discuss Your Industry <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                            </Link>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               ) : (
                 <Link
                   key={item.name}
@@ -563,6 +692,69 @@ const Header: React.FC = () => {
                                 })}
                               </div>
                             ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ) : item.hasIndustriesMenu ? (
+                  <div key={item.name}>
+                    <button
+                      type="button"
+                      onClick={() => setMobileIndustriesOpen((o) => !o)}
+                      aria-expanded={mobileIndustriesOpen}
+                      className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-display text-base font-bold tracking-tight transition-colors duration-200 ${
+                        isActive(item.path)
+                          ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-800/20'
+                          : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-800'
+                      }`}
+                    >
+                      <span onClick={(e) => { e.stopPropagation(); setIsMenuOpen(false); navigate(item.path); }}>
+                        {item.name}
+                      </span>
+                      <ChevronDown className={`h-4 w-4 transition-transform ${mobileIndustriesOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+                    </button>
+                    <AnimatePresence initial={false}>
+                      {mobileIndustriesOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.25 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="ml-2 max-h-[50vh] space-y-1 overflow-y-auto border-l-2 border-primary-200 py-1 pl-2 dark:border-primary-700">
+                            <Link
+                              to="/industries"
+                              onClick={() => setIsMenuOpen(false)}
+                              className="flex items-center justify-between rounded-xl bg-primary-50 px-3 py-2.5 text-sm font-bold text-primary-700 dark:bg-primary-800/30 dark:text-primary-300"
+                            >
+                              View All Industries
+                              <span className="rounded-full bg-primary-600 px-2 py-0.5 text-[11px] font-bold text-white">
+                                {INDUSTRIES.length}
+                              </span>
+                            </Link>
+                            {INDUSTRIES.map((ind) => {
+                              const Icon = serviceIcon(ind.icon);
+                              return (
+                                <Link
+                                  key={ind.slug}
+                                  to={`/industries/${ind.slug}`}
+                                  onClick={() => setIsMenuOpen(false)}
+                                  className="flex items-center gap-3 rounded-xl bg-gray-50 px-3 py-2 text-sm text-gray-700 transition-colors hover:text-primary-600 dark:bg-white/5 dark:text-gray-300"
+                                >
+                                  <span className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${ind.gradient} text-white shadow-sm`}>
+                                    <Icon className="h-4 w-4" aria-hidden="true" />
+                                  </span>
+                                  <span className="min-w-0">
+                                    <span className="block truncate font-semibold">{ind.name}</span>
+                                    <span className="block truncate text-xs text-gray-500 dark:text-gray-400">
+                                      {ind.shortDescription}
+                                    </span>
+                                  </span>
+                                </Link>
+                              );
+                            })}
                           </div>
                         </motion.div>
                       )}
