@@ -11,6 +11,8 @@ const labels: Record<string, string> = {
   'job-admin': 'Jobs',
   'case-studies': 'Case Studies',
   certificates: 'Certificates',
+  leads: 'Leads',
+  import: 'Import',
   new: 'New',
   edit: 'Edit',
   profile: 'Profile'

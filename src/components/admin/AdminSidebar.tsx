@@ -5,6 +5,7 @@ import {
   Contact,
   Briefcase,
   Users,
+  UserPlus,
   FileText,
   ClipboardList,
   Award,
@@ -32,7 +33,8 @@ export const adminNavSections: { heading: string; items: AdminNavItem[] }[] = [
     items: [
       { to: '/admin/contact-table', label: 'Contacts', icon: <Contact className="h-5 w-5" /> },
       { to: '/admin/career-table', label: 'Careers', icon: <Briefcase className="h-5 w-5" /> },
-      { to: '/admin/subscriber-table', label: 'Subscribers', icon: <Users className="h-5 w-5" /> }
+      { to: '/admin/subscriber-table', label: 'Subscribers', icon: <Users className="h-5 w-5" /> },
+      { to: '/admin/leads', label: 'Leads', icon: <UserPlus className="h-5 w-5" /> }
     ]
   },
   {

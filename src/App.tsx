@@ -41,6 +41,11 @@ const CertificatesPage = lazy(() => import('./pages/admin/CertificatesPage'));
 const CertificateNewPage = lazy(() => import('./pages/admin/CertificateNewPage'));
 const CertificateDetailPage = lazy(() => import('./pages/admin/CertificateDetailPage'));
 const CertificateEditPage = lazy(() => import('./pages/admin/CertificateEditPage'));
+const LeadsPage = lazy(() => import('./pages/admin/LeadsPage'));
+const LeadNewPage = lazy(() => import('./pages/admin/LeadNewPage'));
+const LeadDetailPage = lazy(() => import('./pages/admin/LeadDetailPage'));
+const LeadEditPage = lazy(() => import('./pages/admin/LeadEditPage'));
+const LeadImportPage = lazy(() => import('./pages/admin/LeadImportPage'));
 const CertificateVerify = lazy(() => import('./pages/CertificateVerify'));
 
 const RouteFallback: React.FC = () => (
@@ -98,6 +103,11 @@ function App() {
                   <Route path="certificates/new" element={<CertificateNewPage />} />
                   <Route path="certificates/:certificateId" element={<CertificateDetailPage />} />
                   <Route path="certificates/:certificateId/edit" element={<CertificateEditPage />} />
+                  <Route path="leads" element={<LeadsPage />} />
+                  <Route path="leads/new" element={<LeadNewPage />} />
+                  <Route path="leads/import" element={<LeadImportPage />} />
+                  <Route path="leads/:id" element={<LeadDetailPage />} />
+                  <Route path="leads/:id/edit" element={<LeadEditPage />} />
                   <Route path="profile" element={<AdminProfile />} />
                 </Route>
 
