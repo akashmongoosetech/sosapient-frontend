@@ -4,6 +4,55 @@ import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { MapPin, Clock, IndianRupee, Send, CheckCircle, AlertCircle, Share2, Copy, UploadCloud, FileText   } from 'lucide-react';
 import { siteUrl } from '../utils/blog';
+import BlogRichContent from '../components/Blog/BlogRichContent';
+
+// Plain text for SEO/schema. Rich HTML is stripped to readable text.
+function stripRichText(html: unknown): string {
+  if (typeof html !== 'string') return '';
+  return html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;|&#160;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function isRichHtml(value: unknown): value is string {
+  return typeof value === 'string' && value.includes('<') && value.includes('>');
+}
+
+// Renders a requirements/responsibilities/benefits array. Items saved via
+// CKEditor are full HTML documents; legacy items are plain text.
+function RichList({ items, label }: { items: unknown; label: string }) {
+  if (!Array.isArray(items) || items.length === 0) return null;
+  const htmlItems = items.filter(isRichHtml);
+  const textItems = items.filter((v) => typeof v === 'string' && !isRichHtml(v));
+  if (htmlItems.length === 0) {
+    return (
+      <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
+        {textItems.map((req, idx) => (
+          <li key={idx}>{req as string}</li>
+        ))}
+      </ul>
+    );
+  }
+  return (
+    <div className="space-y-4">
+      {htmlItems.map((h, idx) => (
+        <BlogRichContent key={idx} html={h} label={`${label} rich content ${idx + 1}`} />
+      ))}
+      {textItems.length > 0 && (
+        <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
+          {textItems.map((req, idx) => (
+            <li key={`t-${idx}`}>{req as string}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 const JobDetails: React.FC = () => {
   const { jobId } = useParams();
@@ -144,7 +193,8 @@ const JobDetails: React.FC = () => {
 
   const canonical = `${siteUrl()}/careers/${jobId}`;
   const jobTitle = `${job.title} | Careers at SoSapient`;
-  const jobDescription = `${job.title} (${job.type || 'Full-time'}) in ${job.location || 'Ujjain, India'}. ${job.experience ? `Experience: ${job.experience}. ` : ''}Apply with your resume today.`.slice(0, 160);
+  const roleSummary = stripRichText(job.description).slice(0, 80);
+  const jobDescription = `${job.title} (${job.type || 'Full-time'}) in ${job.location || 'Ujjain, India'}. ${roleSummary ? `${roleSummary} ` : ''}${job.experience ? `Experience: ${job.experience}. ` : ''}Apply with your resume today.`.slice(0, 160);
 
   return (
     <div className="bg-white dark:bg-gray-900">
@@ -165,7 +215,7 @@ const JobDetails: React.FC = () => {
             '@context': 'https://schema.org',
             '@type': 'JobPosting',
             title: job.title,
-            description: job.description,
+            description: stripRichText(job.description).slice(0, 500) || jobDescription,
             employmentType: job.type,
             hiringOrganization: {
               '@type': 'Organization',
@@ -218,39 +268,31 @@ const JobDetails: React.FC = () => {
             <div className="lg:col-span-2 space-y-6">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">About the role</h2>
-                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">{job.description}</p>
+                {isRichHtml(job.description) ? (
+                  <BlogRichContent html={job.description} label="Job description" />
+                ) : (
+                  <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">{job.description}</p>
+                )}
               </div>
 
               {Array.isArray(job.requirements) && job.requirements.length > 0 && (
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Requirements</h3>
-                  <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
-                    {job.requirements.map((req: string, idx: number) => (
-                      <li key={idx}>{req}</li>
-                    ))}
-                  </ul>
+                  <RichList items={job.requirements} label="Job requirements" />
                 </div>
               )}
 
               {Array.isArray(job.responsibilities) && job.responsibilities.length > 0 && (
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Responsibilities</h3>
-                  <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
-                    {job.responsibilities.map((item: string, idx: number) => (
-                      <li key={idx}>{item}</li>
-                    ))}
-                  </ul>
+                  <RichList items={job.responsibilities} label="Job responsibilities" />
                 </div>
               )}
 
               {Array.isArray(job.benefits) && job.benefits.length > 0 && (
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Benefits</h3>
-                  <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
-                    {job.benefits.map((b: string, idx: number) => (
-                      <li key={idx}>{b}</li>
-                    ))}
-                  </ul>
+                  <RichList items={job.benefits} label="Job benefits" />
                 </div>
               )}
             </div>

@@ -3,9 +3,10 @@ import { Plus, Pencil, Trash2, Search, RefreshCw } from "lucide-react";
 import { authFetch } from '../utils/api';
 import {
   ContentCard, PageHeader, PrimaryButton, SecondaryButton, IconButton,
-  AdminInput, AdminSelect, AdminTextarea, FieldLabel,
+  AdminInput, AdminSelect, FieldLabel,
   AdminTableShell, TableHead, Th, StatusBadge, EmptyState, ErrorState, ConfirmDialog, LoadingState
 } from '../components/admin/ui';
+import RichTextEditor, { isRichTextEmpty } from '../components/common/RichTextEditor';
 
 interface JobPayload {
   title: string;
@@ -45,6 +46,9 @@ const JobAdmin: React.FC = () => {
   const [search, setSearch] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [descError, setDescError] = useState<string | null>(null);
 
   const fetchJobs = async () => {
     setLoading(true);
@@ -81,20 +85,62 @@ const JobAdmin: React.FC = () => {
 
   const deleteTarget = jobs.find((j) => j._id === deleteId) || null;
 
+  // Rich HTML from one editor is stored as a single array element so the
+  // existing string[] API shape is preserved. Empty editors save as [].
+  const docToArray = (html: string): string[] => (isRichTextEmpty(html) ? [] : [html]);
+
+  // Legacy multi-item plain-text arrays become paragraphs for editing.
+  // Saved back as a single HTML document on submit.
+  const arrayToHtml = (items: unknown): string => {
+    if (typeof items === 'string') return items;
+    if (!Array.isArray(items)) return '';
+    if (items.length === 1 && typeof items[0] === 'string') return items[0];
+    return items
+      .filter((v) => typeof v === 'string')
+      .map((v) => (v as string).includes('<') ? (v as string) : `<p>${(v as string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`)
+      .join('');
+  };
+
+  const setRichField = (key: 'description' | 'requirements' | 'responsibilities' | 'benefits') => (html: string) => {
+    if (key === 'description') {
+      setForm((f) => ({ ...f, description: html }));
+      if (!isRichTextEmpty(html)) setDescError(null);
+    } else {
+      setForm((f) => ({ ...f, [key]: docToArray(html) }));
+    }
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const method = editing ? "PATCH" : "POST";
-    const url = editing
-      ? `${import.meta.env.VITE_BASE_URL}/api/jobs/${editing._id}`
-      : `${import.meta.env.VITE_BASE_URL}/api/jobs`;
-    await authFetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    setForm(emptyJob);
-    setEditing(null);
-    fetchJobs();
+    if (isRichTextEmpty(form.description)) {
+      setDescError('Description is required.');
+      return;
+    }
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const method = editing ? "PATCH" : "POST";
+      const url = editing
+        ? `${import.meta.env.VITE_BASE_URL}/api/jobs/${editing._id}`
+        : `${import.meta.env.VITE_BASE_URL}/api/jobs`;
+      const res = await authFetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.success) {
+        throw new Error(data?.message || 'Failed to save job.');
+      }
+      setForm(emptyJob);
+      setEditing(null);
+      setDescError(null);
+      fetchJobs();
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Failed to save job.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const confirmDelete = async () => {
@@ -110,12 +156,6 @@ const JobAdmin: React.FC = () => {
       fetchJobs();
     }
   };
-
-  const toArray = (value: string) =>
-    value
-      .split("\n")
-      .map((s) => s.trim())
-      .filter(Boolean);
 
   const onChangeStatus = async (id: string, status: 'open' | 'closed') => {
     try {
@@ -159,6 +199,8 @@ const JobAdmin: React.FC = () => {
 
   const startEdit = (job: any) => {
     setEditing(job);
+    setDescError(null);
+    setSaveError(null);
     const {
       title,
       department,
@@ -255,20 +297,46 @@ const JobAdmin: React.FC = () => {
               <AdminInput id="job-exp" placeholder="Experience" value={form.experience} onChange={(e) => setForm({ ...form, experience: e.target.value })} required />
             </div>
             <div className="md:col-span-2">
-              <FieldLabel htmlFor="job-desc">Description</FieldLabel>
-              <AdminTextarea id="job-desc" placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required rows={4} />
-            </div>
-            <div>
-              <FieldLabel htmlFor="job-req">Requirements (one per line)</FieldLabel>
-              <AdminTextarea id="job-req" placeholder="Requirements (one per line)" value={form.requirements.join("\n")} onChange={(e) => setForm({ ...form, requirements: toArray(e.target.value) })} rows={4} />
-            </div>
-            <div>
-              <FieldLabel htmlFor="job-resp">Responsibilities (one per line)</FieldLabel>
-              <AdminTextarea id="job-resp" placeholder="Responsibilities (one per line)" value={form.responsibilities.join("\n")} onChange={(e) => setForm({ ...form, responsibilities: toArray(e.target.value) })} rows={4} />
+              <RichTextEditor
+                key={`desc-${editing?._id || 'new'}`}
+                id="job-desc"
+                label="Description"
+                required
+                value={form.description}
+                onChange={setRichField('description')}
+                placeholder="Write a clear overview of the role…"
+                error={descError}
+              />
             </div>
             <div className="md:col-span-2">
-              <FieldLabel htmlFor="job-ben">Benefits (one per line)</FieldLabel>
-              <AdminTextarea id="job-ben" placeholder="Benefits (one per line)" value={form.benefits.join("\n")} onChange={(e) => setForm({ ...form, benefits: toArray(e.target.value) })} rows={3} />
+              <RichTextEditor
+                key={`req-${editing?._id || 'new'}`}
+                id="job-req"
+                label="Requirements"
+                value={arrayToHtml(form.requirements)}
+                onChange={setRichField('requirements')}
+                placeholder="Add required skills, qualifications, and experience…"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <RichTextEditor
+                key={`resp-${editing?._id || 'new'}`}
+                id="job-resp"
+                label="Responsibilities"
+                value={arrayToHtml(form.responsibilities)}
+                onChange={setRichField('responsibilities')}
+                placeholder="Describe the key responsibilities for this role…"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <RichTextEditor
+                key={`ben-${editing?._id || 'new'}`}
+                id="job-ben"
+                label="Benefits"
+                value={arrayToHtml(form.benefits)}
+                onChange={setRichField('benefits')}
+                placeholder="Add salary, benefits, perks, and other advantages…"
+              />
             </div>
             <div>
               <FieldLabel htmlFor="job-status">Status</FieldLabel>
@@ -277,10 +345,15 @@ const JobAdmin: React.FC = () => {
                 <option value="closed">Closed</option>
               </AdminSelect>
             </div>
+            {saveError && (
+              <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 md:col-span-2 dark:border-red-900 dark:bg-red-900/20 dark:text-red-300">
+                {saveError}
+              </p>
+            )}
             <div className="flex items-end gap-2 md:col-span-2">
-              <PrimaryButton type="submit">{editing ? "Update Job" : "Create Job"}</PrimaryButton>
+              <PrimaryButton type="submit" disabled={saving}>{saving ? 'Saving…' : editing ? "Update Job" : "Create Job"}</PrimaryButton>
               {editing && (
-                <SecondaryButton type="button" onClick={() => { setEditing(null); setForm(emptyJob); }}>
+                <SecondaryButton type="button" onClick={() => { setEditing(null); setForm(emptyJob); setDescError(null); }}>
                   Cancel
                 </SecondaryButton>
               )}

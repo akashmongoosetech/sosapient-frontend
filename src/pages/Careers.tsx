@@ -41,6 +41,19 @@ const Careers: React.FC = () => {
   const [jobs, setJobs] = useState<any[]>([]);
   const [loadingJobs, setLoadingJobs] = useState<boolean>(false);
 
+  // Plain-text excerpt for cards: strips rich HTML so tags never leak into listings.
+  const stripTags = (html?: string) => {
+    if (typeof html !== 'string') return '';
+    return html
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/&nbsp;|&#160;/gi, ' ')
+      .replace(/&amp;/gi, '&')
+      .replace(/&lt;/gi, '<')
+      .replace(/&gt;/gi, '>')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
   const formatRelative = (iso?: string) => {
     if (!iso) return '';
     const date = new Date(iso);
@@ -343,8 +356,8 @@ const Careers: React.FC = () => {
                   </span>
                 </div>
 
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  {job.description}
+                <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                  {stripTags(job.description)}
                 </p>
 
                 <div className="grid grid-cols-2 gap-4 mb-6 text-sm text-gray-500 dark:text-gray-400">
