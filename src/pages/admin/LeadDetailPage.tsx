@@ -6,6 +6,7 @@ import {
   LEAD_STATUSES,
   leadStatusTone,
   leadDigits,
+  leadWebsiteUrl,
   formatLeadDate,
   type Lead,
   type LeadStatus,
@@ -208,7 +209,7 @@ const LeadDetailPage: React.FC = () => {
           <Row label="Website">
             {doc.website ? (
               <span className="inline-flex flex-wrap items-center gap-2">
-                <a href={doc.website} target="_blank" rel="noopener noreferrer" className="break-all text-primary-600 dark:text-primary-400">
+                <a href={leadWebsiteUrl(doc.website)} target="_blank" rel="noopener noreferrer" className="break-all text-primary-600 dark:text-primary-400">
                   {doc.website}
                 </a>
                 <button

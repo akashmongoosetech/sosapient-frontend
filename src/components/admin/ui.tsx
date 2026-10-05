@@ -74,9 +74,9 @@ export function careerTone(status: string): keyof typeof badgeStyles {
 
 /* ---------- Table shell (responsive scroll + skeleton) ---------- */
 
-export const AdminTableShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+export const AdminTableShell: React.FC<{ children: React.ReactNode; fixed?: boolean }> = ({ children, fixed = false }) => (
   <div className="overflow-x-auto">
-    <table className="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
+    <table className={`min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700 ${fixed ? 'table-fixed' : ''}`}>
       {children}
     </table>
   </div>
@@ -89,7 +89,7 @@ export const TableHead: React.FC<{ children: React.ReactNode }> = ({ children })
 );
 
 export const Th: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 ${className}`}>
+  <th scope="col" className={`whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 ${className}`}>
     {children}
   </th>
 );

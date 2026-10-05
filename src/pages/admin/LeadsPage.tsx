@@ -5,6 +5,7 @@ import { authFetch } from '../../utils/api';
 import {
   LEAD_STATUSES,
   leadStatusTone,
+  leadWebsiteUrl,
   formatLeadDate,
   type Lead,
   type LeadListResponse,
@@ -23,7 +24,7 @@ import {
   AdminTableShell,
   TableHead,
   Th,
-  LoadingState,
+  SkeletonRows,
   EmptyState,
   ErrorState,
   ConfirmDialog,
@@ -35,11 +36,11 @@ type ContactFilter = 'all' | 'mobile' | 'no-mobile' | 'website' | 'no-website' |
 
 const CONTACT_OPTIONS: { value: ContactFilter; label: string }[] = [
   { value: 'all', label: 'All contacts' },
-  { value: 'mobile', label: 'Mobile available' },
+  { value: 'mobile', label: 'Has mobile' },
   { value: 'no-mobile', label: 'No mobile' },
-  { value: 'website', label: 'Website available' },
+  { value: 'website', label: 'Has website' },
   { value: 'no-website', label: 'No website' },
-  { value: 'both', label: 'Mobile + Website' },
+  { value: 'both', label: 'Mobile + site' },
   { value: 'neither', label: 'Neither' },
 ];
 
@@ -223,7 +224,7 @@ const LeadsPage: React.FC = () => {
         onClick={() => copyText(text, key)}
         title={done ? 'Copied!' : `Copy ${label}`}
         aria-label={done ? `${label} copied` : `Copy ${label}`}
-        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-gray-400 transition hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+        className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-gray-400 transition hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200"
       >
         {done ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
       </button>
@@ -236,7 +237,7 @@ const LeadsPage: React.FC = () => {
       value={lead.status}
       disabled={statusBusy === lead._id}
       onChange={(e) => changeStatus(lead, e.target.value as LeadStatus)}
-      className={`min-h-[32px] rounded-md border border-gray-200 bg-transparent px-1.5 py-1 text-xs font-bold dark:border-gray-700 ${STATUS_TEXT[lead.status]} disabled:opacity-50`}
+      className={`min-h-[36px] w-[124px] truncate rounded-md border border-gray-200 bg-transparent px-1.5 py-1 text-xs font-bold dark:border-gray-700 ${STATUS_TEXT[lead.status]} disabled:opacity-50`}
     >
       {LEAD_STATUSES.map((s) => (
         <option key={s} value={s}>
@@ -250,7 +251,7 @@ const LeadsPage: React.FC = () => {
     <div>
       <PageHeader
         title="Leads"
-        subtitle={totalItems > 0 ? `${totalItems.toLocaleString()} total leads` : 'Manage your sales leads'}
+        subtitle="Manage your sales leads"
         actions={
           <div className="flex flex-wrap gap-2">
             <Link to="/admin/leads/import">
@@ -267,14 +268,12 @@ const LeadsPage: React.FC = () => {
         }
       />
 
-      {stats && (
-        <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatCard label="Total Leads" value={String(stats.total)} icon={<Users className="h-5 w-5" />} />
-          <StatCard label="New" value={String(stats.byStatus.New || 0)} icon={<Inbox className="h-5 w-5" />} />
-          <StatCard label="Converted" value={String(stats.byStatus.Converted || 0)} icon={<CheckCircle2 className="h-5 w-5" />} />
-          <StatCard label="With Mobile" value={String(stats.withMobile)} icon={<Phone className="h-5 w-5" />} />
-        </div>
-      )}
+      <div className="mb-4 grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4" aria-live="polite">
+        <StatCard label="Total Leads" value={stats ? stats.total.toLocaleString() : ''} loading={!stats} icon={<Users className="h-5 w-5" />} />
+        <StatCard label="New" value={stats ? String(stats.byStatus.New || 0) : ''} loading={!stats} icon={<Inbox className="h-5 w-5" />} />
+        <StatCard label="Converted" value={stats ? String(stats.byStatus.Converted || 0) : ''} loading={!stats} icon={<CheckCircle2 className="h-5 w-5" />} />
+        <StatCard label="With Mobile" value={stats ? String(stats.withMobile) : ''} loading={!stats} icon={<Phone className="h-5 w-5" />} />
+      </div>
 
       {/* Toolbar */}
       <div className="mb-4 flex flex-col gap-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
@@ -284,7 +283,7 @@ const LeadsPage: React.FC = () => {
           placeholder="Search title, city, category, phone, website…"
           aria-label="Search leads"
         />
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6 [&>*]:min-w-0">
           <AdminSelect value={status} onChange={(e) => { setStatus(e.target.value); resetPage(); }} aria-label="Filter by status">
             <option value="all">All statuses</option>
             {LEAD_STATUSES.map((s) => (
@@ -333,7 +332,6 @@ const LeadsPage: React.FC = () => {
         </div>
       </div>
 
-      {loading && items.length === 0 && <LoadingState message="Loading leads…" />}
       {error && items.length === 0 && <ErrorState title="Failed to load leads" body={error} onRetry={refreshAll} />}
 
       {!loading && !error && items.length === 0 && (
@@ -353,11 +351,15 @@ const LeadsPage: React.FC = () => {
         />
       )}
 
-      {items.length > 0 && (
+      {(loading || items.length > 0) && (
         <>
           {/* Mobile cards */}
           <div className="flex flex-col gap-3 sm:hidden">
-            {items.map((lead) => (
+            {loading && items.length === 0
+              ? [0, 1, 2].map((i) => (
+                  <div key={i} className="h-36 animate-pulse rounded-xl bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
+                ))
+              : items.map((lead) => (
               <div key={lead._id} className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
@@ -379,14 +381,15 @@ const LeadsPage: React.FC = () => {
                   ) : null}
                   {lead.website ? (
                     <span className="flex items-center gap-1.5">
-                      <a href={lead.website} target="_blank" rel="noopener noreferrer" className="inline-flex min-w-0 items-center gap-1.5 truncate text-primary-600 dark:text-primary-400">
+                      <a href={leadWebsiteUrl(lead.website)} target="_blank" rel="noopener noreferrer" className="inline-flex min-w-0 items-center gap-1.5 truncate text-primary-600 dark:text-primary-400">
                         <Globe className="h-3.5 w-3.5 shrink-0" /> <span className="truncate">{lead.website}</span>
                       </a>
                       {copyBtn(lead.website, `${lead._id}-web`, 'website')}
                     </span>
                   ) : null}
+                  <p className="text-xs text-gray-400 dark:text-gray-500">Added {formatLeadDate(lead.createdAt)}</p>
                 </div>
-                <div className="mt-3 flex items-center justify-between gap-2">
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                   {statusSelect(lead)}
                   <div className="flex gap-1">
                     <Link to={`/admin/leads/${lead._id}`} aria-label={`View ${lead.title || 'lead'}`}>
@@ -401,28 +404,37 @@ const LeadsPage: React.FC = () => {
                   </div>
                 </div>
               </div>
-            ))}
+                ))}
           </div>
 
           {/* Desktop table */}
-          <div className="hidden sm:block">
-            <AdminTableShell>
-              <table className="w-full text-left text-sm">
+          <div className="relative hidden sm:block">
+            <AdminTableShell fixed>
+                <colgroup>
+                  <col style={{ width: '22%' }} />
+                  <col style={{ width: '12%' }} />
+                  <col style={{ width: '16%' }} />
+                  <col style={{ width: '18%' }} />
+                  <col style={{ width: '124px' }} />
+                  <col style={{ width: '100px' }} />
+                  <col style={{ width: '132px' }} />
+                </colgroup>
                 <TableHead>
-                  <tr>
-                    <Th>Lead</Th>
-                    <Th>City</Th>
-                    <Th>Phone</Th>
-                    <Th>Website</Th>
-                    <Th>Status</Th>
-                    <Th>Created</Th>
-                    <Th>Actions</Th>
-                  </tr>
+                  <Th>Lead</Th>
+                  <Th>City</Th>
+                  <Th>Phone</Th>
+                  <Th>Website</Th>
+                  <Th>Status</Th>
+                  <Th>Created</Th>
+                  <Th>Actions</Th>
                 </TableHead>
-                <tbody>
+                {loading && items.length === 0 ? (
+                  <SkeletonRows rows={8} cols={7} />
+                ) : (
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                   {items.map((lead) => (
-                    <tr key={lead._id} className="border-t border-gray-100 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/50">
-                      <td className="max-w-[220px] px-3 py-2.5">
+                    <tr key={lead._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                      <td className="px-3 py-2.5">
                         <p className="truncate font-semibold text-gray-900 dark:text-white" title={lead.title}>
                           {lead.title || '(No title)'}
                         </p>
@@ -430,8 +442,12 @@ const LeadsPage: React.FC = () => {
                           {lead.categoryName || '—'}
                         </p>
                       </td>
-                      <td className="whitespace-nowrap px-3 py-2.5 text-gray-700 dark:text-gray-300">{lead.city || '—'}</td>
-                      <td className="max-w-[180px] px-3 py-2.5">
+                      <td className="px-3 py-2.5">
+                        <span className="block truncate text-gray-700 dark:text-gray-300" title={lead.city}>
+                          {lead.city || '—'}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2.5">
                         {lead.phoneUnformatted || lead.phone ? (
                           <span className="flex items-center gap-1">
                             <a
@@ -447,10 +463,10 @@ const LeadsPage: React.FC = () => {
                           <span className="text-gray-400">—</span>
                         )}
                       </td>
-                      <td className="max-w-[200px] px-3 py-2.5">
+                      <td className="px-3 py-2.5">
                         {lead.website ? (
                           <span className="flex items-center gap-1">
-                            <a href={lead.website} target="_blank" rel="noopener noreferrer" className="block min-w-0 flex-1 truncate text-primary-600 dark:text-primary-400" title={lead.website}>
+                            <a href={leadWebsiteUrl(lead.website)} target="_blank" rel="noopener noreferrer" className="block min-w-0 flex-1 truncate text-primary-600 dark:text-primary-400" title={lead.website}>
                               {lead.website.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')}
                             </a>
                             {copyBtn(lead.website, `${lead._id}-web`, 'website')}
@@ -459,7 +475,7 @@ const LeadsPage: React.FC = () => {
                           <span className="text-gray-400">—</span>
                         )}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-2.5">{statusSelect(lead)}</td>
+                      <td className="px-3 py-2.5">{statusSelect(lead)}</td>
                       <td className="whitespace-nowrap px-3 py-2.5 text-gray-500 dark:text-gray-400">{formatLeadDate(lead.createdAt)}</td>
                       <td className="whitespace-nowrap px-3 py-2.5">
                         <div className="flex gap-1">
@@ -477,11 +493,20 @@ const LeadsPage: React.FC = () => {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+                )}
             </AdminTableShell>
+            {loading && items.length > 0 && (
+              <div
+                className="absolute inset-0 flex items-center justify-center rounded-xl bg-white/60 dark:bg-gray-900/60"
+                role="status"
+                aria-label="Refreshing leads"
+              >
+                <span className="h-6 w-6 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
+              </div>
+            )}
           </div>
 
-          {totalPages > 1 && (
+          {items.length > 0 && totalPages > 1 && (
             <div className="mt-4 flex flex-col items-center justify-between gap-2 sm:flex-row">
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Showing {(page - 1) * limit + 1}–{Math.min(page * limit, totalItems)} of {totalItems.toLocaleString()} · Page {page} of {totalPages}

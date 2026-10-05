@@ -122,6 +122,14 @@ export const importVerdictLabel = (verdict: ImportVerdict): string => {
   }
 };
 
+// Absolute URL for website links. Prepends https:// when the stored
+// value has no scheme so it never resolves as a relative path.
+export function leadWebsiteUrl(website: string): string {
+  const v = String(website || '').trim();
+  if (v === '') return '';
+  return /^[a-z][a-z0-9+.-]*:/i.test(v) ? v : `https://${v}`;
+}
+
 // Digits for wa.me links. Empty when no meaningful number.
 export function leadDigits(lead: Pick<Lead, 'phone' | 'phoneUnformatted'>): string {
   const digits = String(lead.phoneUnformatted || lead.phone || '').replace(/\D/g, '');
