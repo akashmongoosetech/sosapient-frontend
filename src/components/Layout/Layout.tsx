@@ -12,7 +12,7 @@ const Layout: React.FC = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-primary-900 transition-colors duration-200">
       <Header />
-      <main className="pt-16 lg:pt-20">
+      <main className="pt-24 lg:pt-28">
         <Outlet />
       </main>
       <Footer />

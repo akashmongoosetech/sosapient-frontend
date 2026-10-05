@@ -1,11 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Moon, Sun, ChevronDown, ArrowRight, ArrowUpRight, Info, Newspaper, Briefcase, Mail, Facebook, Linkedin, Instagram, Twitter, Sparkles } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { SERVICES, SERVICE_CATEGORIES, servicesByCategory } from '../../data/services';
 import { INDUSTRIES } from '../../data/industries';
 import { serviceIcon } from '../services/ServiceCard';
+
+const LOGO_URL = 'https://ik.imagekit.io/sentyaztie/Dlogo.png?updatedAt=1749928182723';
+
+const socialLinks = [
+  { label: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61553017931533', Icon: Facebook },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/100043699/admin/page-posts/published/', Icon: Linkedin },
+  { label: 'Instagram', href: 'https://www.instagram.com/sosapient/', Icon: Instagram },
+  { label: 'Twitter', href: 'https://x.com/SoSapient_tech', Icon: Twitter },
+];
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,7 +27,6 @@ const Header: React.FC = () => {
   const [mobileIndustriesOpen, setMobileIndustriesOpen] = useState(false);
   const closeTimer = useRef<number | null>(null);
   const { theme, toggleTheme } = useTheme();
-  const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
@@ -37,17 +45,28 @@ const Header: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!servicesOpen && !aboutOpen && !industriesOpen) return;
+    if (!servicesOpen && !aboutOpen && !industriesOpen && !isMenuOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setServicesOpen(false);
         setAboutOpen(false);
         setIndustriesOpen(false);
+        setIsMenuOpen(false);
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [servicesOpen, aboutOpen, industriesOpen]);
+  }, [servicesOpen, aboutOpen, industriesOpen, isMenuOpen]);
+
+  // Lock body scroll while the mobile overlay is open
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isMenuOpen]);
 
   // Close the menus on route change
   useEffect(() => {
@@ -121,18 +140,27 @@ const Header: React.FC = () => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
+  const triggerCls = (active: boolean) =>
+    `flex items-center gap-1.5 rounded-full px-4 py-2 font-display text-[15px] font-semibold tracking-tight transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+      active
+        ? 'bg-primary-100/80 text-primary-700 dark:bg-white/10 dark:text-primary-300'
+        : 'text-gray-800 hover:bg-gray-100 hover:text-primary-700 dark:text-gray-200 dark:hover:bg-white/10 dark:hover:text-primary-300'
+    }`;
+
+  const panelCls =
+    'overflow-hidden rounded-2xl border border-gray-200/70 bg-white/95 shadow-2xl shadow-secondary-900/10 backdrop-blur-xl dark:border-white/10 dark:bg-gray-900/95 dark:shadow-black/40';
+
+  const rowCls =
+    'group flex items-center gap-3 rounded-xl p-2.5 transition-all duration-150 hover:translate-x-0.5 hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:bg-white/10';
+
   return (
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? 'bg-white/95 dark:bg-primary-900/95 backdrop-blur-md shadow-lg'
-          : 'bg-transparent'
-      }`}
+      className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4"
     >
-      {/* Click-outside backdrop while a dropdown is open */}
+      {/* Click-outside backdrop while a desktop dropdown is open */}
       <AnimatePresence>
         {(servicesOpen || aboutOpen || industriesOpen) && (
           <motion.div
@@ -146,44 +174,23 @@ const Header: React.FC = () => {
           />
         )}
       </AnimatePresence>
-      {/* Utility strip — desktop only, hides on scroll */}
-      <div className={`hidden overflow-hidden bg-gradient-to-r from-primary-700 via-primary-600 to-secondary-600 transition-all duration-300 lg:block ${
-        isScrolled ? 'max-h-0' : 'max-h-10'
-      }`}>
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 text-xs font-medium text-white/90 sm:px-6 lg:px-8">
-          <p className="font-display tracking-wide">AI-powered software, delivered end-to-end</p>
-          <div className="flex items-center gap-5">
-            <Link to="/careers" className="transition hover:text-white">Careers</Link>
-            <Link to="/blog" className="transition hover:text-white">Blog</Link>
-            <Link to="/contact" className="transition hover:text-white">Contact</Link>
-            <span className="h-3.5 w-px bg-white/30" aria-hidden="true" />
-            <div className="flex items-center gap-3">
-              <a href="https://www.facebook.com/profile.php?id=61553017931533" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="transition hover:text-white">
-                <Facebook className="h-3.5 w-3.5" />
-              </a>
-              <a href="https://www.linkedin.com/company/100043699/admin/page-posts/published/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="transition hover:text-white">
-                <Linkedin className="h-3.5 w-3.5" />
-              </a>
-              <a href="https://www.instagram.com/sosapient/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="transition hover:text-white">
-                <Instagram className="h-3.5 w-3.5" />
-              </a>
-              <a href="https://x.com/SoSapient_tech" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="transition hover:text-white">
-                <Twitter className="h-3.5 w-3.5" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-[72px] lg:h-24">
+
+      {/* Floating pill bar */}
+      <div
+        className={`relative mx-auto max-w-7xl rounded-2xl border border-gray-200/70 bg-white/85 backdrop-blur-xl transition-all duration-300 dark:border-white/10 dark:bg-gray-900/85 ${
+          isScrolled ? 'shadow-2xl shadow-secondary-900/10 dark:shadow-black/40' : 'shadow-xl shadow-secondary-900/5'
+        }`}
+      >
+        <div className={`mx-auto flex items-center justify-between gap-2 px-3 transition-all duration-300 sm:px-4 ${
+          isScrolled ? 'h-14 lg:h-16' : 'h-16 lg:h-[72px]'
+        }`}>
           {/* Logo */}
-          <Link to="/" className="flex shrink-0 items-center space-x-2" aria-label="SoSapient home">
-            <img src="https://ik.imagekit.io/sentyaztie/Dlogo.png?updatedAt=1749928182723" className='w-52 lg:w-64' alt="SoSapient logo" />
+          <Link to="/" className="flex shrink-0 items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500" aria-label="SoSapient home">
+            <img src={LOGO_URL} width={208} height={52} className="h-9 w-auto lg:h-10" alt="SoSapient logo" />
           </Link>
 
           {/* Desktop Navigation */}
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8" aria-label="Primary">
+          <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
             {navItems.map((item) => (
               item.hasAboutMenu ? (
                 <div
@@ -198,20 +205,10 @@ const Header: React.FC = () => {
                     aria-haspopup="true"
                     onFocus={openAbout}
                     onClick={() => setAboutOpen(false)}
-                    className={`flex items-center gap-1.5 font-display text-[15px] font-semibold tracking-tight transition-colors duration-200 relative ${
-                      isActive(item.path)
-                        ? 'text-primary-600 dark:text-primary-400'
-                        : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
-                    }`}
+                    className={triggerCls(isActive(item.path))}
                   >
                     {item.name}
                     <ChevronDown className={`h-4 w-4 transition-transform ${aboutOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
-                    {isActive(item.path) && (
-                      <motion.div
-                        layoutId="activeTab"
-                        className="absolute -bottom-1 left-0 right-0 h-1 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500"
-                      />
-                    )}
                   </Link>
                   <AnimatePresence>
                     {aboutOpen && (
@@ -224,7 +221,7 @@ const Header: React.FC = () => {
                         onMouseEnter={openAbout}
                         onMouseLeave={scheduleCloseAbout}
                       >
-                        <div className="overflow-hidden rounded-2xl border border-white/50 bg-white/90 shadow-2xl shadow-secondary-900/15 backdrop-blur-xl dark:border-white/10 dark:bg-gray-900/90 dark:shadow-black/50">
+                        <div className={panelCls}>
                           <div className="h-1 bg-gradient-to-r from-primary-500 via-secondary-500 to-primary-500" aria-hidden="true" />
                           <ul className="p-2.5">
                             {aboutMenuItems.map((sub, i) => (
@@ -237,7 +234,7 @@ const Header: React.FC = () => {
                                 <Link
                                   to={sub.path}
                                   onClick={() => setAboutOpen(false)}
-                                  className="group flex items-center gap-3 rounded-xl p-2.5 transition-all duration-200 hover:translate-x-0.5 hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:bg-white/10"
+                                  className={rowCls}
                                 >
                                   <span className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${sub.gradient} text-white shadow-md transition-transform duration-200 group-hover:scale-105`}>
                                     <sub.Icon className="h-[18px] w-[18px]" aria-hidden="true" />
@@ -246,7 +243,7 @@ const Header: React.FC = () => {
                                     <span className="block text-sm font-bold text-gray-900 group-hover:text-primary-700 dark:text-gray-100 dark:group-hover:text-primary-300">
                                       {sub.name}
                                     </span>
-                                    <span className="block truncate text-xs text-gray-500 dark:text-gray-400">
+                                    <span className="block text-xs leading-snug text-gray-500 line-clamp-2 dark:text-gray-400">
                                       {sub.description}
                                     </span>
                                   </span>
@@ -282,20 +279,10 @@ const Header: React.FC = () => {
                     aria-haspopup="true"
                     onFocus={openServices}
                     onClick={() => setServicesOpen(false)}
-                    className={`flex items-center gap-1.5 font-display text-[15px] font-semibold tracking-tight transition-colors duration-200 relative ${
-                      isActive(item.path)
-                        ? 'text-primary-600 dark:text-primary-400'
-                        : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
-                    }`}
+                    className={triggerCls(isActive(item.path))}
                   >
                     {item.name}
                     <ChevronDown className={`h-4 w-4 transition-transform ${servicesOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
-                    {isActive(item.path) && (
-                      <motion.div
-                        layoutId="activeTab"
-                        className="absolute -bottom-1 left-0 right-0 h-1 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500"
-                      />
-                    )}
                   </Link>
                   <AnimatePresence>
                     {servicesOpen && (
@@ -309,14 +296,11 @@ const Header: React.FC = () => {
                         onMouseLeave={scheduleCloseServices}
                       >
                         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-                        <div className="overflow-hidden rounded-3xl border border-white/50 bg-white/90 shadow-2xl shadow-secondary-900/15 backdrop-blur-xl dark:border-white/10 dark:bg-gray-900/90 dark:shadow-black/50">
+                        <div className={`${panelCls} rounded-3xl`}>
                           <div className="h-1 bg-gradient-to-r from-primary-500 via-secondary-500 to-primary-500" aria-hidden="true" />
                           <div className="grid gap-0 lg:grid-cols-[300px_1fr]">
                             {/* Spotlight card */}
-                            <div
-                              className="relative overflow-hidden p-6 text-white lg:p-7"
-                              style={{ backgroundImage: 'linear-gradient(150deg, #2e1f7c 0%, #6d4d94 100%)' }}
-                            >
+                            <div className="relative overflow-hidden bg-gradient-to-br from-secondary-700 to-primary-600 p-6 text-white lg:p-7">
                               <div
                                 className="pointer-events-none absolute inset-0 opacity-20"
                                 aria-hidden="true"
@@ -381,7 +365,7 @@ const Header: React.FC = () => {
                                               <span className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${s.gradient} text-white shadow-sm transition-transform duration-150 group-hover:scale-105`}>
                                                 <Icon className="h-4 w-4" aria-hidden="true" />
                                               </span>
-                                              <span className="min-w-0 truncate text-sm font-semibold text-gray-800 group-hover:text-primary-700 dark:text-gray-200 dark:group-hover:text-primary-300">
+                                              <span className="min-w-0 text-sm font-semibold leading-snug text-gray-800 line-clamp-2 group-hover:text-primary-700 dark:text-gray-200 dark:group-hover:text-primary-300">
                                                 {s.shortName}
                                               </span>
                                             </Link>
@@ -413,20 +397,10 @@ const Header: React.FC = () => {
                     aria-haspopup="true"
                     onFocus={openIndustries}
                     onClick={() => setIndustriesOpen(false)}
-                    className={`flex items-center gap-1.5 font-display text-[15px] font-semibold tracking-tight transition-colors duration-200 relative ${
-                      isActive(item.path)
-                        ? 'text-primary-600 dark:text-primary-400'
-                        : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
-                    }`}
+                    className={triggerCls(isActive(item.path))}
                   >
                     {item.name}
                     <ChevronDown className={`h-4 w-4 transition-transform ${industriesOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
-                    {isActive(item.path) && (
-                      <motion.div
-                        layoutId="activeTab"
-                        className="absolute -bottom-1 left-0 right-0 h-1 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500"
-                      />
-                    )}
                   </Link>
                   <AnimatePresence>
                     {industriesOpen && (
@@ -440,7 +414,7 @@ const Header: React.FC = () => {
                         onMouseLeave={scheduleCloseIndustries}
                       >
                         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-                          <div className="overflow-hidden rounded-3xl border border-white/50 bg-white/90 shadow-2xl shadow-secondary-900/15 backdrop-blur-xl dark:border-white/10 dark:bg-gray-900/90 dark:shadow-black/50">
+                          <div className={`${panelCls} rounded-3xl`}>
                             <div className="h-1 bg-gradient-to-r from-primary-500 via-secondary-500 to-primary-500" aria-hidden="true" />
                             <div className="flex items-center justify-between px-6 py-4">
                               <p className="font-display text-base font-bold text-gray-900 dark:text-white">
@@ -477,10 +451,10 @@ const Header: React.FC = () => {
                                         <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
                                       </span>
                                       <span className="min-w-0">
-                                        <span className="block truncate text-sm font-bold text-gray-900 group-hover:text-primary-700 dark:text-gray-100 dark:group-hover:text-primary-300">
+                                        <span className="block text-sm font-bold leading-snug text-gray-900 line-clamp-2 group-hover:text-primary-700 dark:text-gray-100 dark:group-hover:text-primary-300">
                                           {ind.name}
                                         </span>
-                                        <span className="block truncate text-xs text-gray-500 dark:text-gray-400">
+                                        <span className="block text-xs leading-snug text-gray-500 line-clamp-2 dark:text-gray-400">
                                           {ind.shortDescription}
                                         </span>
                                       </span>
@@ -506,268 +480,172 @@ const Header: React.FC = () => {
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`font-display text-[15px] font-semibold tracking-tight transition-colors duration-200 relative ${
-                    isActive(item.path)
-                      ? 'text-primary-600 dark:text-primary-400'
-                      : 'text-gray-800 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400'
-                  }`}
+                  className={triggerCls(isActive(item.path))}
                 >
                   {item.name}
-                  {isActive(item.path) && (
-                    <motion.div
-                      layoutId="activeTab"
-                      className="absolute -bottom-1 left-0 right-0 h-1 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500"
-                    />
-                  )}
                 </Link>
               )
             ))}
           </nav>
 
-          {/* Theme Toggle & Mobile Menu */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* Actions */}
+          <div className="flex items-center gap-2">
             <Link
               to="/contact"
-              className="hidden sm:inline-flex min-h-[48px] items-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-secondary-600 px-6 sm:px-7 py-2.5 font-display text-[15px] font-bold text-white shadow-lg shadow-primary-600/25 transition hover:shadow-xl hover:brightness-110"
+              className="hidden items-center gap-1.5 rounded-xl bg-gradient-to-r from-primary-600 to-secondary-600 px-5 py-2.5 font-display text-sm font-bold text-white shadow-lg shadow-primary-600/25 transition hover:shadow-xl hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 sm:inline-flex"
             >
               Get in Touch <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <button
               onClick={toggleTheme}
               aria-label="Toggle theme"
-              className="rounded-full border border-gray-200 p-2.5 text-gray-700 transition hover:border-primary-300 hover:text-primary-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-primary-600"
+              aria-pressed={theme === 'dark'}
+              className="rounded-full border border-gray-200 p-2.5 text-gray-700 transition hover:border-primary-300 hover:text-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-gray-700 dark:text-gray-300 dark:hover:border-primary-600"
             >
               {theme === 'light' ? (
-                <Moon className="h-5 w-5" />
+                <Moon className="h-5 w-5" aria-hidden="true" />
               ) : (
-                <Sun className="h-5 w-5" />
+                <Sun className="h-5 w-5" aria-hidden="true" />
               )}
             </button>
-
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+              onClick={() => setIsMenuOpen(true)}
+              aria-label="Open menu"
               aria-expanded={isMenuOpen}
-              className="rounded-xl bg-gray-900 p-2.5 text-white transition hover:bg-gray-700 dark:bg-white dark:text-gray-900 lg:hidden"
+              className="rounded-xl bg-gray-900 p-2.5 text-white transition hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:bg-white dark:text-gray-900 lg:hidden"
             >
-              {isMenuOpen ? (
-                <X className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
+              <Menu className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Mobile Navigation */}
+      {/* Full-screen mobile overlay */}
+      <AnimatePresence>
         {isMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden overflow-hidden rounded-b-3xl bg-white shadow-2xl dark:bg-primary-900 border-t border-primary-200 dark:border-primary-700"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[60] flex flex-col bg-white/95 backdrop-blur-2xl dark:bg-gray-950/95 lg:hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site menu"
           >
-            <div className="max-h-[calc(100dvh-96px)] overflow-y-auto px-2 py-4 space-y-1">
-              {navItems.map((item) => (
-                item.hasAboutMenu ? (
-                  <div key={item.name}>
-                    <button
-                      type="button"
-                      onClick={() => setMobileAboutOpen((o) => !o)}
-                      aria-expanded={mobileAboutOpen}
-                      className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-display text-base font-bold tracking-tight transition-colors duration-200 ${
-                        isActive(item.path)
-                          ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-800/20'
-                          : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-800'
-                      }`}
-                    >
-                      <span onClick={(e) => { e.stopPropagation(); setIsMenuOpen(false); navigate(item.path); }}>
-                        {item.name}
-                      </span>
-                      <ChevronDown className={`h-4 w-4 transition-transform ${mobileAboutOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
-                    </button>
-                    <AnimatePresence initial={false}>
-                      {mobileAboutOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.25 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="ml-2 space-y-1 border-l-2 border-primary-200 py-1 pl-2 dark:border-primary-700">
-                            {aboutMenuItems.map((sub) => (
-                              <Link
-                                key={sub.path + sub.name}
-                                to={sub.path}
-                                onClick={() => setIsMenuOpen(false)}
-                                className="flex items-center gap-3 rounded-xl bg-gray-50 px-3 py-2 text-sm text-gray-700 transition-colors hover:text-primary-600 dark:bg-white/5 dark:text-gray-300"
-                              >
-                                <span className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${sub.gradient} text-white shadow-sm`}>
-                                  <sub.Icon className="h-4 w-4" aria-hidden="true" />
-                                </span>
-                                <span className="min-w-0">
-                                  <span className="block truncate font-semibold">{sub.name}</span>
-                                  <span className="block truncate text-xs text-gray-500 dark:text-gray-400">
-                                    {sub.description}
-                                  </span>
-                                </span>
-                              </Link>
-                            ))}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ) : item.hasMenu ? (
-                  <div key={item.name}>
-                    <button
-                      type="button"
-                      onClick={() => setMobileServicesOpen((o) => !o)}
-                      aria-expanded={mobileServicesOpen}
-                      className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-display text-base font-bold tracking-tight transition-colors duration-200 ${
-                        isActive(item.path)
-                          ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-800/20'
-                          : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-800'
-                      }`}
-                    >
-                      <span onClick={(e) => { e.stopPropagation(); setIsMenuOpen(false); navigate(item.path); }}>
-                        {item.name}
-                      </span>
-                      <ChevronDown className={`h-4 w-4 transition-transform ${mobileServicesOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
-                    </button>
-                    <AnimatePresence initial={false}>
-                      {mobileServicesOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.25 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="ml-2 max-h-[50vh] space-y-1 overflow-y-auto border-l-2 border-primary-200 py-1 pl-2 dark:border-primary-700">
-                            <Link
-                              to="/services"
-                              onClick={() => setIsMenuOpen(false)}
-                              className="flex items-center justify-between rounded-xl bg-primary-50 px-3 py-2.5 text-sm font-bold text-primary-700 dark:bg-primary-800/30 dark:text-primary-300"
-                            >
-                              View All Services
-                              <span className="rounded-full bg-primary-600 px-2 py-0.5 text-[11px] font-bold text-white">
-                                {SERVICES.length}
-                              </span>
-                            </Link>
-                            {SERVICE_CATEGORIES.map((cat) => (
-                              <div key={cat.id} className="pt-1">
-                                <p className="px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
-                                  {cat.label}
-                                </p>
-                                {servicesByCategory(cat.id).map((s) => {
-                                  const Icon = serviceIcon(s.icon);
-                                  return (
-                                    <Link
-                                      key={s.slug}
-                                      to={`/services/${s.slug}`}
-                                      onClick={() => setIsMenuOpen(false)}
-                                      className="flex items-center gap-3 rounded-xl bg-gray-50 px-3 py-2 text-sm text-gray-700 transition-colors hover:text-primary-600 dark:bg-white/5 dark:text-gray-300"
-                                    >
-                                      <span className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${s.gradient} text-white shadow-sm`}>
-                                        <Icon className="h-4 w-4" aria-hidden="true" />
-                                      </span>
-                                      <span className="min-w-0">
-                                        <span className="block truncate font-semibold">{s.name}</span>
-                                        <span className="block truncate text-xs text-gray-500 dark:text-gray-400">
-                                          {s.shortDescription}
-                                        </span>
-                                      </span>
-                                    </Link>
-                                  );
-                                })}
-                              </div>
-                            ))}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ) : item.hasIndustriesMenu ? (
-                  <div key={item.name}>
-                    <button
-                      type="button"
-                      onClick={() => setMobileIndustriesOpen((o) => !o)}
-                      aria-expanded={mobileIndustriesOpen}
-                      className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-display text-base font-bold tracking-tight transition-colors duration-200 ${
-                        isActive(item.path)
-                          ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-800/20'
-                          : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-800'
-                      }`}
-                    >
-                      <span onClick={(e) => { e.stopPropagation(); setIsMenuOpen(false); navigate(item.path); }}>
-                        {item.name}
-                      </span>
-                      <ChevronDown className={`h-4 w-4 transition-transform ${mobileIndustriesOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
-                    </button>
-                    <AnimatePresence initial={false}>
-                      {mobileIndustriesOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.25 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="ml-2 max-h-[50vh] space-y-1 overflow-y-auto border-l-2 border-primary-200 py-1 pl-2 dark:border-primary-700">
-                            <Link
-                              to="/industries"
-                              onClick={() => setIsMenuOpen(false)}
-                              className="flex items-center justify-between rounded-xl bg-primary-50 px-3 py-2.5 text-sm font-bold text-primary-700 dark:bg-primary-800/30 dark:text-primary-300"
-                            >
-                              View All Industries
-                              <span className="rounded-full bg-primary-600 px-2 py-0.5 text-[11px] font-bold text-white">
-                                {INDUSTRIES.length}
-                              </span>
-                            </Link>
-                            {INDUSTRIES.map((ind) => {
-                              const Icon = serviceIcon(ind.icon);
-                              return (
-                                <Link
-                                  key={ind.slug}
-                                  to={`/industries/${ind.slug}`}
-                                  onClick={() => setIsMenuOpen(false)}
-                                  className="flex items-center gap-3 rounded-xl bg-gray-50 px-3 py-2 text-sm text-gray-700 transition-colors hover:text-primary-600 dark:bg-white/5 dark:text-gray-300"
-                                >
-                                  <span className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${ind.gradient} text-white shadow-sm`}>
-                                    <Icon className="h-4 w-4" aria-hidden="true" />
-                                  </span>
-                                  <span className="min-w-0">
-                                    <span className="block truncate font-semibold">{ind.name}</span>
-                                    <span className="block truncate text-xs text-gray-500 dark:text-gray-400">
-                                      {ind.shortDescription}
-                                    </span>
-                                  </span>
-                                </Link>
-                              );
-                            })}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ) : (
-                  <Link
+            <div className="flex h-16 shrink-0 items-center justify-between px-4">
+              <Link to="/" onClick={() => setIsMenuOpen(false)} aria-label="SoSapient home">
+                <img src={LOGO_URL} width={176} height={44} className="h-8 w-auto" alt="SoSapient logo" />
+              </Link>
+              <button
+                onClick={() => setIsMenuOpen(false)}
+                aria-label="Close menu"
+                className="rounded-xl bg-gray-900 p-2.5 text-white transition hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:bg-white dark:text-gray-900"
+              >
+                <X className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </div>
+
+            <nav className="flex-1 overflow-y-auto px-4 pb-6" aria-label="Mobile">
+              {navItems.map((item, ni) => {
+                const hasMenu = Boolean(item.hasAboutMenu || item.hasMenu || item.hasIndustriesMenu);
+                const open = item.hasAboutMenu ? mobileAboutOpen : item.hasMenu ? mobileServicesOpen : mobileIndustriesOpen;
+                const toggle = item.hasAboutMenu
+                  ? () => setMobileAboutOpen((o) => !o)
+                  : item.hasMenu
+                    ? () => setMobileServicesOpen((o) => !o)
+                    : () => setMobileIndustriesOpen((o) => !o);
+                return (
+                  <motion.div
                     key={item.name}
-                    to={item.path}
-                    onClick={() => setIsMenuOpen(false)}
-                    className={`block rounded-xl px-4 py-3 font-display text-lg font-bold tracking-tight transition-colors duration-200 ${
-                      isActive(item.path)
-                        ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-800/20'
-                        : 'text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-800'
-                    }`}
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.05 * ni, duration: 0.3 }}
+                    className="border-b border-gray-100 dark:border-white/10"
                   >
-                    {item.name}
-                  </Link>
-                )
-              ))}
-              <div className="sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent px-2 pb-2 pt-6 dark:from-primary-900 dark:via-primary-900">
+                    <div className="flex items-center gap-2 py-1">
+                      <Link
+                        to={item.path}
+                        onClick={() => setIsMenuOpen(false)}
+                        aria-current={isActive(item.path) ? 'page' : undefined}
+                        className={`flex-1 rounded-xl px-3 py-3 font-display text-2xl font-bold tracking-tight transition-colors ${
+                          isActive(item.path)
+                            ? 'text-primary-600 dark:text-primary-400'
+                            : 'text-gray-900 hover:text-primary-600 dark:text-white dark:hover:text-primary-400'
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                      {hasMenu && (
+                        <button
+                          type="button"
+                          onClick={toggle}
+                          aria-expanded={open}
+                          aria-label={`${open ? 'Collapse' : 'Expand'} ${item.name} submenu`}
+                          className="rounded-xl bg-gray-100 p-3 text-gray-700 transition hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:bg-white/10 dark:text-gray-200"
+                        >
+                          <ChevronDown className={`h-5 w-5 transition-transform ${open ? 'rotate-180' : ''}`} aria-hidden="true" />
+                        </button>
+                      )}
+                    </div>
+                    {hasMenu && (
+                      <AnimatePresence initial={false}>
+                        {open && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.25 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="max-h-[46vh] space-y-1 overflow-y-auto pb-4 pl-1">
+                              {item.hasAboutMenu && aboutMenuItems.map((sub) => (
+                                <MobileSubLink key={sub.path} to={sub.path} close={() => setIsMenuOpen(false)} icon={<sub.Icon className="h-4 w-4" aria-hidden="true" />} gradient={sub.gradient} title={sub.name} sub={sub.description} />
+                              ))}
+                              {item.hasMenu && (
+                                <>
+                                  <MobileSubLink to="/services" close={() => setIsMenuOpen(false)} title="View All Services" badge={String(SERVICES.length)} strong />
+                                  {SERVICE_CATEGORIES.map((cat) => (
+                                    <div key={cat.id}>
+                                      <p className="px-3 pb-0.5 pt-2 text-[11px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+                                        {cat.label}
+                                      </p>
+                                      {servicesByCategory(cat.id).map((s) => {
+                                        const Icon = serviceIcon(s.icon);
+                                        return (
+                                          <MobileSubLink key={s.slug} to={`/services/${s.slug}`} close={() => setIsMenuOpen(false)} icon={<Icon className="h-4 w-4" aria-hidden="true" />} gradient={s.gradient} title={s.name} sub={s.shortDescription} />
+                                        );
+                                      })}
+                                    </div>
+                                  ))}
+                                </>
+                              )}
+                              {item.hasIndustriesMenu && (
+                                <>
+                                  <MobileSubLink to="/industries" close={() => setIsMenuOpen(false)} title="View All Industries" badge={String(INDUSTRIES.length)} strong />
+                                  {INDUSTRIES.map((ind) => {
+                                    const Icon = serviceIcon(ind.icon);
+                                    return (
+                                      <MobileSubLink key={ind.slug} to={`/industries/${ind.slug}`} close={() => setIsMenuOpen(false)} icon={<Icon className="h-4 w-4" aria-hidden="true" />} gradient={ind.gradient} title={ind.name} sub={ind.shortDescription} />
+                                    );
+                                  })}
+                                </>
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    )}
+                  </motion.div>
+                );
+              })}
+
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.3 }}
+                className="pt-6"
+              >
                 <Link
                   to="/contact"
                   onClick={() => setIsMenuOpen(false)}
@@ -775,13 +653,63 @@ const Header: React.FC = () => {
                 >
                   Get in Touch <ArrowRight className="h-5 w-5" aria-hidden="true" />
                 </Link>
-              </div>
-            </div>
+                <div className="mt-5 flex items-center justify-center gap-3">
+                  {socialLinks.map((s) => (
+                    <a
+                      key={s.label}
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`SoSapient on ${s.label}`}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 text-gray-600 transition hover:bg-primary-600 hover:text-white dark:bg-white/10 dark:text-gray-300"
+                    >
+                      <s.Icon className="h-[18px] w-[18px]" />
+                    </a>
+                  ))}
+                </div>
+              </motion.div>
+            </nav>
           </motion.div>
         )}
-      </div>
+      </AnimatePresence>
     </motion.header>
   );
 };
+
+const MobileSubLink: React.FC<{
+  to: string;
+  close: () => void;
+  title: string;
+  sub?: string;
+  icon?: React.ReactNode;
+  gradient?: string;
+  badge?: string;
+  strong?: boolean;
+}> = ({ to, close, title, sub, icon, gradient, badge, strong }) => (
+  <Link
+    to={to}
+    onClick={close}
+    className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
+      strong
+        ? 'bg-primary-50 font-bold text-primary-700 dark:bg-primary-800/30 dark:text-primary-300'
+        : 'bg-gray-50 text-gray-700 hover:text-primary-600 dark:bg-white/5 dark:text-gray-300'
+    }`}
+  >
+    {icon && gradient && (
+      <span className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${gradient} text-white shadow-sm`}>
+        {icon}
+      </span>
+    )}
+    <span className="min-w-0 flex-1">
+      <span className="block truncate font-semibold">{title}</span>
+      {sub && (
+        <span className="block truncate text-xs text-gray-500 dark:text-gray-400">{sub}</span>
+      )}
+    </span>
+    {badge && (
+      <span className="rounded-full bg-primary-600 px-2 py-0.5 text-[11px] font-bold text-white">{badge}</span>
+    )}
+  </Link>
+);
 
 export default Header;
