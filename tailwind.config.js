@@ -54,6 +54,7 @@ export default {
         'float-delayed': 'float 7s ease-in-out 1.5s infinite',
         'float-slow': 'float 11s ease-in-out infinite',
         'float-slower': 'float 14s ease-in-out 2s infinite',
+        'marquee': 'marquee 42s linear infinite',
       },
       keyframes: {
         fadeIn: {
@@ -67,6 +68,10 @@ export default {
         float: {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-10px)' },
+        },
+        marquee: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
         }
       }
     },

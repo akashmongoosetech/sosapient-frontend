@@ -2,15 +2,19 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import Hero from '../components/Home/Hero';
 import Services from '../components/Home/Services';
-import About from '../components/Home/About';
 import TechStack from '../components/Home/TechStack';
 import Testimonials from '../components/Home/Testimonials';
 import BlogPreview from '../components/Home/BlogPreview';
 import CTA from '../components/Home/CTA';
-// import FeaturesSection from '../components/Home/FeaturesSection';
 import ProcessSection from '../components/Home/ProcessSection';
 import FaqSection from '../components/Home/FaqSection';
-// import GoogleReviews from '../components/Home/GoogleReviews';
+import ValueProp from '../components/Home/ValueProp';
+import AiAutomation from '../components/Home/AiAutomation';
+import IndustriesGrid from '../components/Home/IndustriesGrid';
+import WhyUs from '../components/Home/WhyUs';
+import TechEcosystem from '../components/Home/TechEcosystem';
+import HomeCaseStudies from '../components/Home/HomeCaseStudies';
+import Outcomes from '../components/Home/Outcomes';
 
 const Home: React.FC = () => {
   return (
@@ -61,15 +65,19 @@ const Home: React.FC = () => {
         </script>
       </Helmet>
       <Hero />
-      <Services />
-      <About />
       <TechStack />
-      {/* <FeaturesSection/> */}
-      <ProcessSection/>
-      <FaqSection/>
-      {/* <GoogleReviews/> */}
+      <ValueProp />
+      <Services />
+      <AiAutomation />
+      <IndustriesGrid />
+      <WhyUs />
+      <TechEcosystem />
+      <HomeCaseStudies />
+      <ProcessSection />
+      <Outcomes />
       <Testimonials />
       <BlogPreview />
+      <FaqSection />
       <CTA />
     </>
   );

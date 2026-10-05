@@ -1,10 +1,12 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 
-const TechStack: React.FC = () => {
-  const navigate = useNavigate();
-  const technologies = [
+export interface HomeTech {
+  name: string;
+  logo: string;
+  color: string;
+}
+
+export const TECHNOLOGIES: HomeTech[] = [
     // Frontend Frameworks
     { 
       name: 'Angular', 
@@ -163,74 +165,35 @@ const TechStack: React.FC = () => {
     }
   ];
 
+const TechStack: React.FC = () => {
+  const row = [...TECHNOLOGIES, ...TECHNOLOGIES];
   return (
-    <section className="py-20 bg-white dark:bg-primary-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            Technologies We Use
-          </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            We leverage cutting-edge technologies and frameworks to build robust, 
-            scalable, and future-proof solutions for our clients.
-          </p>
-        </motion.div>
-
-        {/* Tech Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-6">
-          {technologies.map((tech, index) => (
-            <motion.div
-              key={tech.name}
-              initial={{ opacity: 0, scale: 0.5 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: index * 0.05 }}
-              viewport={{ once: true }}
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              className="group relative"
+    <section aria-label="Technologies we use" className="overflow-hidden border-y border-gray-100 bg-white py-10 dark:border-gray-800 dark:bg-gray-900">
+      <p className="mb-6 text-center text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+        Powering products with modern technology
+      </p>
+      <div className="relative">
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-white to-transparent dark:from-gray-900" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-white to-transparent dark:from-gray-900" aria-hidden="true" />
+        <div className="flex w-max animate-marquee gap-4 hover:[animation-play-state:paused] motion-reduce:animate-none">
+          {row.map((tech, i) => (
+            <div
+              key={`${tech.name}-${i}`}
+              aria-hidden={i >= TECHNOLOGIES.length}
+              className="flex shrink-0 items-center gap-2.5 rounded-full border border-gray-200 bg-gray-50 py-2 pl-2 pr-4 dark:border-gray-700 dark:bg-gray-800"
             >
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700">
-                <div className={`w-14 h-14 mx-auto mb-3 bg-gradient-to-br ${tech.color} rounded-xl flex items-center justify-center p-2`}>
-                  <img 
-                    src={tech.logo} 
-                    alt={`${tech.name} logo`}
-                    className="w-full h-full object-contain filter dark:brightness-0 dark:invert"
-                  />
-                </div>
-                <h3 className="text-center text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                  {tech.name}
-                </h3>
-              </div>
-            </motion.div>
+              <span className={`flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br ${tech.color} p-1.5`}>
+                <img
+                  src={tech.logo}
+                  alt={i < TECHNOLOGIES.length ? `${tech.name} logo` : ''}
+                  loading="lazy"
+                  className="h-full w-full object-contain"
+                />
+              </span>
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">{tech.name}</span>
+            </div>
           ))}
         </div>
-
-        {/* Bottom CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mt-16"
-        >
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
-            Ready to build something amazing together?
-          </p>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/contact')}
-            className="px-8 py-4 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-semibold hover:from-primary-600 hover:to-secondary-600 transition-all duration-200 shadow-lg"
-          >
-            Start Your Project
-          </motion.button>
-        </motion.div>
       </div>
     </section>
   );

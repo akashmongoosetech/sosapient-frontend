@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Moon, Sun, ChevronDown, ArrowRight, ArrowUpRight, Info, Newspaper, Briefcase, Mail, Facebook, Linkedin, Instagram, Twitter, Sparkles } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { SERVICES, SERVICE_CATEGORIES, servicesByCategory } from '../../data/services';
 import { INDUSTRIES } from '../../data/industries';
 import { serviceIcon } from '../services/ServiceCard';
@@ -19,7 +18,6 @@ const Header: React.FC = () => {
   const [mobileIndustriesOpen, setMobileIndustriesOpen] = useState(false);
   const closeTimer = useRef<number | null>(null);
   const { theme, toggleTheme } = useTheme();
-  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -526,14 +524,8 @@ const Header: React.FC = () => {
             ))}
           </nav>
 
-          {/* Theme Toggle & Auth & Mobile Menu */}
+          {/* Theme Toggle & Mobile Menu */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {!isAuthenticated && (
-              <div className="hidden items-center gap-4 lg:flex">
-                <Link to="/login" className="font-display text-[15px] font-semibold text-gray-800 hover:text-primary-600 dark:text-gray-200">Login</Link>
-                <Link to="/signup" className="rounded-lg bg-gray-900 px-4 py-2 text-[15px] font-semibold text-white transition hover:bg-gray-700 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200">Sign up</Link>
-              </div>
-            )}
             <Link
               to="/contact"
               className="hidden sm:inline-flex min-h-[48px] items-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-secondary-600 px-6 sm:px-7 py-2.5 font-display text-[15px] font-bold text-white shadow-lg shadow-primary-600/25 transition hover:shadow-xl hover:brightness-110"
@@ -775,16 +767,6 @@ const Header: React.FC = () => {
                   </Link>
                 )
               ))}
-              {!isAuthenticated && (
-                <>
-                  <Link to="/login" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Login
-                  </Link>
-                  <Link to="/signup" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm font-medium text-primary-600">
-                    Sign up
-                  </Link>
-                </>
-              )}
               <div className="sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent px-2 pb-2 pt-6 dark:from-primary-900 dark:via-primary-900">
                 <Link
                   to="/contact"
