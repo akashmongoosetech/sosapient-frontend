@@ -21,6 +21,8 @@ interface AuthContextType {
   signup: (payload: SignupPayload) => Promise<AuthUser>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
+  updateProfile: (payload: ProfileUpdatePayload) => Promise<AuthUser>;
+  changePassword: (payload: PasswordChangePayload) => Promise<void>;
 }
 
 export interface SignupPayload {
@@ -31,6 +33,21 @@ export interface SignupPayload {
   mobile: string;
   profilePic?: string;
   password: string;
+  confirmPassword: string;
+}
+
+export interface ProfileUpdatePayload {
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  mobile: string;
+  profilePic: string;
+}
+
+export interface PasswordChangePayload {
+  currentPassword: string;
+  newPassword: string;
   confirmPassword: string;
 }
 
@@ -162,6 +179,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [persist]);
 
+  const updateProfile = useCallback(async (payload: ProfileUpdatePayload) => {
+    const t = readToken();
+    if (!t) throw new Error('You are not logged in.');
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+      const res = await fetch(`${baseUrl()}/api/auth/me`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${t}` },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.user) {
+        throw new Error(data?.message || 'Profile update failed');
+      }
+      persist(t, data.user as AuthUser);
+      return data.user as AuthUser;
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        throw new Error('Request timed out. Please check your connection and try again.');
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }, [persist]);
+
+  const changePassword = useCallback(async (payload: PasswordChangePayload) => {
+    const t = readToken();
+    if (!t) throw new Error('You are not logged in.');
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+      const res = await fetch(`${baseUrl()}/api/auth/password`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${t}` },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.success) {
+        throw new Error(data?.message || 'Password change failed');
+      }
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        throw new Error('Request timed out. Please check your connection and try again.');
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     // Optimistic: clear state first so UI responds instantly (JWT is stateless).
     const t = readToken();
@@ -192,8 +263,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     login,
     signup,
     logout,
-    refresh
-  }), [user, token, loading, login, signup, logout, refresh]);
+    refresh,
+    updateProfile,
+    changePassword
+  }), [user, token, loading, login, signup, logout, refresh, updateProfile, changePassword]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

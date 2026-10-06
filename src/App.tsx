@@ -4,7 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout/Layout';
-import ProtectedRoute from './components/Layout/ProtectedRoute';
+import ProtectedRoute, { RequireAuth } from './components/Layout/ProtectedRoute';
 import AdminLayout from './components/admin/AdminLayout';
 import Home from './pages/Home';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -26,6 +26,7 @@ const JobAdmin = lazy(() => import('./pages/JobAdmin'));
 const JobDetails = lazy(() => import('./pages/JobDetails'));
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
+const Profile = lazy(() => import('./pages/Profile'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const AdminProfile = lazy(() => import('./pages/admin/AdminProfile'));
 const ServiceDetail = lazy(() => import('./pages/ServiceDetail'));
@@ -78,11 +79,14 @@ function App() {
                   <Route path="careers/:jobId" element={<JobDetails />} />
                   <Route path="contact" element={<Contact />} />
                   <Route path="portfolio" element={<Portfolio />} />
+                  {/* Self profile for any authenticated role (ADMIN and USER) */}
+                  <Route path="profile" element={<RequireAuth><Profile /></RequireAuth>} />
                 </Route>
 
                 {/* Auth pages render standalone without site header/footer */}
                 <Route path="login" element={<Login />} />
                 <Route path="signup" element={<Signup />} />
+
 
                 {/* Legacy API-key login removed: redirect to JWT login */}
                 <Route path="admin-login" element={<Navigate to="/login" replace />} />
