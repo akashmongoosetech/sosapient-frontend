@@ -206,7 +206,7 @@ export const ErrorState: React.FC<{ title: string; body: string; onRetry?: () =>
 export const ConfirmDialog: React.FC<{
   open: boolean;
   title: string;
-  body: string;
+  body: React.ReactNode;
   confirmLabel?: string;
   busy?: boolean;
   onCancel: () => void;

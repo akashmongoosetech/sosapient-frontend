@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, Pencil, Trash2, Plus, Upload, Phone, Globe, Users, Inbox, CheckCircle2, Copy, Check } from 'lucide-react';
 import { authFetch } from '../../utils/api';
@@ -16,6 +16,7 @@ import {
   PageHeader,
   PrimaryButton,
   SecondaryButton,
+  DangerButton,
   IconButton,
   AdminInput,
   AdminSelect,
@@ -83,6 +84,14 @@ const LeadsPage: React.FC = () => {
   const [deleting, setDeleting] = useState(false);
   const [statusBusy, setStatusBusy] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  // Page-scoped multi-select: holds IDs visible on the current page only.
+  // Cleared whenever page, filters, search, sort or page size change so a
+  // stale selection can never leak into another result set (Option A).
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkConfirm, setBulkConfirm] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const headerCheckRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const t = window.setTimeout(() => {
@@ -93,6 +102,83 @@ const LeadsPage: React.FC = () => {
   }, [search]);
 
   const resetPage = () => setPage(1);
+
+  // Safety: any result-set change wipes the page-scoped selection.
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [page, limit, debouncedSearch, status, city, category, contact, sort]);
+
+  const toggleOne = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAllOnPage = () => {
+    setSelectedIds((prev) => {
+      const allSelected = items.length > 0 && items.every((l) => prev.has(l._id));
+      if (allSelected) return new Set();
+      return new Set(items.map((l) => l._id));
+    });
+  };
+
+  const pageIds = items.map((l) => l._id);
+  const allOnPageSelected = items.length > 0 && pageIds.every((id) => selectedIds.has(id));
+  const someOnPageSelected = pageIds.some((id) => selectedIds.has(id));
+
+  useEffect(() => {
+    if (headerCheckRef.current) {
+      headerCheckRef.current.indeterminate = someOnPageSelected && !allOnPageSelected;
+    }
+  });
+
+  const selectedLeads = items.filter((l) => selectedIds.has(l._id));
+
+  const confirmBulkDelete = async () => {
+    if (selectedIds.size === 0 || bulkDeleting) return;
+    setBulkDeleting(true);
+    try {
+      const res = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/leads/bulk-delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: [...selectedIds] }),
+      });
+      if (res.status === 401) {
+        window.location.href = '/login';
+        return;
+      }
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data || !data.success) {
+        throw new Error((data && data.message) || 'Unable to delete selected leads. Please try again.');
+      }
+      const count = typeof data.deletedCount === 'number' ? data.deletedCount : selectedIds.size;
+      setSelectedIds(new Set());
+      setBulkConfirm(false);
+      setFeedback({
+        type: 'success',
+        message: count === 1 ? '1 lead deleted successfully.' : `${count} leads deleted successfully.`,
+      });
+      // If the page was fully cleared and pages remain, step back first.
+      const remaining = items.length - count;
+      if (remaining <= 0 && page > 1) {
+        setPage(page - 1);
+      } else {
+        fetchItems();
+      }
+      fetchMeta();
+    } catch (err) {
+      // Keep the selection so the user can retry.
+      setFeedback({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'Unable to delete selected leads. Please try again.',
+      });
+    } finally {
+      setBulkDeleting(false);
+    }
+  };
 
   const buildParams = useCallback(() => {
     const params = new URLSearchParams({ page: String(page), limit: String(limit) });
@@ -332,6 +418,47 @@ const LeadsPage: React.FC = () => {
         </div>
       </div>
 
+      {feedback && (
+        <div
+          role={feedback.type === 'error' ? 'alert' : 'status'}
+          className={`mb-4 flex items-start justify-between gap-3 rounded-xl border px-4 py-3 text-sm font-medium ${
+            feedback.type === 'success'
+              ? 'border-green-200 bg-green-50 text-green-800 dark:border-green-900 dark:bg-green-900/20 dark:text-green-300'
+              : 'border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-900/20 dark:text-red-300'
+          }`}
+        >
+          <span>{feedback.message}</span>
+          <button
+            type="button"
+            onClick={() => setFeedback(null)}
+            aria-label="Dismiss notification"
+            className="shrink-0 rounded-md px-1 font-bold hover:opacity-70"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {selectedIds.size > 0 && (
+        <div
+          className="mb-4 flex flex-col gap-2 rounded-xl border border-primary-200 bg-primary-50 px-4 py-3 dark:border-primary-800 dark:bg-primary-900/30 sm:flex-row sm:items-center sm:justify-between"
+          aria-live="polite"
+        >
+          <p className="text-sm font-bold text-gray-900 dark:text-white">
+            {selectedIds.size} {selectedIds.size === 1 ? 'lead' : 'leads'} selected
+            <span className="ml-2 font-normal text-gray-500 dark:text-gray-400">· current page only</span>
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <SecondaryButton type="button" onClick={() => setSelectedIds(new Set())} disabled={bulkDeleting}>
+              Clear Selection
+            </SecondaryButton>
+            <DangerButton type="button" onClick={() => setBulkConfirm(true)} disabled={bulkDeleting}>
+              <Trash2 className="mr-1.5 h-4 w-4" /> {bulkDeleting ? 'Deleting…' : 'Delete Selected'}
+            </DangerButton>
+          </div>
+        </div>
+      )}
+
       {error && items.length === 0 && <ErrorState title="Failed to load leads" body={error} onRetry={refreshAll} />}
 
       {!loading && !error && items.length === 0 && (
@@ -362,7 +489,15 @@ const LeadsPage: React.FC = () => {
               : items.map((lead) => (
               <div key={lead._id} className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
                 <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(lead._id)}
+                    onChange={() => toggleOne(lead._id)}
+                    disabled={bulkDeleting}
+                    aria-label={`Select ${lead.title || 'lead'}`}
+                    className="mt-1 h-5 w-5 shrink-0 rounded accent-primary-600"
+                  />
+                  <div className="min-w-0 flex-1">
                     <p className="truncate font-bold text-gray-900 dark:text-white">{lead.title || '(No title)'}</p>
                     <p className="truncate text-xs text-gray-500 dark:text-gray-400">
                       {[lead.categoryName, lead.city].filter(Boolean).join(' · ') || '—'}
@@ -411,15 +546,27 @@ const LeadsPage: React.FC = () => {
           <div className="relative hidden sm:block">
             <AdminTableShell fixed>
                 <colgroup>
-                  <col style={{ width: '22%' }} />
-                  <col style={{ width: '12%' }} />
-                  <col style={{ width: '16%' }} />
-                  <col style={{ width: '18%' }} />
+                  <col style={{ width: '44px' }} />
+                  <col style={{ width: '21%' }} />
+                  <col style={{ width: '11%' }} />
+                  <col style={{ width: '15%' }} />
+                  <col style={{ width: '17%' }} />
                   <col style={{ width: '124px' }} />
                   <col style={{ width: '100px' }} />
                   <col style={{ width: '132px' }} />
                 </colgroup>
                 <TableHead>
+                  <Th>
+                    <input
+                      ref={headerCheckRef}
+                      type="checkbox"
+                      checked={allOnPageSelected}
+                      onChange={toggleAllOnPage}
+                      disabled={bulkDeleting || (loading && items.length === 0)}
+                      aria-label={allOnPageSelected ? 'Deselect all leads on this page' : 'Select all leads on this page'}
+                      className="h-4 w-4 rounded accent-primary-600"
+                    />
+                  </Th>
                   <Th>Lead</Th>
                   <Th>City</Th>
                   <Th>Phone</Th>
@@ -429,11 +576,21 @@ const LeadsPage: React.FC = () => {
                   <Th>Actions</Th>
                 </TableHead>
                 {loading && items.length === 0 ? (
-                  <SkeletonRows rows={8} cols={7} />
+                  <SkeletonRows rows={8} cols={8} />
                 ) : (
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                   {items.map((lead) => (
                     <tr key={lead._id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                      <td className="px-3 py-2.5">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.has(lead._id)}
+                          onChange={() => toggleOne(lead._id)}
+                          disabled={bulkDeleting}
+                          aria-label={`Select ${lead.title || 'lead'}`}
+                          className="h-4 w-4 rounded accent-primary-600"
+                        />
+                      </td>
                       <td className="px-3 py-2.5">
                         <p className="truncate font-semibold text-gray-900 dark:text-white" title={lead.title}>
                           {lead.title || '(No title)'}
@@ -512,10 +669,10 @@ const LeadsPage: React.FC = () => {
                 Showing {(page - 1) * limit + 1}–{Math.min(page * limit, totalItems)} of {totalItems.toLocaleString()} · Page {page} of {totalPages}
               </p>
               <div className="flex gap-2">
-                <SecondaryButton type="button" disabled={page === 1} onClick={() => setPage(page - 1)}>
+                <SecondaryButton type="button" disabled={page === 1 || bulkDeleting} onClick={() => setPage(page - 1)}>
                   Previous
                 </SecondaryButton>
-                <SecondaryButton type="button" disabled={page === totalPages} onClick={() => setPage(page + 1)}>
+                <SecondaryButton type="button" disabled={page === totalPages || bulkDeleting} onClick={() => setPage(page + 1)}>
                   Next
                 </SecondaryButton>
               </div>
@@ -532,6 +689,37 @@ const LeadsPage: React.FC = () => {
         busy={deleting}
         onCancel={() => setDeleteId(null)}
         onConfirm={confirmDelete}
+      />
+
+      <ConfirmDialog
+        open={bulkConfirm}
+        title={`Delete ${selectedIds.size} ${selectedIds.size === 1 ? 'lead' : 'leads'}?`}
+        body={
+          selectedLeads.length > 0 ? (
+            <span>
+              You are about to permanently delete {selectedIds.size} {selectedIds.size === 1 ? 'lead' : 'leads'}:
+              <ul className="mt-2 max-h-32 list-disc space-y-0.5 overflow-y-auto pl-5 text-left">
+                {selectedLeads.slice(0, 5).map((l) => (
+                  <li key={l._id} className="truncate">
+                    {l.title || '(No title)'}
+                    {l.city ? ` · ${l.city}` : ''}
+                  </li>
+                ))}
+              </ul>
+              {selectedLeads.length > 5 && (
+                <span className="mt-1 block text-left">…and {selectedLeads.length - 5} more.</span>
+              )}
+            </span>
+          ) : (
+            `You are about to permanently delete ${selectedIds.size} leads.`
+          )
+        }
+        confirmLabel={bulkDeleting ? 'Deleting…' : `Delete ${selectedIds.size} ${selectedIds.size === 1 ? 'Lead' : 'Leads'}`}
+        busy={bulkDeleting}
+        onCancel={() => {
+          if (!bulkDeleting) setBulkConfirm(false);
+        }}
+        onConfirm={confirmBulkDelete}
       />
     </div>
   );
