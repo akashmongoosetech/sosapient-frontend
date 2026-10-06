@@ -46,6 +46,7 @@ const LeadNewPage = lazy(() => import('./pages/admin/LeadNewPage'));
 const LeadDetailPage = lazy(() => import('./pages/admin/LeadDetailPage'));
 const LeadEditPage = lazy(() => import('./pages/admin/LeadEditPage'));
 const LeadImportPage = lazy(() => import('./pages/admin/LeadImportPage'));
+const DealsPage = lazy(() => import('./pages/admin/DealsPage'));
 const CertificateVerify = lazy(() => import('./pages/CertificateVerify'));
 
 const RouteFallback: React.FC = () => (
@@ -108,6 +109,7 @@ function App() {
                   <Route path="leads/import" element={<LeadImportPage />} />
                   <Route path="leads/:id" element={<LeadDetailPage />} />
                   <Route path="leads/:id/edit" element={<LeadEditPage />} />
+                  <Route path="deals" element={<DealsPage />} />
                   <Route path="profile" element={<AdminProfile />} />
                 </Route>
 

@@ -68,6 +68,32 @@ const LeadDetailPage: React.FC = () => {
     })();
   }, [id]);
 
+  const [convertMsg, setConvertMsg] = useState<{ type: 'success' | 'error'; text: string; dealId?: string } | null>(null);
+  const [linkedDealId, setLinkedDealId] = useState<string | null>(null);
+
+  // For already-converted leads, resolve the linked deal for a View link.
+  useEffect(() => {
+    if (!doc || doc.status !== 'Converted') {
+      setLinkedDealId(null);
+      return;
+    }
+    let live = true;
+    (async () => {
+      try {
+        const res = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/deals/by-lead/${doc._id}`);
+        const data = await res.json().catch(() => null);
+        if (live && res.ok && data && data.success && data.data) {
+          setLinkedDealId(data.data._id);
+        }
+      } catch {
+        // link simply stays hidden
+      }
+    })();
+    return () => {
+      live = false;
+    };
+  }, [doc]);
+
   const changeStatus = async (next: LeadStatus) => {
     if (!doc || next === doc.status || statusBusy) return;
     setStatusBusy(true);
@@ -78,7 +104,37 @@ const LeadDetailPage: React.FC = () => {
         body: JSON.stringify({ status: next }),
       });
       const data = await res.json();
-      if (data.success && data.data) setDoc(data.data);
+      if (data.success && data.data) {
+        setDoc(data.data);
+        if (next === 'Converted') {
+          if (data.deal && data.deal._id) {
+            setConvertMsg({ type: 'success', text: 'Lead converted successfully. Deal created.', dealId: data.deal._id });
+          } else {
+            setConvertMsg({
+              type: 'error',
+              text: (data.dealError as string) || 'Lead converted, but the deal could not be created. Please retry conversion.',
+            });
+          }
+        }
+      }
+    } finally {
+      setStatusBusy(false);
+    }
+  };
+
+  const retryConvert = async () => {
+    if (!doc || statusBusy) return;
+    setStatusBusy(true);
+    try {
+      const res = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/leads/${doc._id}/convert`, {
+        method: 'POST',
+      });
+      const data = await res.json().catch(() => null);
+      if (res.ok && data && data.success && data.deal) {
+        setConvertMsg({ type: 'success', text: 'Deal created successfully.', dealId: data.deal._id });
+      } else {
+        setConvertMsg({ type: 'error', text: (data && data.message) || 'Deal could not be created. Please try again.' });
+      }
     } finally {
       setStatusBusy(false);
     }
@@ -166,10 +222,41 @@ const LeadDetailPage: React.FC = () => {
         }
       />
 
+      {convertMsg && (
+        <div
+          role={convertMsg.type === 'error' ? 'alert' : 'status'}
+          className={`mb-4 flex flex-wrap items-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium ${
+            convertMsg.type === 'success'
+              ? 'border-green-200 bg-green-50 text-green-800 dark:border-green-900 dark:bg-green-900/20 dark:text-green-300'
+              : 'border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-900/20 dark:text-red-300'
+          }`}
+        >
+          <span className="flex-1">{convertMsg.text}</span>
+          {convertMsg.type === 'success' && convertMsg.dealId && (
+            <Link
+              to={`/admin/deals?open=${convertMsg.dealId}`}
+              className="font-bold underline hover:no-underline"
+            >
+              View Deal →
+            </Link>
+          )}
+          {convertMsg.type === 'error' && (
+            <SecondaryButton type="button" onClick={retryConvert} disabled={statusBusy}>
+              Retry Conversion
+            </SecondaryButton>
+          )}
+        </div>
+      )}
+
       <ContentCard>
         <div className="mb-2 flex flex-wrap items-center gap-2">
           <StatusBadge label={doc.status} tone={leadStatusTone(doc.status)} />
           {doc.categoryName && <span className="text-sm text-gray-500 dark:text-gray-400">{doc.categoryName}</span>}
+          {linkedDealId && (
+            <Link to={`/admin/deals?open=${linkedDealId}`} className="text-sm font-bold text-primary-600 hover:underline dark:text-primary-400">
+              View Deal →
+            </Link>
+          )}
         </div>
         <dl className="grid grid-cols-1 gap-x-8 sm:grid-cols-2">
           <Row label="Business / Lead Title">{doc.title || '—'}</Row>

@@ -250,6 +250,9 @@ const LeadsPage: React.FC = () => {
     fetchMeta();
   };
 
+  const [convertedDeal, setConvertedDeal] = useState<{ leadId: string; dealId: string } | null>(null);
+  const [retryLeadId, setRetryLeadId] = useState<string | null>(null);
+
   const changeStatus = async (lead: Lead, next: LeadStatus) => {
     if (next === lead.status || statusBusy) return;
     setStatusBusy(lead._id);
@@ -261,11 +264,66 @@ const LeadsPage: React.FC = () => {
       });
       const data = await res.json();
       if (data.success && data.data) {
-        setItems((prev) => prev.map((p) => (p._id === lead._id ? data.data : p)));
-        fetchMeta();
+        // Backend-driven conversion: only celebrate when the backend confirms a deal.
+        if (next === 'Converted') {
+          if (data.deal && data.deal._id) {
+            // Moved leads live in Deals now: drop the row immediately and
+            // revalidate counts. Step back if the page drained.
+            setConvertedDeal({ leadId: lead._id, dealId: data.deal._id });
+            setFeedback({ type: 'success', message: 'Lead converted successfully. Deal created.' });
+            setSelectedIds((prev) => {
+              const nextSet = new Set(prev);
+              nextSet.delete(lead._id);
+              return nextSet;
+            });
+            if (items.length === 1 && page > 1) {
+              setPage(page - 1);
+            } else {
+              fetchItems();
+            }
+            fetchMeta();
+          } else {
+            // Conversion failed: the lead keeps no deal, so it stays visible
+            // by design. Offer an explicit retry.
+            setConvertedDeal(null);
+            setRetryLeadId(lead._id);
+            setFeedback({
+              type: 'error',
+              message: (data.dealError as string) || 'Lead converted, but the deal could not be created.',
+            });
+          }
+        } else {
+          setItems((prev) => prev.map((p) => (p._id === lead._id ? data.data : p)));
+          fetchMeta();
+        }
       }
     } catch {
       // keep old status on failure
+    } finally {
+      setStatusBusy(null);
+    }
+  };
+
+  const retryConvert = async () => {
+    if (!retryLeadId || statusBusy) return;
+    setStatusBusy(retryLeadId);
+    try {
+      const res = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/leads/${retryLeadId}/convert`, {
+        method: 'POST',
+      });
+      const data = await res.json().catch(() => null);
+      if (res.ok && data && data.success && data.deal) {
+        setRetryLeadId(null);
+        setConvertedDeal({ leadId: retryLeadId, dealId: data.deal._id });
+        setFeedback({ type: 'success', message: 'Lead converted successfully. Deal created.' });
+        fetchItems();
+        fetchMeta();
+      } else {
+        setFeedback({
+          type: 'error',
+          message: (data && data.message) || 'Deal could not be created. Please try again.',
+        });
+      }
     } finally {
       setStatusBusy(null);
     }
@@ -357,7 +415,7 @@ const LeadsPage: React.FC = () => {
       <div className="mb-4 grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4" aria-live="polite">
         <StatCard label="Total Leads" value={stats ? stats.total.toLocaleString() : ''} loading={!stats} icon={<Users className="h-5 w-5" />} />
         <StatCard label="New" value={stats ? String(stats.byStatus.New || 0) : ''} loading={!stats} icon={<Inbox className="h-5 w-5" />} />
-        <StatCard label="Converted" value={stats ? String(stats.byStatus.Converted || 0) : ''} loading={!stats} icon={<CheckCircle2 className="h-5 w-5" />} />
+        <StatCard label="In Progress" value={stats ? String((stats.byStatus.Message || 0) + (stats.byStatus.WhatsApp || 0) + (stats.byStatus.Call || 0)) : ''} loading={!stats} icon={<CheckCircle2 className="h-5 w-5" />} />
         <StatCard label="With Mobile" value={stats ? String(stats.withMobile) : ''} loading={!stats} icon={<Phone className="h-5 w-5" />} />
       </div>
 
@@ -427,10 +485,31 @@ const LeadsPage: React.FC = () => {
               : 'border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-900/20 dark:text-red-300'
           }`}
         >
-          <span>{feedback.message}</span>
+          <span>
+            {feedback.message}{' '}
+            {convertedDeal && feedback.type === 'success' && (
+              <Link to={`/admin/deals?open=${convertedDeal.dealId}`} className="font-bold underline hover:no-underline">
+                View Deal →
+              </Link>
+            )}
+            {retryLeadId && feedback.type === 'error' && (
+              <button
+                type="button"
+                onClick={retryConvert}
+                disabled={statusBusy !== null}
+                className="ml-1 font-bold underline hover:no-underline disabled:opacity-50"
+              >
+                Retry Conversion
+              </button>
+            )}
+          </span>
           <button
             type="button"
-            onClick={() => setFeedback(null)}
+            onClick={() => {
+              setFeedback(null);
+              setConvertedDeal(null);
+              setRetryLeadId(null);
+            }}
             aria-label="Dismiss notification"
             className="shrink-0 rounded-md px-1 font-bold hover:opacity-70"
           >

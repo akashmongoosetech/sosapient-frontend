@@ -12,6 +12,7 @@ const labels: Record<string, string> = {
   'case-studies': 'Case Studies',
   certificates: 'Certificates',
   leads: 'Leads',
+  deals: 'Deals',
   import: 'Import',
   new: 'New',
   edit: 'Edit',

@@ -17,6 +17,7 @@ const titles: Record<string, string> = {
   '/admin/certificates': 'Certificate Generation',
   '/admin/certificates/new': 'Generate Certificate',
   '/admin/leads': 'Leads',
+  '/admin/deals': 'Deals',
   '/admin/leads/new': 'Add Lead',
   '/admin/leads/import': 'Import Leads',
   '/admin/profile': 'Profile'

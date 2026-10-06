@@ -9,6 +9,7 @@ import {
   FileText,
   ClipboardList,
   Award,
+  Handshake,
   User,
   LogOut,
   X,
@@ -34,7 +35,8 @@ export const adminNavSections: { heading: string; items: AdminNavItem[] }[] = [
       { to: '/admin/contact-table', label: 'Contacts', icon: <Contact className="h-5 w-5" /> },
       { to: '/admin/career-table', label: 'Careers', icon: <Briefcase className="h-5 w-5" /> },
       { to: '/admin/subscriber-table', label: 'Subscribers', icon: <Users className="h-5 w-5" /> },
-      { to: '/admin/leads', label: 'Leads', icon: <UserPlus className="h-5 w-5" /> }
+      { to: '/admin/leads', label: 'Leads', icon: <UserPlus className="h-5 w-5" /> },
+      { to: '/admin/deals', label: 'Deals', icon: <Handshake className="h-5 w-5" /> }
     ]
   },
   {
