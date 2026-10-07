@@ -1,0 +1,16 @@
+# Netlify build configuration for the Vite SPA.
+# Security/SEO headers live in public/_headers (copied to dist/ at build).
+# SPA fallback lives in public/_redirects.
+# Required build-time env vars (set in Netlify dashboard → Site settings →
+# Environment variables; NEVER commit values):
+#   VITE_BASE_URL=https://sosapient-backend-49je.onrender.com
+#   VITE_SITE_URL=https://sosapient.in
+#   VITE_GA_MEASUREMENT_ID=G-45Y111F07G
+
+[build]
+  command = "npm run build"
+  publish = "dist/"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NPM_FLAGS = "--no-audit --no-fund"
