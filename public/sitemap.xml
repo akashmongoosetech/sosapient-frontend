@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://sosapient.in/</loc><lastmod>2026-10-07</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://sosapient.in/about</loc><lastmod>2026-10-07</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sosapient.in/services</loc><lastmod>2026-10-07</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://sosapient.in/industries</loc><lastmod>2026-10-07</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sosapient.in/blog</loc><lastmod>2026-10-07</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sosapient.in/case-studies</loc><lastmod>2026-10-07</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sosapient.in/careers</loc><lastmod>2026-10-07</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://sosapient.in/contact</loc><lastmod>2026-10-07</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://sosapient.in/privacy</loc><lastmod>2026-10-07</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://sosapient.in/terms</loc><lastmod>2026-10-07</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://sosapient.in/cookies</loc><lastmod>2026-10-07</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
+</urlset>
+<!-- NOTE: dynamic slugs (/services/:slug, /industries/:slug, /blog/:slug, /case-studies/:slug, /careers/:jobId) are served by the backend GET /sitemap.xml. Proxy /sitemap.xml to the API or extend this file at build time to avoid drift. -->

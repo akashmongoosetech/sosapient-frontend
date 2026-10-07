@@ -106,6 +106,12 @@ const ChatPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       }
       setCaptureDone(true);
       setCapture({ mode: 'off' });
+      try {
+        const { trackFormSubmit } = await import('../../utils/analytics');
+        trackFormSubmit('chatbot_lead');
+      } catch {
+        /* analytics optional */
+      }
       pushAssistant(data.message || "Thanks! I've received your details. We'll be in touch soon.");
     } catch (err) {
       setCaptureError(err instanceof Error ? err.message : 'Submission failed. Please try again.');

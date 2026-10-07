@@ -73,15 +73,22 @@ export interface ResolvedBlogSeo {
 }
 
 // Fallback chains: explicit SEO → base content → derived excerpt.
+export function truncateTitle(value: string, max = 60): string {
+  const v = String(value || '').trim().replace(/\s+/g, ' ');
+  return v.length > max ? `${v.slice(0, max - 1).trim()}…` : v;
+}
+
 export function resolveBlogSeo(blog: BlogSeoSource): ResolvedBlogSeo {
   const contentExcerpt = stripHtml(blog.content || '').slice(0, 160);
   const description = blog.seo?.metaDescription?.trim()
     || blog.excerpt?.trim()
     || contentExcerpt
     || `${blog.title} — SoSapient blog`;
-  const title = blog.seo?.metaTitle?.trim() || `${blog.title} | SoSapient`;
+  const rawTitle = blog.seo?.metaTitle?.trim() || `${blog.title} | SoSapient`;
+  const title = truncateTitle(rawTitle, 60);
   const canonical = blog.seo?.canonicalUrl?.trim() || `${siteUrl()}/blog/${blog.slug}`;
-  const image = absoluteUrl(blog.seo?.ogImage) || absoluteUrl(blog.image);
+  const cover = `${siteUrl()}/og/og-cover-1200x630.png`;
+  const image = absoluteUrl(blog.seo?.ogImage) || absoluteUrl(blog.image) || cover;
   const ogTitle = blog.seo?.ogTitle?.trim() || blog.seo?.metaTitle?.trim() || blog.title;
   const ogDescription = blog.seo?.ogDescription?.trim() || description;
   const keywords = (blog.seo?.keywords && blog.seo.keywords.length > 0

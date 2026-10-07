@@ -16,7 +16,12 @@ const IndustryDetail: React.FC = () => {
 
   if (!industry) {
     return (
-      <div className="mx-auto flex min-h-[60vh] max-w-3xl flex-col items-center justify-center px-4 py-20 text-center">
+      <>
+        <Helmet>
+          <title>Industry not found | SoSapient</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
+        <div className="mx-auto flex min-h-[60vh] max-w-3xl flex-col items-center justify-center px-4 py-20 text-center">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Industry not found</h1>
         <p className="mt-3 text-gray-600 dark:text-gray-300">
           The industry you are looking for does not exist or has been moved.
@@ -27,7 +32,8 @@ const IndustryDetail: React.FC = () => {
         >
           View all industries
         </Link>
-      </div>
+        </div>
+      </>
     );
   }
 
@@ -48,9 +54,11 @@ const IndustryDetail: React.FC = () => {
         <meta property="og:description" content={industry.seoDescription} />
         <meta property="og:url" content={canonical} />
         <meta property="og:site_name" content="SoSapient" />
+        <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={industry.seoTitle} />
         <meta name="twitter:description" content={industry.seoDescription} />
+        <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
         <script type="application/ld+json">
           {JSON.stringify({
             '@context': 'https://schema.org',

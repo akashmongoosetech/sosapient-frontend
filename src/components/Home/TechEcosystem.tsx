@@ -55,7 +55,7 @@ const TechEcosystem: React.FC = () => {
                     style={{ left: `${50 + 50 * Math.cos(a)}%`, top: `${50 + 50 * Math.sin(a)}%` }}
                     title={t.name}
                   >
-                    <img src={t.logo} alt="" loading="lazy" className="h-full w-full object-contain" />
+                    <img src={t.logo} alt={t.name} loading="lazy" decoding="async" className="h-full w-full object-contain" />
                   </span>
                 );
               })}
@@ -71,7 +71,7 @@ const TechEcosystem: React.FC = () => {
                     style={{ left: `${50 + 50 * Math.cos(a)}%`, top: `${50 + 50 * Math.sin(a)}%` }}
                     title={t.name}
                   >
-                    <img src={t.logo} alt="" loading="lazy" className="h-full w-full object-contain" />
+                    <img src={t.logo} alt={t.name} loading="lazy" decoding="async" className="h-full w-full object-contain" />
                   </span>
                 );
               })}
@@ -98,7 +98,7 @@ const TechEcosystem: React.FC = () => {
                     return (
                       <span key={n} className="inline-flex items-center gap-2 rounded-full bg-white/10 py-1.5 pl-1.5 pr-3 text-sm font-semibold text-white">
                         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white p-1">
-                          <img src={t.logo} alt="" loading="lazy" className="h-full w-full object-contain" />
+                          <img src={t.logo} alt={`${t.name} logo`} loading="lazy" decoding="async" className="h-full w-full object-contain" />
                         </span>
                         {t.name}
                       </span>

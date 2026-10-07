@@ -426,6 +426,8 @@ const BlogPost: React.FC = () => {
             <img
               src={blogPost.image}
               alt={blogPost.imageAlt || blogPost.title}
+              fetchPriority="high"
+              decoding="async"
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/80" />
@@ -862,6 +864,22 @@ const BlogPost: React.FC = () => {
             relatedBlogs={relatedBlogs}
             relatedLoading={relatedLoading}
           />
+
+          {/* Services CTA — internal link: blog → services/contact */}
+          <div className="mt-12 rounded-2xl border border-gray-200 bg-gray-50 p-6 text-center dark:border-gray-700 dark:bg-gray-800/50">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Need help with a project like this?</h2>
+            <p className="mx-auto mt-2 max-w-xl text-sm text-gray-600 dark:text-gray-300">
+              Explore our services or start a project with the SoSapient team.
+            </p>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+              <a href="/services" className="inline-flex min-h-[44px] items-center rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold hover:bg-gray-100 dark:border-gray-600">
+                Browse all services
+              </a>
+              <a href="/contact" className="inline-flex min-h-[44px] items-center rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700">
+                Start a project
+              </a>
+            </div>
+          </div>
         </article>
       </div>
     </>

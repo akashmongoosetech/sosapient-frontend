@@ -17,7 +17,7 @@ const About: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>About SoSapient | Web Development & AI Company in Ujjain, India</title>
+        <title>About SoSapient | Web Development & AI Company</title>
         <meta
           name="description"
           content="SoSapient is a software company in Ujjain, India building custom websites, MERN stack apps, AI automation and CRM/ERP solutions for clients worldwide."

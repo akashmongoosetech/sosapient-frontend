@@ -28,11 +28,16 @@ const Home: React.FC = () => {
         <meta property="og:description" content="MERN stack apps, AI chatbots & automation, CRM/ERP software, SEO and social media growth — from Ujjain, India to clients worldwide." />
         <meta property="og:url" content="https://sosapient.in/" />
         <meta property="og:site_name" content="SoSapient" />
-        <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <meta property="og:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
+        <meta property="og:image:alt" content="SoSapient — Web Development & AI Solutions" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:type" content="image/png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Full Stack Web Development & AI Solutions | SoSapient" />
         <meta name="twitter:description" content="MERN stack apps, AI chatbots & automation, CRM/ERP software, SEO and social media growth." />
-        <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <meta name="twitter:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
+        <meta name="twitter:image:alt" content="SoSapient — Web Development & AI Solutions" />
         <script type="application/ld+json">
           {JSON.stringify({
             '@context': 'https://schema.org',
@@ -50,7 +55,7 @@ const Home: React.FC = () => {
             sameAs: [
               'https://www.facebook.com/profile.php?id=61553017931533',
               'https://x.com/SoSapient_tech',
-              'https://www.linkedin.com/company/100043699/admin/page-posts/published/',
+              'https://www.linkedin.com/company/100043699/',
               'https://www.instagram.com/sosapient/'
             ]
           })}

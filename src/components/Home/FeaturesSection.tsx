@@ -157,8 +157,12 @@ const FeaturesSection: React.FC = () => {
             className="md:w-1/2"
           >
             <img 
-              src="./home/side7.png" 
-              alt="Business solutions" 
+              src="/home/side7.png" 
+              alt="Team reviewing digital growth dashboard" 
+              loading="lazy"
+              decoding="async"
+              width={525}
+              height={494}
               className="w-full rounded-xl border-4 border-white dark:border-gray-800"
             />
           </motion.div>

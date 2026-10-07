@@ -12,6 +12,19 @@ export default defineConfig(({ mode }) => {
     optimizeDeps: {
       exclude: ['lucide-react'],
     },
+    build: {
+      chunkSizeWarningLimit: 600,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom', 'react-router-dom'],
+            motion: ['framer-motion'],
+            editor: ['@ckeditor/ckeditor5-build-classic', '@ckeditor/ckeditor5-react'],
+            docs: ['jspdf', 'jspdf-autotable', 'xlsx', 'qrcode', 'html-to-image'],
+          },
+        },
+      },
+    },
     server: {
       proxy: {
         '/api': {

@@ -41,7 +41,7 @@ const ServiceSection: React.FC = () => {
                       to="/contact" 
                       className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium group"
                     >
-                      Learn More
+                      Get in touch about this service
                       <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </div>

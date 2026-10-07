@@ -276,7 +276,7 @@ const Comments: React.FC<CommentsProps> = ({
       form.append('name', cName.trim());
       form.append('email', cEmail.trim());
       form.append('comment', cText.trim());
-      form.append('userId', currentUserId); // Add userId to track ownership
+      form.append('website', ''); // honeypot: must stay empty
       if (cAvatarFile) form.append('avatar', cAvatarFile);
       const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/${blogId}/comments`, {
         method: 'POST',
@@ -605,7 +605,7 @@ const Comments: React.FC<CommentsProps> = ({
                 <div className="flex items-center gap-3">
                   <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
                     {cAvatarPreview ? (
-                      <img src={cAvatarPreview} alt="avatar preview" className="h-full w-full object-cover" />
+                      <img src={cAvatarPreview} alt="Your comment avatar preview" className="h-full w-full object-cover" />
                     ) : (
                       <span className="text-xs text-gray-500">No image</span>
                     )}

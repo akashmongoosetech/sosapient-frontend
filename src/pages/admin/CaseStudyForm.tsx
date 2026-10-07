@@ -281,7 +281,7 @@ const CaseStudyForm: React.FC<CaseStudyFormProps> = ({
                 ) : (
                   <img
                     src={v.thumbnailImageUrl.trim()}
-                    alt="Thumbnail preview"
+                    alt={`Thumbnail preview for ${v.title || 'case study'}`}
                     className="max-h-48 w-full object-cover"
                     onLoad={() => setThumbOk(true)}
                     onError={() => setThumbOk(false)}

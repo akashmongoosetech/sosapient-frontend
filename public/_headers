@@ -1,0 +1,24 @@
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://ik.imagekit.io https://images.unsplash.com https://images.pexels.com https://sosapient-backend.onrender.com; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://sosapient-backend.onrender.com; frame-src https://www.google.com https://www.youtube.com; frame-ancestors 'self'
+/admin/*
+  X-Robots-Tag: noindex, nofollow
+/login
+  X-Robots-Tag: noindex, nofollow
+/signup
+  X-Robots-Tag: noindex, nofollow
+/thank-you
+  X-Robots-Tag: noindex, nofollow
+/verify/*
+  X-Robots-Tag: noindex, nofollow
+/profile
+  X-Robots-Tag: noindex, nofollow
+/api/*
+  X-Robots-Tag: noindex, nofollow
+/uploads/*
+  Cache-Control: public, max-age=2592000, immutable
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

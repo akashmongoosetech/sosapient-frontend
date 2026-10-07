@@ -4,13 +4,13 @@ import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 
 const GoogleReviews: React.FC = () => {
   const reviews = [
-    { id: 1, image: './google/11.png' },
-    { id: 2, image: './google/22.png' },
-    { id: 3, image: './google/33.png' },
-    { id: 4, image: './google/44.png' },
-    { id: 5, image: './google/55.png' },
-    { id: 6, image: './google/11.png' },
-    { id: 7, image: './google/22.png' },
+    { id: 1, image: '/google/11.png' },
+    { id: 2, image: '/google/22.png' },
+    { id: 3, image: '/google/33.png' },
+    { id: 4, image: '/google/44.png' },
+    { id: 5, image: '/google/55.png' },
+    { id: 6, image: '/google/11.png' },
+    { id: 7, image: '/google/22.png' },
   ];
 
   // Group reviews into pairs
@@ -97,12 +97,14 @@ const GoogleReviews: React.FC = () => {
               {/* Navigation Buttons */}
               <button
                 onClick={prevSlide}
+                aria-label="Previous reviews"
                 className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-1.5 rounded-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-all duration-300 -translate-x-1/2"
               >
                 <ChevronLeft className="w-4 h-4 text-gray-600 dark:text-gray-300" />
               </button>
               <button
                 onClick={nextSlide}
+                aria-label="Next reviews"
                 className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-1.5 rounded-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-all duration-300 translate-x-1/2"
               >
                 <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-300" />
@@ -127,7 +129,9 @@ const GoogleReviews: React.FC = () => {
                             <img 
                               src={review.image} 
                               className="w-full h-full object-contain rounded-xl shadow-lg bg-white" 
-                              alt={`Review ${review.id}`} 
+                              alt={`Google review screenshot ${review.id} — client feedback`} 
+                              loading="lazy"
+                              decoding="async"
                             />
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                           </div>
@@ -143,6 +147,8 @@ const GoogleReviews: React.FC = () => {
                 {reviewPairs.map((_, index) => (
                   <button
                     key={index}
+                    aria-label={`Go to review slide ${index + 1}`}
+                    aria-current={index === currentIndex ? 'true' : undefined}
                     onClick={() => {
                       setCurrentIndex(index);
                       setIsAutoPlaying(false);

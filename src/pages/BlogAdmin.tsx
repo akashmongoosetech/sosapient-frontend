@@ -748,7 +748,7 @@ const BlogAdmin: React.FC = () => {
                       <div className="relative">
                         <img
                           src={editingBlog.image}
-                          alt="Preview"
+                          alt={`Featured image preview for ${editingBlog.title || 'blog post'}`}
                           className="w-full h-32 object-cover rounded-lg"
                         />
                         <button
@@ -835,7 +835,7 @@ const BlogAdmin: React.FC = () => {
                     <div className="mt-2">
                       <img
                         src={editingBlog.author.image}
-                        alt="Author Preview"
+                        alt={`Author image preview for ${editingBlog.author.name || 'blog author'}`}
                         className="w-16 h-16 object-cover rounded-full border-2 border-gray-300"
                       />
                     </div>

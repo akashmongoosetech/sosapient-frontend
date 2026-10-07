@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Mail, CheckCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { trackFormSubmit } from '../../utils/analytics';
+import { ArrowRight, Mail } from 'lucide-react';
 
 const BlogNewsletter: React.FC = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [website, setWebsite] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,15 +21,14 @@ const BlogNewsletter: React.FC = () => {
       const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, website })
       });
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.message || 'Subscription failed');
       }
-      setIsSubscribed(true);
-      setEmail('');
-      setTimeout(() => setIsSubscribed(false), 3000);
+      trackFormSubmit('newsletter');
+      navigate('/thank-you');
     } catch (err: any) {
       setError(err?.message || 'Something went wrong');
     } finally {
@@ -106,23 +108,7 @@ const BlogNewsletter: React.FC = () => {
             Subscribe to our newsletter and get the latest articles delivered to your inbox.
           </motion.p>
 
-          {isSubscribed ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center justify-center space-x-2 text-white"
-            >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 0.5 }}
-              >
-                <CheckCircle className="w-6 h-6" />
-              </motion.div>
-              <span className="text-lg font-medium">Thank you for subscribing!</span>
-            </motion.div>
-          ) : (
-            <>
-              {error && (
+          {error && (
                 <div className="text-red-100 bg-red-500/20 border border-red-300/30 rounded-md px-3 py-2 mb-4 max-w-md mx-auto">
                   {error}
                 </div>
@@ -135,6 +121,15 @@ const BlogNewsletter: React.FC = () => {
                 transition={{ duration: 0.6, delay: 0.6 }}
                 viewport={{ once: true }}
               >
+                <input
+                  type="text"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="hidden"
+                />
                 <motion.input
                   type="email"
                   placeholder="Enter your email"
@@ -166,8 +161,6 @@ const BlogNewsletter: React.FC = () => {
                   </motion.div>
                 </motion.button>
               </motion.form>
-            </>
-          )}
         </motion.div>
       </div>
     </section>

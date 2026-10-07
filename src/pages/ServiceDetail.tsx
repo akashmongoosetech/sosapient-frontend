@@ -15,7 +15,12 @@ const ServiceDetail: React.FC = () => {
 
   if (!service) {
     return (
-      <div className="mx-auto flex min-h-[60vh] max-w-3xl flex-col items-center justify-center px-4 py-20 text-center">
+      <>
+        <Helmet>
+          <title>Service not found | SoSapient</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
+        <div className="mx-auto flex min-h-[60vh] max-w-3xl flex-col items-center justify-center px-4 py-20 text-center">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Service not found</h1>
         <p className="mt-3 text-gray-600 dark:text-gray-300">
           The service you are looking for does not exist or has been moved.
@@ -26,7 +31,8 @@ const ServiceDetail: React.FC = () => {
         >
           View all services
         </Link>
-      </div>
+        </div>
+      </>
     );
   }
 
@@ -47,9 +53,11 @@ const ServiceDetail: React.FC = () => {
         <meta property="og:description" content={service.seoDescription} />
         <meta property="og:url" content={canonical} />
         <meta property="og:site_name" content="SoSapient" />
+        <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={service.seoTitle} />
         <meta name="twitter:description" content={service.seoDescription} />
+        <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
         <script type="application/ld+json">
           {JSON.stringify({
             '@context': 'https://schema.org',

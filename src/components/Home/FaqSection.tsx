@@ -76,7 +76,7 @@ const FAQS: FaqItem[] = [
     id: 11,
     question: 'How can we contact your support team?',
     answer:
-      'Email info.sosapient@gmail.com, call +91-9685533878 (Mon–Fri, 10AM–8PM), or send a message through our Contact page form. Maintenance-plan clients get priority response channels.',
+      'Email info.sosapient@gmail.com, call +91-9685533878 (Mon–Fri, 10AM–8PM IST), or send a message through our Contact page form. Maintenance-plan clients get priority response channels.',
   },
   {
     id: 12,

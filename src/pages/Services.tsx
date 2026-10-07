@@ -45,8 +45,8 @@ const Services: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Services - SoSapient | Development, AI, Cloud & Business Software</title>
-        <meta name="description" content="End-to-end development, AI automation, cloud and business software: frontend, backend, mobile, UI/UX, security, AI solutions, chatbots, RAG, CRM, ERP and SaaS product development." />
+        <title>Services | AI, Cloud & Software | SoSapient</title>
+        <meta name="description" content="End-to-end development, AI automation, cloud and business software: frontend, backend, mobile, UI/UX, security, chatbots, RAG, CRM, ERP and SaaS." />
 
         <meta
           name="keywords"
@@ -56,17 +56,19 @@ const Services: React.FC = () => {
         <meta name="robots" content="index, follow" />
         <meta property="og:locale" content="en_US" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="Services - SoSapient" />
+        <meta property="og:title" content="Services | AI, Cloud & Software | SoSapient" />
         <meta
           property="og:description"
           content="Digital solutions built for growth: development, AI, automation, cloud, security and business software."
         />
+        <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Services - SoSapient" />
+        <meta name="twitter:title" content="Services | AI, Cloud & Software | SoSapient" />
         <meta
           name="twitter:description"
           content="Digital solutions built for growth: development, AI, automation, cloud, security and business software."
         />
+        <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta property="og:url" content="https://sosapient.in/services" />
         <meta property="og:site_name" content="SoSapient" />
         <link rel="canonical" href="https://sosapient.in/services" />

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Github, ExternalLink } from 'lucide-react';
 
@@ -72,6 +73,22 @@ const Portfolio: React.FC = () => {
     : projects.filter(project => project.category === activeFilter);
 
   return (
+    <>
+    <Helmet>
+      <title>Portfolio | Web, Mobile & AI Projects | SoSapient</title>
+      <meta name="description" content="Illustrative sample projects showing the range of work SoSapient delivers. See case studies for detailed client outcomes." />
+      <meta name="robots" content="noindex, nofollow" />
+      <link rel="canonical" href="https://sosapient.in/portfolio" />
+      <meta property="og:type" content="website" />
+      <meta property="og:title" content="Portfolio | SoSapient" />
+      <meta property="og:description" content="Selected SoSapient projects across web, mobile, AI and cloud." />
+      <meta property="og:url" content="https://sosapient.in/portfolio" />
+      <meta property="og:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="Portfolio | SoSapient" />
+      <meta name="twitter:description" content="Selected SoSapient projects across web, mobile, AI and cloud." />
+      <meta name="twitter:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
+    </Helmet>
     <section className="py-20 bg-white dark:bg-primary-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -85,8 +102,8 @@ const Portfolio: React.FC = () => {
             Our Portfolio
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Explore our diverse range of projects showcasing our expertise in various technologies
-            and industries.
+            Illustrative sample projects showing the range of work we deliver.
+            See our case studies for detailed client outcomes.
           </p>
         </motion.div>
 
@@ -98,6 +115,7 @@ const Portfolio: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setActiveFilter(category.id)}
+              aria-pressed={activeFilter === category.id}
               className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 activeFilter === category.id
                   ? 'bg-primary-500 text-white'
@@ -125,7 +143,8 @@ const Portfolio: React.FC = () => {
                 <div className="relative h-48 overflow-hidden">
                   <img
                     src={project.image}
-                    alt={project.title}
+                    alt={`${project.title} project preview`}
+                    loading="lazy"
                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -152,19 +171,20 @@ const Portfolio: React.FC = () => {
                     ))}
                   </div>
 
-                  {/* Links */}
+                  {/* Links (illustrative samples — no live demo links until real projects are published) */}
                   <div className="flex gap-4">
-                    {project.githubUrl && (
+                    {project.githubUrl && project.githubUrl !== 'https://github.com' && (
                       <a
                         href={project.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
+                        aria-label={`${project.title} source code`}
                         className="text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
                       >
                         <Github className="w-5 h-5" />
                       </a>
                     )}
-                    {project.liveUrl && (
+                    {project.liveUrl && project.liveUrl !== 'https://example.com' && (
                       <a
                         href={project.liveUrl}
                         target="_blank"
@@ -182,6 +202,7 @@ const Portfolio: React.FC = () => {
         </div>
       </div>
     </section>
+    </>
   );
 };
 

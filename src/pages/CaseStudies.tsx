@@ -71,7 +71,7 @@ const CaseStudies: React.FC = () => {
     <div className="bg-white dark:bg-gray-900">
       <Helmet>
         <title>Case Studies | SoSapient — Client Projects & Outcomes</title>
-        <meta name="description" content="Selected SoSapient client projects: real solutions, measurable outcomes, and the technologies behind them." />
+        <meta name="description" content="Explore SoSapient case studies — real client projects across web, AI and cloud with challenges, solutions, tech stacks and measurable outcomes." />
         <link rel="canonical" href={canonical} />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Case Studies | SoSapient" />

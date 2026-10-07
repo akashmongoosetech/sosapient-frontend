@@ -295,6 +295,14 @@ const CaseStudyDetails: React.FC = () => {
           >
             <ArrowLeft className="h-4 w-4" /> Back to Case Studies
           </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link to="/services" className="inline-flex min-h-[44px] items-center rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold hover:bg-gray-50 dark:border-gray-600">
+              Browse related services
+            </Link>
+            <Link to="/contact" className="inline-flex min-h-[44px] items-center rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700">
+              Discuss your project
+            </Link>
+          </div>
         </div>
       </article>
 

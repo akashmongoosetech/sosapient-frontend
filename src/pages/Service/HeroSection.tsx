@@ -64,18 +64,18 @@ const HeroSection: React.FC = () => {
               </motion.div>
             </div>
 
-            {/* Stats */}
+            {/* Stats — canonical site-wide figures */}
             <div className="grid grid-cols-3 gap-4 pt-8">
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">100+</div>
+                <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">20+</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Happy Clients</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">200+</div>
+                <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">50+</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Projects</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">10+</div>
+                <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">3+</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Years Experience</div>
               </div>
             </div>

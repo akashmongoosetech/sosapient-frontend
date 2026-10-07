@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { trackFormSubmit } from '../utils/analytics';
 import { 
   Mail, 
   Phone, 
@@ -26,9 +28,11 @@ interface ContactFormData {
   message: string;
   budget: string;
   timeline: string;
+  website?: string;
 }
 
 const Contact: React.FC = () => {
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState<{
     type: 'success' | 'error';
@@ -40,25 +44,25 @@ const Contact: React.FC = () => {
     {
       icon: Mail,
       title: 'Email Us',
-      details: 'info.sosapient@gmail.com hr.sosapient@gmail.com',
+      details: 'info.sosapient@gmail.com',
       description: 'Send us an email anytime!'
     },
     {
       icon: Phone,
       title: 'Call Us',
-      details: 'For Support +91-9685533878 For Hr Call +91-8815596247 ',
-      description: 'Mon-Fri from 8am to 6pm PST'
+      details: 'Support: +91-9685533878 · HR: +91-8815596247',
+      description: 'Mon–Fri, 10AM–8PM IST'
     },
     {
       icon: MapPin,
       title: 'Visit Us',
-      details: 'Anand Nagar, Vasant Vihar Ujjain (M.P.) 456010 India',
+      details: 'Anand Nagar, Vasant Vihar, Ujjain (M.P.) 456010 India',
       description: 'Come say hello at our office'
     },
     {
       icon: Clock,
       title: 'Working Hours',
-      details: 'Mon - Fri: 10:00 AM - 08:00 PM',
+      details: 'Mon–Fri: 10:00 AM – 08:00 PM IST',
       description: 'We respond within 24 hours'
     }
   ];
@@ -66,7 +70,7 @@ const Contact: React.FC = () => {
   const socialLinks = [
     { icon: Facebook, href: 'https://www.facebook.com/profile.php?id=61553017931533', label: 'Facebook', color: 'hover:text-blue-600' },
     { icon: Twitter, href: 'https://x.com/SoSapient_tech', label: 'Twitter', color: 'hover:text-sky-500' },
-    { icon: Linkedin, href: 'https://www.linkedin.com/company/100043699/admin/feed/posts/', label: 'LinkedIn', color: 'hover:text-blue-700' },
+    { icon: Linkedin, href: 'https://www.linkedin.com/company/100043699/', label: 'LinkedIn', color: 'hover:text-blue-700' },
     { icon: Instagram, href: 'https://www.instagram.com/sosapient/', label: 'Instagram', color: 'hover:text-pink-600' },
   ];
 
@@ -75,7 +79,8 @@ const Contact: React.FC = () => {
     setNotification(null);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/contact`, {
+      const { getBaseUrl } = await import('../utils/api');
+      const response = await fetch(`${getBaseUrl()}/api/contact`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -89,18 +94,9 @@ const Contact: React.FC = () => {
         throw new Error(responseData.message || 'Failed to send message');
       }
 
-      setNotification({
-        type: 'success',
-        message: 'Thank you! Your message has been sent successfully.'
-      });
-
-      // Reset form
       reset();
-
-      // Clear success message after 5 seconds
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
+      trackFormSubmit('contact');
+      navigate('/thank-you');
 
     } catch (error) {
       setNotification({
@@ -123,9 +119,11 @@ const Contact: React.FC = () => {
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Contact Us | SoSapient" />
         <meta property="og:description" content="Start your project with SoSapient — web development, AI automation, CRM/ERP and digital marketing." />
+        <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Contact Us | SoSapient" />
         <meta name="twitter:description" content="Start your project with SoSapient — web development, AI automation, CRM/ERP and digital marketing." />
+        <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta property="og:url" content="https://sosapient.in/contact" />
         <meta property="og:site_name" content="SoSapient" />
         <link rel="canonical" href="https://sosapient.in/contact" />
@@ -182,11 +180,11 @@ const Contact: React.FC = () => {
                 className="text-center bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700"
               >
                 <div className="inline-flex p-3 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl mb-4">
-                  <info.icon className="w-6 h-6 text-white" />
+                  <info.icon className="w-6 h-6 text-white" aria-hidden="true" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                   {info.title}
-                </h3>
+                </h2>
                 <p className="text-primary-600 dark:text-primary-400 font-medium mb-1">
                   {info.details}
                 </p>
@@ -217,6 +215,7 @@ const Contact: React.FC = () => {
 
                 {notification && (
                   <motion.div
+                    role="alert"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className={`mb-6 p-4 rounded-lg flex items-center space-x-3 ${
@@ -243,26 +242,34 @@ const Contact: React.FC = () => {
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label htmlFor="contact-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Name *
                       </label>
                       <input
+                        id="contact-name"
                         type="text"
+                        autoComplete="name"
+                        aria-invalid={Boolean(errors.name)}
+                        aria-describedby={errors.name ? 'contact-name-error' : undefined}
                         {...register('name', { required: 'Name is required' })}
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       />
                       {errors.name && (
-                        <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                        <p id="contact-name-error" role="alert" className="mt-1 text-sm text-red-600 dark:text-red-400">
                           {errors.name.message}
                         </p>
                       )}
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label htmlFor="contact-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Email *
                       </label>
                       <input
+                        id="contact-email"
                         type="email"
+                        autoComplete="email"
+                        aria-invalid={Boolean(errors.email)}
+                        aria-describedby={errors.email ? 'contact-email-error' : undefined}
                         {...register('email', { 
                           required: 'Email is required',
                           pattern: {
@@ -273,7 +280,7 @@ const Contact: React.FC = () => {
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       />
                       {errors.email && (
-                        <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                        <p id="contact-email-error" role="alert" className="mt-1 text-sm text-red-600 dark:text-red-400">
                           {errors.email.message}
                         </p>
                       )}
@@ -282,21 +289,25 @@ const Contact: React.FC = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label htmlFor="contact-company" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Company
                       </label>
                       <input
+                        id="contact-company"
                         type="text"
+                        autoComplete="organization"
                         {...register('company')}
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label htmlFor="contact-phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Phone
                       </label>
                       <input
+                        id="contact-phone"
                         type="tel"
+                        autoComplete="tel"
                         {...register('phone')}
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       />
@@ -304,16 +315,19 @@ const Contact: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label htmlFor="contact-subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Subject *
                     </label>
                     <input
+                      id="contact-subject"
                       type="text"
+                      aria-invalid={Boolean(errors.subject)}
+                      aria-describedby={errors.subject ? 'contact-subject-error' : undefined}
                       {...register('subject', { required: 'Subject is required' })}
                       className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     />
                     {errors.subject && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      <p id="contact-subject-error" role="alert" className="mt-1 text-sm text-red-600 dark:text-red-400">
                         {errors.subject.message}
                       </p>
                     )}
@@ -321,10 +335,11 @@ const Contact: React.FC = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label htmlFor="contact-budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Budget Range
                       </label>
                       <select
+                        id="contact-budget"
                         {...register('budget')}
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       >
@@ -337,10 +352,11 @@ const Contact: React.FC = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label htmlFor="contact-timeline" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Timeline
                       </label>
                       <select
+                        id="contact-timeline"
                         {...register('timeline')}
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       >
@@ -355,21 +371,38 @@ const Contact: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label htmlFor="contact-message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Message *
                     </label>
                     <textarea
+                      id="contact-message"
                       rows={5}
+                      maxLength={5000}
+                      aria-invalid={Boolean(errors.message)}
+                      aria-describedby={errors.message ? 'contact-message-error' : undefined}
                       {...register('message', { required: 'Message is required' })}
                       placeholder="Tell us about your project..."
                       className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     />
+                    {/* Honeypot: humans never see/fill this; bots do */}
+                    <input
+                      type="text"
+                      {...register('website')}
+                      tabIndex={-1}
+                      autoComplete="off"
+                      aria-hidden="true"
+                      className="hidden"
+                    />
                     {errors.message && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      <p id="contact-message-error" role="alert" className="mt-1 text-sm text-red-600 dark:text-red-400">
                         {errors.message.message}
                       </p>
                     )}
                   </div>
+
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    By submitting you agree to our <a href="/privacy" className="font-semibold underline">Privacy Policy</a>.
+                  </p>
 
                   <motion.button
                     type="submit"
@@ -410,8 +443,9 @@ const Contact: React.FC = () => {
                 <div className="aspect-video bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/30 dark:to-secondary-900/30 rounded-lg flex items-center justify-center">
                   <div className="text-center">
                   <iframe
+      title="SoSapient office location map"
       src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3023.7154705350486!2d75.79301277430585!3d23.148887211604542!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89d0a6d63a3dc719%3A0x512e53adaab1b1ff!2sSoSapient!5e1!3m2!1sen!2sin!4v1749841232215!5m2!1sen!2sin"
-      width="auto"
+      width="100%"
       height="450"
       style={{ border: 0 }}
       allowFullScreen

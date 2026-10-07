@@ -269,6 +269,7 @@ const CertificateVerify: React.FC = () => {
       <Helmet>
         <title>Certificate Verification - {displayName} | SoSapient</title>
         <meta name="description" content={`Verify the internship certificate issued by SoSapient for ${displayName}.`} />
+        <meta name="robots" content="noindex, nofollow" />
         <link rel="canonical" href={canonical} />
         <meta property="og:type" content="website" />
         <meta property="og:title" content={`Certificate Verification - ${displayName} | SoSapient`} />

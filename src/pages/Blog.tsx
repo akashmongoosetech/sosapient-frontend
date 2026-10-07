@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import BlogHero from '../components/Blog/BlogHero';
 import BlogSearch from '../components/Blog/BlogSearch';
@@ -22,15 +22,26 @@ interface BlogPost {
 }
 
 const Blog: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(() => searchParams.get('q') || '');
+  const [selectedCategory, setSelectedCategory] = useState(() => searchParams.get('cat') || 'All');
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [categories, setCategories] = useState<string[]>(['All']);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(() => Math.max(1, parseInt(searchParams.get('page') || '1', 10) || 1));
   const [totalPages, setTotalPages] = useState(1);
   const [featured, setFeatured] = useState<BlogPost | null>(null);
+
+  // Keep URL in sync so pages 2+ and filters are crawlable/shareable (?q=&cat=&page=)
+  useEffect(() => {
+    const next: Record<string, string> = {};
+    if (searchTerm) next.q = searchTerm;
+    if (selectedCategory && selectedCategory !== 'All') next.cat = selectedCategory;
+    if (currentPage > 1) next.page = String(currentPage);
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm, selectedCategory, currentPage]);
 
   useEffect(() => {
     fetchCategories();
@@ -177,7 +188,7 @@ const Blog: React.FC = () => {
     <div className="bg-white dark:bg-gray-900">
       <Helmet>
         <title>Blog | SoSapient — Insights, guides and updates</title>
-        <meta name="description" content="Insights, guides and updates on web development, AI/ML, cybersecurity and business from the SoSapient team." />
+        <meta name="description" content="Explore SoSapient insights on web development, AI/ML, cybersecurity and business growth — practical guides and updates from our team." />
         <link rel="canonical" href={canonical} />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Blog | SoSapient" />

@@ -19,7 +19,7 @@ const Testimonials: React.FC = () => {
         <SectionHead
           eyebrow="Client love"
           title="What our clients say"
-          sub="Real reviews from real engagements — here's what working with SoSapient looks like."
+          sub="Selected client feedback — screenshots below. Full reviews are on our Google profile."
         />
 
         {/* Featured client story */}
@@ -43,7 +43,6 @@ const Testimonials: React.FC = () => {
             <span className="text-left">
               <span className="flex items-center gap-1.5 font-bold text-gray-900 dark:text-white">
                 Dr. Shashank Bhargawa
-                <BadgeCheck className="h-4 w-4 text-primary-500" aria-label="Verified client" />
               </span>
               <span className="block text-sm text-gray-500 dark:text-gray-400">
                 Dermatologist · Bhargawa Skins Care — Clinic Website

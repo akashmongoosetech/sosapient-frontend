@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { MapPin, Clock, IndianRupee, Send, CheckCircle, AlertCircle, Share2, Copy, UploadCloud, FileText   } from 'lucide-react';
 import { siteUrl } from '../utils/blog';
+import { trackFormSubmit } from '../utils/analytics';
 import BlogRichContent from '../components/Blog/BlogRichContent';
 
 // Plain text for SEO/schema. Rich HTML is stripped to readable text.
@@ -56,6 +57,7 @@ function RichList({ items, label }: { items: unknown; label: string }) {
 
 const JobDetails: React.FC = () => {
   const { jobId } = useParams();
+  const navigate = useNavigate();
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +73,8 @@ const JobDetails: React.FC = () => {
     experience: '',
     currentCompany: '',
     expectedSalary: '',
-    noticePeriod: ''
+    noticePeriod: '',
+    website: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -163,20 +166,8 @@ const JobDetails: React.FC = () => {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data?.message || 'Failed to submit application');
-      setNotification({ type: 'success', message: 'Application submitted successfully!' });
-      setApplicationData({
-        name: '',
-        email: '',
-        phone: '',
-        resume: null,
-        coverLetter: '',
-        position: job?.title || '',
-        experience: '',
-        currentCompany: '',
-        expectedSalary: '',
-        noticePeriod: ''
-      });
-      setErrors({});
+      trackFormSubmit('career_application');
+      navigate('/thank-you');
     } catch (err: any) {
       setNotification({ type: 'error', message: err?.message || 'Failed to submit application' });
     } finally {
@@ -207,9 +198,11 @@ const JobDetails: React.FC = () => {
         <meta property="og:description" content={jobDescription} />
         <meta property="og:url" content={canonical} />
         <meta property="og:site_name" content="SoSapient" />
-        <meta name="twitter:card" content="summary" />
+        <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={jobTitle} />
         <meta name="twitter:description" content={jobDescription} />
+        <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
         <script type="application/ld+json">
           {JSON.stringify({
             '@context': 'https://schema.org',
@@ -375,6 +368,8 @@ const JobDetails: React.FC = () => {
 
                   <input className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Notice Period" value={applicationData.noticePeriod} onChange={e => setApplicationData({ ...applicationData, noticePeriod: e.target.value })} />
                   <textarea rows={4} className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Cover Letter" value={applicationData.coverLetter} onChange={e => setApplicationData({ ...applicationData, coverLetter: e.target.value })} />
+                  {/* Honeypot: hidden from humans, traps bots */}
+                  <input type="text" value={applicationData.website} onChange={e => setApplicationData({ ...applicationData, website: e.target.value })} tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Resume *

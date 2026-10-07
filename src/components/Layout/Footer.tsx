@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { trackFormSubmit } from '../../utils/analytics';
 import { motion } from 'framer-motion';
 import {
   Mail,
@@ -18,7 +19,9 @@ import {
 import { fadeUp } from '../Home/shared';
 
 const Footer: React.FC = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
+  const [website, setWebsite] = useState('');
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
 
@@ -33,7 +36,7 @@ const Footer: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, website }),
       });
 
       const data = await response.json();
@@ -42,8 +45,9 @@ const Footer: React.FC = () => {
         throw new Error(data.message || 'Subscription failed');
       }
 
-      setStatus({ type: 'success', message: 'Successfully subscribed!' });
       setEmail('');
+      trackFormSubmit('newsletter');
+      navigate('/thank-you');
     } catch (error) {
       setStatus({ type: 'error', message: error instanceof Error ? error.message : 'Failed to subscribe' });
     } finally {
@@ -82,7 +86,10 @@ const Footer: React.FC = () => {
     Resources: [
       { name: 'Blog', path: '/blog' },
       { name: 'Case Studies', path: '/case-studies' },
-      { name: 'Documentation', path: '#' },
+      { name: 'Portfolio', path: '/portfolio' },
+      { name: 'Privacy Policy', path: '/privacy' },
+      { name: 'Terms', path: '/terms' },
+      { name: 'Cookies', path: '/cookies' },
       { name: 'Support', path: '/contact' },
     ],
   };
@@ -90,13 +97,13 @@ const Footer: React.FC = () => {
   const socialLinks = [
     { icon: Facebook, href: 'https://www.facebook.com/profile.php?id=61553017931533', label: 'Facebook' },
     { icon: Twitter, href: 'https://x.com/SoSapient_tech', label: 'Twitter' },
-    { icon: Linkedin, href: 'https://www.linkedin.com/company/100043699/admin/page-posts/published/', label: 'LinkedIn' },
+    { icon: Linkedin, href: 'https://www.linkedin.com/company/100043699/', label: 'LinkedIn' },
     { icon: Instagram, href: 'https://www.instagram.com/sosapient/', label: 'Instagram' },
   ];
 
   const contactRows = [
     { icon: Mail, label: 'info.sosapient@gmail.com', href: 'mailto:info.sosapient@gmail.com' },
-    { icon: Phone, label: '+91 8815596247', href: 'tel:+918815596247' },
+    { icon: Phone, label: '+91-8815596247', href: 'tel:+918815596247' },
     { icon: MapPin, label: 'Anand Nagar, Vasant Vihar, Ujjain (M.P.) 456010 India' },
   ];
 
@@ -142,6 +149,15 @@ const Footer: React.FC = () => {
                 <label htmlFor="footer-newsletter-email" className="sr-only">
                   Email address
                 </label>
+                <input
+                  type="text"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="hidden"
+                />
                 <input
                   id="footer-newsletter-email"
                   type="email"
@@ -277,6 +293,20 @@ const Footer: React.FC = () => {
             <Link to="/careers" className="text-xs font-semibold text-gray-400 transition-colors hover:text-white">
               Careers
             </Link>
+            <button
+              type="button"
+              onClick={() => {
+                try {
+                  localStorage.removeItem('sosapient_consent');
+                } catch {
+                  /* ignore */
+                }
+                window.location.reload();
+              }}
+              className="text-xs font-semibold text-gray-400 transition-colors hover:text-white"
+            >
+              Cookie settings
+            </button>
             <button
               type="button"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Helmet } from "react-helmet-async";
+import { trackFormSubmit } from '../utils/analytics';
 import PremiumHero from '../components/heroes/PremiumHero';
 import {
   MapPin,
@@ -18,6 +20,7 @@ import {
 } from 'lucide-react';
 
 const Careers: React.FC = () => {
+  const navigate = useNavigate();
   const [selectedJob] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -36,7 +39,8 @@ const Careers: React.FC = () => {
     experience: '',
     currentCompany: '',
     expectedSalary: '',
-    noticePeriod: ''
+    noticePeriod: '',
+    website: ''
   });
   const [jobs, setJobs] = useState<any[]>([]);
   const [loadingJobs, setLoadingJobs] = useState<boolean>(false);
@@ -165,28 +169,9 @@ const Careers: React.FC = () => {
         throw new Error(data.message || 'Failed to submit application');
       }
 
-      setNotification({
-        type: 'success',
-        message: 'Application submitted successfully!'
-      });
-
-      // Reset form and close modal after 2 seconds
-      setTimeout(() => {
-        setIsModalOpen(false);
-        setApplicationData({
-          name: '',
-          email: '',
-          phone: '',
-          resume: null,
-          coverLetter: '',
-          position: '',
-          experience: '',
-          currentCompany: '',
-          expectedSalary: '',
-          noticePeriod: ''
-        });
-        setNotification(null);
-      }, 2000);
+      setIsModalOpen(false);
+      trackFormSubmit('career_application');
+      navigate('/thank-you');
 
     } catch (error) {
       console.error('Application submission error:', error);
@@ -557,6 +542,16 @@ const Careers: React.FC = () => {
                   onChange={(e) => setApplicationData({...applicationData, coverLetter: e.target.value})}
                   placeholder="Tell us why you're interested in this position..."
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+                {/* Honeypot: hidden from humans, traps bots */}
+                <input
+                  type="text"
+                  value={applicationData.website}
+                  onChange={(e) => setApplicationData({...applicationData, website: e.target.value})}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="hidden"
                 />
               </div>
 

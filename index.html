@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SoSapient - Full Stack Web Development & AI Solutions | Ujjain, India</title>
+    <title>Full Stack Web Development & AI Solutions | SoSapient</title>
     <link rel="icon" type="image/png" sizes="32x32" href="/google/Dicon.png" />
     <link rel="apple-touch-icon" href="/google/Dicon.png" />
     <meta name="theme-color" content="#6d4d94" />
@@ -16,7 +16,7 @@
 
     <!-- Primary SEO -->
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <meta name="description" content="SoSapient builds custom websites, MERN stack apps, AI chatbots & automation, CRM/ERP software, plus SEO and social media growth — from Ujjain, India to clients worldwide.">
+    <meta name="description" content="SoSapient builds custom websites, MERN stack apps, AI chatbots and automation, CRM/ERP software, plus SEO and growth — from Ujjain, India worldwide.">
     <link rel="canonical" href="https://sosapient.in/">
 
     <!-- Open Graph -->
@@ -26,16 +26,18 @@
     <meta property="og:title" content="SoSapient - Full Stack Web Development & AI Solutions">
     <meta property="og:description" content="Custom websites, MERN stack apps, AI chatbots & automation, CRM/ERP software, SEO and social media growth — from Ujjain, India to clients worldwide.">
     <meta property="og:url" content="https://sosapient.in/">
-    <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png">
-    <meta property="og:image:alt" content="SoSapient logo">
+    <meta property="og:image" content="https://sosapient.in/og/og-cover-1200x630.png">
+    <meta property="og:image:alt" content="SoSapient — Web Development & AI Solutions">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="SoSapient - Full Stack Web Development & AI Solutions">
     <meta name="twitter:description" content="Custom websites, MERN stack apps, AI chatbots & automation, CRM/ERP software, SEO and social media growth.">
-    <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png">
+    <meta name="twitter:image" content="https://sosapient.in/og/og-cover-1200x630.png">
+    <meta name="twitter:image:alt" content="SoSapient — Web Development & AI Solutions">
 
     <!-- Google verification -->
     <meta name="google-site-verification" content="LdQ1ZP-JDJl6atTPL-wChsFTW8nj-mHhiyOHnLswCf4" />
@@ -50,11 +52,17 @@
     <!-- End Google Tag Manager -->
 
 
-   <!-- Google tag (gtag.js) -->
+   <!-- Google tag (gtag.js) with Consent Mode v2 defaults (denied until user opts in) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-45Y111F07G"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', { ad_storage: 'denied', analytics_storage: 'denied', functionality_storage: 'granted', security_storage: 'granted' });
+  try {
+    if (localStorage.getItem('sosapient_consent') === 'granted') {
+      gtag('consent', 'update', { ad_storage: 'denied', analytics_storage: 'granted' });
+    }
+  } catch (e) {}
   gtag('js', new Date());
 
   gtag('config', 'G-45Y111F07G');

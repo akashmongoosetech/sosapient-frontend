@@ -9,9 +9,9 @@ import { IndustryCard } from '../components/industries/IndustrySections';
 
 const Industries: React.FC = () => {
   const canonical = `${siteUrl()}/industries`;
-  const seoTitle = 'Industries We Serve: Healthcare, Retail, AI, Cloud & More | SoSapient';
+  const seoTitle = 'Industries: Healthcare, Retail, AI & More | SoSapient';
   const seoDescription =
-    'Technology solutions tailored to 17 industries — healthcare, e-commerce, manufacturing, education, AI, cloud, cybersecurity and more. Explore SoSapient industry expertise.';
+    'Industry software by SoSapient — healthcare, e-commerce, manufacturing, education, AI, cloud and cybersecurity solutions tailored to your sector.';
 
   return (
     <>
@@ -29,9 +29,11 @@ const Industries: React.FC = () => {
         <meta property="og:description" content={seoDescription} />
         <meta property="og:url" content={canonical} />
         <meta property="og:site_name" content="SoSapient" />
+        <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={seoTitle} />
         <meta name="twitter:description" content={seoDescription} />
+        <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
         <script type="application/ld+json">
           {JSON.stringify({
             '@context': 'https://schema.org',

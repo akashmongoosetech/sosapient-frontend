@@ -8,6 +8,7 @@ export interface LeadPayload {
   company: string;
   service: string;
   message: string;
+  website?: string;
 }
 
 interface ContactCaptureFormProps {
@@ -105,6 +106,8 @@ const ContactCaptureForm: React.FC<ContactCaptureFormProps> = ({
           <label className="mb-0.5 block text-xs font-medium text-gray-700 dark:text-gray-300" htmlFor="cb-message">Project details *</label>
           <textarea id="cb-message" value={form.message} onChange={set('message')} rows={3} maxLength={2000} className={`${inputCls} resize-none`} />
           {errors.message && <p className="mt-0.5 text-xs text-red-600">{errors.message}</p>}
+          {/* Honeypot: hidden from humans, traps bots */}
+          <input type="text" value={(form as { website?: string }).website || ''} onChange={(e) => setForm((f) => ({ ...f, website: e.target.value }))} tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
         </div>
       </div>
       {serverError && <p role="alert" className="mt-2 text-xs text-red-600">{serverError}</p>}

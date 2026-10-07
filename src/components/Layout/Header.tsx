@@ -11,7 +11,7 @@ const LOGO_URL = 'https://ik.imagekit.io/sentyaztie/Dlogo.png?updatedAt=17499281
 
 const socialLinks = [
   { label: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61553017931533', Icon: Facebook },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/100043699/admin/page-posts/published/', Icon: Linkedin },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/100043699/', Icon: Linkedin },
   { label: 'Instagram', href: 'https://www.instagram.com/sosapient/', Icon: Instagram },
   { label: 'Twitter', href: 'https://x.com/SoSapient_tech', Icon: Twitter },
 ];
@@ -133,6 +133,7 @@ const Header: React.FC = () => {
     { name: 'Services', path: '/services', hasMenu: true },
     { name: 'Industries', path: '/industries', hasIndustriesMenu: true },
     { name: 'Case Studies', path: '/case-studies' },
+    { name: 'Blog', path: '/blog' },
   ];
 
   const isActive = (path: string) => {

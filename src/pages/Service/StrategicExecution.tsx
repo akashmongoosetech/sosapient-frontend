@@ -112,9 +112,11 @@ const StrategicExecution = () => {
         </div>
         <div className="container mx-auto px-4">
           <img
-            src="./service/car4.png"
+            src="/service/car4.png"
             style={{ width: "100%" }}
-            alt=""
+            alt="SoSapient service delivery illustration"
+            loading="lazy"
+            decoding="async"
           />
         </div>
       </section>
