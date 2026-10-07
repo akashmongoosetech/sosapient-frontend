@@ -3,7 +3,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-WsA+nTGKWG9sPI+FEref059a8wohIRvIewDUQuHVfCc=' 'sha256-QRNWTHY6OqFIYpmBhLFF1HJU+6nJd/T4pHkh3s4uBNU=' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://ik.imagekit.io https://images.unsplash.com https://images.pexels.com https://sosapient-backend-49je.onrender.com; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://sosapient-backend-49je.onrender.com; frame-src https://www.google.com https://www.youtube.com; frame-ancestors 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-WsA+nTGKWG9sPI+FEref059a8wohIRvIewDUQuHVfCc=' 'sha256-QRNWTHY6OqFIYpmBhLFF1HJU+6nJd/T4pHkh3s4uBNU=' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://ik.imagekit.io https://images.unsplash.com https://images.pexels.com https://cdn.jsdelivr.net https://shecancode.io https://sosapient-backend-49je.onrender.com; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://sosapient-backend-49je.onrender.com; frame-src https://www.google.com https://www.youtube.com; frame-ancestors 'self'
 /admin/*
   X-Robots-Tag: noindex, nofollow
 /login
