@@ -10,157 +10,157 @@ export const TECHNOLOGIES: HomeTech[] = [
     // Frontend Frameworks
     { 
       name: 'Angular', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angularjs/angularjs-original.svg',
+      logo: '/tech/angularjs/angularjs-original.svg',
       color: 'from-red-500 to-red-700'
     },
     { 
       name: 'React', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg',
+      logo: '/tech/react/react-original.svg',
       color: 'from-blue-400 to-blue-600'
     },
     { 
       name: 'Vue.js', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg',
+      logo: '/tech/vuejs/vuejs-original.svg',
       color: 'from-green-500 to-green-700'
     },
     { 
       name: 'Next.js', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg',
+      logo: '/tech/nextjs/nextjs-original.svg',
       color: 'from-gray-700 to-gray-900'
     },
     { 
       name: 'ExtJS', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg',
+      logo: '/tech/javascript/javascript-original.svg',
       color: 'from-yellow-400 to-yellow-600'
     },
 
     // Core Web Technologies
     { 
       name: 'HTML5', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg',
+      logo: '/tech/html5/html5-original.svg',
       color: 'from-orange-500 to-orange-700'
     },
     { 
       name: 'CSS3', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg',
+      logo: '/tech/css3/css3-original.svg',
       color: 'from-blue-500 to-blue-700'
     },
     { 
       name: 'JavaScript', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg',
+      logo: '/tech/javascript/javascript-original.svg',
       color: 'from-yellow-400 to-yellow-600'
     },
 
     // Mobile Development
     { 
       name: 'React Native', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg',
+      logo: '/tech/react/react-original.svg',
       color: 'from-blue-400 to-blue-600'
     },
     { 
       name: 'iOS', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apple/apple-original.svg',
+      logo: '/tech/apple/apple-original.svg',
       color: 'from-gray-600 to-gray-800'
     },
     { 
       name: 'Android', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/android/android-original.svg',
+      logo: '/tech/android/android-original.svg',
       color: 'from-green-500 to-green-700'
     },
 
     // Backend Technologies
     { 
       name: 'Node.js', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg',
+      logo: '/tech/nodejs/nodejs-original.svg',
       color: 'from-green-400 to-green-600'
     },
     { 
       name: 'Python', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg',
+      logo: '/tech/python/python-original.svg',
       color: 'from-yellow-400 to-yellow-600'
     },
     { 
       name: 'Java', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg',
+      logo: '/tech/java/java-original.svg',
       color: 'from-red-500 to-red-700'
     },
     { 
       name: 'C#', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg',
+      logo: '/tech/csharp/csharp-original.svg',
       color: 'from-purple-500 to-purple-700'
     },
     { 
       name: 'C++', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg',
+      logo: '/tech/cplusplus/cplusplus-original.svg',
       color: 'from-blue-500 to-blue-700'
     },
     { 
       name: 'Spring', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg',
+      logo: '/tech/spring/spring-original.svg',
       color: 'from-green-500 to-green-700'
     },
 
     // Databases
     { 
       name: 'MySQL', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg',
+      logo: '/tech/mysql/mysql-original.svg',
       color: 'from-blue-400 to-blue-600'
     },
     { 
       name: 'MongoDB', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg',
+      logo: '/tech/mongodb/mongodb-original.svg',
       color: 'from-green-500 to-green-700'
     },
     { 
       name: 'MariaDB', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg',
+      logo: '/tech/mysql/mysql-original.svg',
       color: 'from-blue-400 to-blue-600'
     },
     { 
       name: 'Oracle', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/oracle/oracle-original.svg',
+      logo: '/tech/oracle/oracle-original.svg',
       color: 'from-red-300 to-red-400'
     },
 
     // Cloud & DevOps
     { 
       name: 'AWS', 
-      logo: 'https://shecancode.io/wp-content/uploads/2022/04/aws.png',
+      logo: '/tech/aws.png',
       color: 'from-orange-400 to-orange-400'
     },
     { 
       name: 'Google Cloud', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg',
+      logo: '/tech/googlecloud/googlecloud-original.svg',
       color: 'from-blue-400 to-blue-600'
     },
     { 
       name: 'Digital Ocean', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/digitalocean/digitalocean-original.svg',
+      logo: '/tech/digitalocean/digitalocean-original.svg',
       color: 'from-blue-400 to-blue-600'
     },
     { 
       name: 'Docker', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg',
+      logo: '/tech/docker/docker-original.svg',
       color: 'from-blue-500 to-blue-700'
     },
     { 
       name: 'Kubernetes', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg',
+      logo: '/tech/kubernetes/kubernetes-plain.svg',
       color: 'from-blue-400 to-blue-600'
     },
     { 
       name: 'Jenkins', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jenkins/jenkins-original.svg',
+      logo: '/tech/jenkins/jenkins-original.svg',
       color: 'from-red-500 to-red-700'
     },
     { 
       name: 'Terraform', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/terraform/terraform-original.svg',
+      logo: '/tech/terraform/terraform-original.svg',
       color: 'from-purple-500 to-purple-700'
     },
     { 
       name: 'Hadoop', 
-      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/hadoop/hadoop-original.svg',
+      logo: '/tech/hadoop/hadoop-original.svg',
       color: 'from-yellow-500 to-yellow-700'
     }
   ];
