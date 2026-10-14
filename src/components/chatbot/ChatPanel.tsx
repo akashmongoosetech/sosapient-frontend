@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { X, Bot, RotateCcw, ExternalLink } from 'lucide-react';
 import { getBaseUrl } from '../../utils/api';
 import ChatInput from './ChatInput';
+import ChatMessage from './ChatMessage';
 import ContactCaptureForm, { LeadPayload } from './ContactCaptureForm';
 
 interface Source {
@@ -10,11 +11,24 @@ interface Source {
   url: string;
 }
 
+interface ChatAction {
+  label: string;
+  url: string;
+}
+
+// Only these action targets may render as buttons (fixed allowlist mirrors backend).
+function isAllowedActionUrl(url: string): boolean {
+  if (url.startsWith('tel:+91')) return true;
+  if (!url.startsWith('/') || url.startsWith('//')) return false;
+  return /^\/(contact|services|industries|blog|case-studies|careers|about|verify|privacy)(\/|$)/.test(url);
+}
+
 interface ChatMsg {
   id: number;
   isUser: boolean;
   text: string;
   sources?: Source[];
+  actions?: ChatAction[];
 }
 
 type CaptureState =
@@ -57,8 +71,8 @@ const ChatPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, pending, capture]);
 
-  const pushAssistant = useCallback((text: string, sources?: Source[]) => {
-    setMessages((prev) => [...prev, { id: newId(), isUser: false, text, sources }]);
+  const pushAssistant = useCallback((text: string, sources?: Source[], actions?: ChatAction[]) => {
+    setMessages((prev) => [...prev, { id: newId(), isUser: false, text, sources, actions }]);
   }, []);
 
   const sendMessage = useCallback(async (text: string) => {
@@ -78,7 +92,11 @@ const ChatPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       if (!res.ok || !data?.message) {
         throw new Error(data?.message || 'Request failed');
       }
-      pushAssistant(data.message, Array.isArray(data.sources) ? data.sources : []);
+      pushAssistant(
+        data.message,
+        Array.isArray(data.sources) ? data.sources.filter((s: Source) => s && typeof s.url === 'string' && s.url.startsWith('/')) : [],
+        Array.isArray(data.actions) ? data.actions.filter((a: ChatAction) => a && typeof a.url === 'string' && isAllowedActionUrl(a.url)) : []
+      );
       const lower = clean.toLowerCase();
       if (!captureDone && capture.mode === 'off' && CONTACT_TRIGGERS.some((t) => lower.includes(t))) {
         setCapture({ mode: 'form', service: '' });
@@ -159,7 +177,31 @@ const ChatPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                   : 'rounded-bl-md bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100'
               }`}
             >
-              <p className="whitespace-pre-wrap">{m.text}</p>
+              <ChatMessage text={m.text} />
+              {!m.isUser && m.actions && m.actions.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {m.actions.map((a) =>
+                    a.url.startsWith('tel:') ? (
+                      <a
+                        key={a.url + a.label}
+                        href={a.url}
+                        className="inline-flex min-h-[36px] items-center rounded-full bg-primary-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-primary-700"
+                      >
+                        {a.label}
+                      </a>
+                    ) : (
+                      <Link
+                        key={a.url + a.label}
+                        to={a.url}
+                        onClick={onClose}
+                        className="inline-flex min-h-[36px] items-center rounded-full bg-primary-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-primary-700"
+                      >
+                        {a.label}
+                      </Link>
+                    )
+                  )}
+                </div>
+              )}
               {!m.isUser && m.sources && m.sources.length > 0 && (
                 <div className="mt-2 border-t border-gray-200 pt-2 dark:border-gray-700">
                   <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">Sources</p>
