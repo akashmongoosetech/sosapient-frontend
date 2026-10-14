@@ -85,7 +85,8 @@ const BlogAdmin: React.FC = () => {
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [editLoading, setEditLoading] = useState(false);
+  // Row-level edit loading: only the clicked row disables (never the whole table).
+  const [editLoadingId, setEditLoadingId] = useState<string | null>(null);
   const [stats, setStats] = useState({ totalBlogs: 0, totalViews: 0, categoryStats: [] });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [blogToDelete, setBlogToDelete] = useState<BlogPost | null>(null);
@@ -123,6 +124,7 @@ const BlogAdmin: React.FC = () => {
 
   // Abort in-flight requests on unmount / supersede; guards setState-after-unmount.
   const abortRef = useRef<AbortController | null>(null);
+  const editRequestRef = useRef(0);
   const mountedRef = useRef(true);
   useEffect(() => {
     mountedRef.current = true;
@@ -384,14 +386,24 @@ const BlogAdmin: React.FC = () => {
   const handleEdit = async (blog: BlogPost) => {
     // List rows carry summary fields only — fetch the full document for editing.
     if (!blog._id) return;
-    setEditLoading(true);
+    // Supersede any in-flight edit fetch so switching rows never leaves a stale loader.
+    abortRef.current?.abort();
+    const requestId = (editRequestRef.current += 1);
+    setEditLoadingId(blog._id);
+    const controller = new AbortController();
+    abortRef.current = controller;
+    // Bounded wait: full docs can be megabytes on slow connections.
+    const timeout = setTimeout(() => controller.abort(), 30000);
     try {
-      const response = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/admin/${blog._id}`);
+      const response = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/admin/${blog._id}`, {
+        signal: controller.signal
+      });
       if (response.status === 401) {
         window.location.href = '/login';
         return;
       }
       const data = await response.json();
+      if (!mountedRef.current || editRequestRef.current !== requestId) return;
       if (!data.success || !data.data) {
         setListError(data.message || 'Failed to load blog for editing.');
         return;
@@ -410,10 +422,16 @@ const BlogAdmin: React.FC = () => {
       // Existing posts already have a slug: treat as customized so title edits don't silently rewrite URLs
       setSlugCustomized(true);
       setIsEditing(true);
-    } catch {
-      setListError('Failed to load blog for editing. Please try again.');
+    } catch (err) {
+      if (!mountedRef.current || editRequestRef.current !== requestId) return;
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        setListError('Loading the blog timed out. Please check your connection and try again.');
+      } else {
+        setListError('Failed to load blog for editing. Please try again.');
+      }
     } finally {
-      setEditLoading(false);
+      clearTimeout(timeout);
+      if (mountedRef.current && editRequestRef.current === requestId) setEditLoadingId(null);
     }
   };
 
@@ -1444,11 +1462,12 @@ const BlogAdmin: React.FC = () => {
                         <div className="flex items-center justify-end space-x-2">
                           <button
                             onClick={() => handleEdit(blog)}
-                            disabled={editLoading}
-                            aria-label={`Edit ${blog.title}`}
+                            disabled={editLoadingId === blog._id}
+                            aria-label={editLoadingId === blog._id ? `Loading ${blog.title}…` : `Edit ${blog.title}`}
+                            title={editLoadingId === blog._id ? 'Loading…' : undefined}
                             className="text-primary-600 hover:text-primary-900 disabled:opacity-50"
                           >
-                            <Edit className="w-4 h-4" />
+                            <Edit className={`w-4 h-4 ${editLoadingId === blog._id ? 'animate-pulse' : ''}`} />
                           </button>
                           <button
                             onClick={() => handleDeleteClick(blog)}
