@@ -121,6 +121,10 @@ const BlogPreview: React.FC = () => {
                   <img
                     src={post.image}
                     alt={post.title}
+                    loading="lazy"
+                    decoding="async"
+                    width={400}
+                    height={192}
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute top-4 left-4">

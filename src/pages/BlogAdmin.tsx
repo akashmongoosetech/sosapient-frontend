@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Edit, Trash2, Eye, Save, X, Upload, User, BarChart3 } from 'lucide-react';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import BookReaderLoader from '../components/Loaders/BookReaderLoader';
-import { getAdminHeaders, authFetch } from '../utils/api';
+import { authFetch } from '../utils/api';
 import { buildSlugPreview, isValidSlug } from '../utils/blog';
 import { useMemo } from 'react';
 import {
@@ -13,6 +13,7 @@ import {
 } from '../components/admin/ui';
 
 interface BlogSection {
+  clientId?: string;
   heading: string;
   content: string;
   image: string;
@@ -55,7 +56,6 @@ interface BlogPost {
   };
   readTime?: string;
 }
-
 const emptySeo = () => ({
   metaTitle: '',
   metaDescription: '',
@@ -69,11 +69,23 @@ const emptySeo = () => ({
   twitterImage: ''
 });
 
+// Stable client-only section identity (never sent to the API).
+const newSectionId = () => {
+  try {
+    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
+  } catch {
+    // fall through
+  }
+  return `sec_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+};
+
 const BlogAdmin: React.FC = () => {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
   const [stats, setStats] = useState({ totalBlogs: 0, totalViews: 0, categoryStats: [] });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [blogToDelete, setBlogToDelete] = useState<BlogPost | null>(null);
@@ -98,7 +110,7 @@ const BlogAdmin: React.FC = () => {
     status: 'published',
     featured: false,
     sections: [
-      { heading: '', content: '', image: '', imageAlt: '' }
+      { clientId: newSectionId(), heading: '', content: '', image: '', imageAlt: '' }
     ],
     seo: emptySeo(),
     readTime: ''
@@ -108,6 +120,21 @@ const BlogAdmin: React.FC = () => {
   const [blogSearch, setBlogSearch] = useState('');
   const [blogStatusFilter, setBlogStatusFilter] = useState<'all' | 'draft' | 'published' | 'archived'>('all');
   const [blogCategoryFilter, setBlogCategoryFilter] = useState('All');
+
+  // Abort in-flight requests on unmount / supersede; guards setState-after-unmount.
+  const abortRef = useRef<AbortController | null>(null);
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      abortRef.current?.abort();
+    };
+  }, []);
+  // Pending featured-image binary (never base64 into state; sent as multipart File).
+  const imageFileRef = useRef<File | null>(null);
+
+  const newClientId = () => newSectionId();
 
   const filteredBlogs = useMemo(() => {
     let list = blogs;
@@ -138,52 +165,64 @@ const BlogAdmin: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-save functionality for long content
+  // Auto-save full draft (all editable fields, not just title/excerpt/content).
   useEffect(() => {
-    if (!editingBlog || !editingBlog.content) return;
-    
+    if (!editingBlog) return;
+
     const autoSaveTimer = setTimeout(() => {
-      // Save to localStorage as backup for very long content
-      const backupData = {
-        title: editingBlog.title,
-        excerpt: editingBlog.excerpt,
-        content: editingBlog.content,
-        timestamp: new Date().toISOString()
-      };
-      localStorage.setItem('sosapient_blog_backup', JSON.stringify(backupData));
-      console.log('Content auto-saved to localStorage');
-    }, 10000); // Auto-save every 10 seconds
+      try {
+        const { clientId: _omit, ...rest } = editingBlog as BlogPost & { clientId?: string };
+        void _omit;
+        localStorage.setItem('sosapient_blog_backup', JSON.stringify({
+          ...rest,
+          sections: (editingBlog.sections || []).map(({ clientId: _c, ...s }) => { void _c; return s; }),
+          timestamp: new Date().toISOString()
+        }));
+      } catch {
+        // storage full or unavailable — draft backup is best-effort
+      }
+    }, 10000);
 
     return () => clearTimeout(autoSaveTimer);
-  }, [editingBlog?.content, editingBlog?.title, editingBlog?.excerpt]);
+  }, [editingBlog]);
 
-  const fetchBlogs = async () => {
+  const fetchBlogs = async (signal?: AbortSignal) => {
     try {
       setLoading(true);
       setListError(null);
-      const response = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/admin?limit=50`);
+      const controller = new AbortController();
+      abortRef.current = controller;
+      const response = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/admin?limit=50`, {
+        signal: signal || controller.signal
+      });
       if (response.status === 401) {
         window.location.href = '/login';
         return;
       }
       const data = await response.json();
+      if (!mountedRef.current) return;
       if (data.success) {
         setBlogs(Array.isArray(data.data) ? data.data : []);
       } else {
         setListError(data.message || 'Failed to load blog posts.');
       }
-    } catch {
-      setListError('Failed to load blog posts. Please try again.');
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      if (mountedRef.current) setListError('Failed to load blog posts. Please try again.');
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
   };
 
   const fetchStats = async () => {
     try {
       const response = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/stats`);
+      if (response.status === 401) {
+        window.location.href = '/login';
+        return;
+      }
       const data = await response.json();
-      if (data.success) {
+      if (data.success && mountedRef.current) {
         setStats(data.data);
       }
     } catch {
@@ -194,100 +233,102 @@ const BlogAdmin: React.FC = () => {
   const [saveError, setSaveError] = useState<string | null>(null);
 
   const handleSave = async () => {
-    if (!editingBlog) return;
+    const snapshot = editingBlog;
+    if (!snapshot || saving) return;
     setSaveError(null);
 
-    if (!editingBlog.title.trim() || !editingBlog.excerpt.trim() || !editingBlog.content.trim()) {
+    if (!snapshot.title.trim() || !snapshot.excerpt.trim() || !snapshot.content.trim()) {
       setSaveError('Title, excerpt and content are required.');
       return;
     }
-    if (!editingBlog.author?.name.trim() || !editingBlog.author?.email.trim()) {
+    if (!snapshot.author?.name.trim() || !snapshot.author?.email.trim()) {
       setSaveError('Author name and email are required.');
       return;
     }
-    if (editingBlog.slug && editingBlog.slug.trim() && !isValidSlug(editingBlog.slug.trim().toLowerCase())) {
+    const cleanSlug = snapshot.slug ? snapshot.slug.trim().toLowerCase() : '';
+    if (cleanSlug && !isValidSlug(cleanSlug)) {
       setSaveError('Slug may contain lowercase letters, numbers and single hyphens only (max 160 characters).');
       return;
     }
-    if (editingBlog.slug) {
-      editingBlog.slug = editingBlog.slug.trim().toLowerCase();
-    }
 
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const timeout = setTimeout(() => controller.abort(), 60000);
     try {
-      setLoading(true);
+      setSaving(true);
       const formData = new FormData();
 
-      // Always append tags and seo fields, even if empty - ensure we have the latest state
-      const tagsToSend = Array.isArray(editingBlog.tags) ? editingBlog.tags : [];
-      const seoToSend = editingBlog.seo || { metaTitle: '', metaDescription: '', keywords: [] };
+      const tagsToSend = Array.isArray(snapshot.tags) ? snapshot.tags : [];
+      const seoToSend = snapshot.seo || { metaTitle: '', metaDescription: '', keywords: [] };
       const keywordsToSend = Array.isArray(seoToSend.keywords) ? seoToSend.keywords : [];
 
-      // Create clean SEO object with proper keywords array
-      const cleanSeoToSend = {
-        ...seoToSend,
-        keywords: keywordsToSend
-      };
-
       formData.append('tags', JSON.stringify(tagsToSend));
-      formData.append('seo', JSON.stringify(cleanSeoToSend));
-      // CSV fallbacks to improve robustness
-      formData.append('tagsCsv', tagsToSend.join(','));
-      formData.append('seoKeywordsCsv', keywordsToSend.join(','));
-
-      // Only append other fields that have values and are not internal MongoDB fields
-      Object.keys(editingBlog).forEach(key => {
-        const value = editingBlog[key as keyof BlogPost];
-
-        // Skip internal MongoDB fields, undefined/null values, and tags/seo/readTime (already handled above)
-        if (key.startsWith('_') || key === '__v' || value === undefined || value === null || key === 'tags' || key === 'seo' || key === 'readTime') {
-          return;
-        }
-
-        if (key === 'author' || key === 'sections') {
-          if (typeof value === 'object' && value !== null) {
-            formData.append(key, JSON.stringify(value));
-          } else if (typeof value === 'string' && value !== '') {
-            formData.append(key, value);
-          }
-        } else if (typeof value === 'boolean') {
-          formData.append(key, value.toString());
-        } else if (value !== '' && typeof value === 'string') {
-          formData.append(key, value);
-        }
-      });
-
-      // Ensure readTime is always set, even if empty
-      if (!editingBlog.readTime || editingBlog.readTime.trim() === '') {
-        formData.append('readTime', calculateReadTime(editingBlog.content));
-      } else {
-        formData.append('readTime', editingBlog.readTime);
+      formData.append('seo', JSON.stringify({ ...seoToSend, keywords: keywordsToSend }));
+      if (cleanSlug) formData.append('slug', cleanSlug);
+      formData.append('title', snapshot.title.trim());
+      formData.append('excerpt', snapshot.excerpt.trim());
+      formData.append('content', snapshot.content);
+      formData.append('author', JSON.stringify(snapshot.author));
+      formData.append('category', snapshot.category);
+      formData.append('status', snapshot.status);
+      formData.append('featured', String(snapshot.featured));
+      formData.append('sections', JSON.stringify(
+        (snapshot.sections || []).map((s) => ({
+          heading: s.heading || '',
+          content: s.content || '',
+          image: s.image || '',
+          imageAlt: s.imageAlt || ''
+        }))
+      ));
+      if (snapshot.imageAlt) formData.append('imageAlt', snapshot.imageAlt);
+      formData.append('readTime', snapshot.readTime?.trim() ? snapshot.readTime : calculateReadTime(snapshot.content));
+      // Binary featured image when newly chosen; existing/data URLs stay as `image` string.
+      if (imageFileRef.current) {
+        formData.append('image', imageFileRef.current);
+      } else if (snapshot.image) {
+        formData.append('image', snapshot.image);
       }
 
-      const url = editingBlog._id ? `${import.meta.env.VITE_BASE_URL}/api/blogs/${editingBlog._id}` : `${import.meta.env.VITE_BASE_URL}/api/blogs`;
-      const method = editingBlog._id ? 'PUT' : 'POST';
+      const url = snapshot._id ? `${import.meta.env.VITE_BASE_URL}/api/blogs/${snapshot._id}` : `${import.meta.env.VITE_BASE_URL}/api/blogs`;
+      const method = snapshot._id ? 'PUT' : 'POST';
 
-      const response = await fetch(url, {
+      const response = await authFetch(url, {
         method,
-        headers: getAdminHeaders(),
-        body: formData as unknown as BodyInit
+        body: formData as unknown as BodyInit,
+        signal: controller.signal
       });
+      if (response.status === 401) {
+        window.location.href = '/login';
+        return;
+      }
 
       const data = await response.json();
 
-      if (data.success) {
-        await fetchBlogs();
-        await fetchStats();
-        // Clear backup on successful save
+      if (data.success && data.data) {
+        // Reuse the returned document: merge into the list instead of a full refetch.
+        setBlogs((prev) => {
+          const saved = data.data;
+          const exists = prev.some((b) => b._id === saved._id);
+          return exists ? prev.map((b) => (b._id === saved._id ? saved : b)) : [saved, ...prev];
+        });
+        imageFileRef.current = null;
         localStorage.removeItem('sosapient_blog_backup');
         setIsEditing(false);
         setEditingBlog(null);
+        // Stats are independent — refresh in parallel without blocking the UI.
+        void fetchStats();
       } else {
         setSaveError(data.message || 'Failed to save blog post');
       }
-    } catch {
-      setSaveError('Network error occurred while saving the blog post');
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        setSaveError('Save timed out. Please check your connection and try again.');
+      } else {
+        setSaveError('Network error occurred while saving the blog post');
+      }
     } finally {
-      setLoading(false);
+      clearTimeout(timeout);
+      if (mountedRef.current) setSaving(false);
     }
   };
 
@@ -297,7 +338,7 @@ const BlogAdmin: React.FC = () => {
   };
 
   const handleDeleteConfirm = async () => {
-    if (!blogToDelete?._id) return;
+    if (!blogToDelete?._id || deleting) return;
 
     try {
       setDeleting(true);
@@ -305,6 +346,10 @@ const BlogAdmin: React.FC = () => {
       const response = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/${blogToDelete._id}`, {
         method: 'DELETE'
       });
+      if (response.status === 401) {
+        window.location.href = '/login';
+        return;
+      }
 
       const data = await response.json();
 
@@ -318,10 +363,12 @@ const BlogAdmin: React.FC = () => {
         setShowDeleteModal(false);
         setBlogToDelete(null);
       } else {
-        setSaveError(data.message || 'Failed to delete blog post');
+        setListError(data.message || 'Failed to delete blog post');
+        setShowDeleteModal(false);
       }
     } catch {
-      setSaveError('Network error occurred while deleting the blog post');
+      setListError('Network error occurred while deleting the blog post');
+      setShowDeleteModal(false);
     } finally {
       setDeleting(false);
     }
@@ -334,17 +381,40 @@ const BlogAdmin: React.FC = () => {
 
   const [slugCustomized, setSlugCustomized] = useState(false);
 
-  const handleEdit = (blog: BlogPost) => {
-    setEditingBlog({
-      ...blog,
-      tags: Array.isArray(blog.tags) ? blog.tags : [],
-      sections: Array.isArray(blog.sections) ? blog.sections.map((s) => ({ heading: s.heading || '', content: s.content || '', image: s.image || '', imageAlt: s.imageAlt || '' })) : [],
-      seo: { ...emptySeo(), ...(blog.seo || {}) },
-      readTime: blog.readTime || calculateReadTime(blog.content)
-    });
-    // Existing posts already have a slug: treat as customized so title edits don't silently rewrite URLs
-    setSlugCustomized(true);
-    setIsEditing(true);
+  const handleEdit = async (blog: BlogPost) => {
+    // List rows carry summary fields only — fetch the full document for editing.
+    if (!blog._id) return;
+    setEditLoading(true);
+    try {
+      const response = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/admin/${blog._id}`);
+      if (response.status === 401) {
+        window.location.href = '/login';
+        return;
+      }
+      const data = await response.json();
+      if (!data.success || !data.data) {
+        setListError(data.message || 'Failed to load blog for editing.');
+        return;
+      }
+      const full: BlogPost = data.data;
+      setEditingBlog({
+        ...full,
+        tags: Array.isArray(full.tags) ? full.tags : [],
+        sections: Array.isArray(full.sections)
+          ? full.sections.map((s) => ({ clientId: newClientId(), heading: s.heading || '', content: s.content || '', image: s.image || '', imageAlt: s.imageAlt || '' }))
+          : [{ clientId: newClientId(), heading: '', content: '', image: '', imageAlt: '' }],
+        seo: { ...emptySeo(), ...(full.seo || {}) },
+        readTime: full.readTime || ''
+      });
+      imageFileRef.current = null;
+      // Existing posts already have a slug: treat as customized so title edits don't silently rewrite URLs
+      setSlugCustomized(true);
+      setIsEditing(true);
+    } catch {
+      setListError('Failed to load blog for editing. Please try again.');
+    } finally {
+      setEditLoading(false);
+    }
   };
 
   const handleNew = () => {
@@ -368,11 +438,16 @@ const BlogAdmin: React.FC = () => {
         if (hoursDiff < 24 && backupData.content && backupData.content.length > 100) {
           const restore = confirm(`Found unsaved content from ${backupTime.toLocaleString()}. Would you like to restore it?`);
           if (restore) {
+            const { timestamp: _backupTime, ...draft } = backupData;
+            void _backupTime;
             newBlogState = {
               ...newBlogState,
-              title: backupData.title || '',
-              excerpt: backupData.excerpt || '',
-              content: backupData.content || ''
+              ...draft,
+              tags: Array.isArray(backupData.tags) ? backupData.tags : [],
+              sections: Array.isArray(backupData.sections) && backupData.sections.length > 0
+                ? backupData.sections.map((s: BlogSection) => ({ clientId: newSectionId(), heading: s.heading || '', content: s.content || '', image: s.image || '', imageAlt: s.imageAlt || '' }))
+                : newBlogState.sections,
+              seo: { ...emptySeo(), ...(backupData.seo || {}) }
             };
           }
         }
@@ -386,21 +461,34 @@ const BlogAdmin: React.FC = () => {
   };
 
   const handleCancel = () => {
+    if (saving) return;
+    imageFileRef.current = null;
     setIsEditing(false);
     setEditingBlog(null);
   };
 
+  const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && editingBlog) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setEditingBlog({
-          ...editingBlog,
-          image: e.target?.result as string
-        });
-      };
-      reader.readAsDataURL(file);
+      if (!file.type.startsWith('image/')) {
+        setSaveError('Only image files are allowed for the featured image.');
+        return;
+      }
+      if (file.size > MAX_IMAGE_BYTES) {
+        setSaveError('Featured image must be 5MB or smaller.');
+        return;
+      }
+      // Keep the binary File for multipart upload; preview via object URL.
+      if (editingBlog.image && editingBlog.image.startsWith('blob:')) {
+        try { URL.revokeObjectURL(editingBlog.image); } catch { /* ignore */ }
+      }
+      imageFileRef.current = file;
+      setEditingBlog({
+        ...editingBlog,
+        image: URL.createObjectURL(file)
+      });
     }
   };
 
@@ -455,15 +543,16 @@ const BlogAdmin: React.FC = () => {
               <div className="flex space-x-2">
                 <button
                   onClick={handleSave}
-                  disabled={loading}
+                  disabled={loading || saving}
                   className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
                 >
                   <Save className="w-4 h-4" />
-                  <span>{loading ? 'Saving...' : 'Save'}</span>
+                  <span>{saving ? 'Saving...' : 'Save'}</span>
                 </button>
                 <button
                   onClick={handleCancel}
-                  className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                  disabled={saving}
+                  className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50"
                 >
                   <X className="w-4 h-4" />
                   <span>Cancel</span>
@@ -531,7 +620,8 @@ const BlogAdmin: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => {
-                        setSlugCustomized(false);
+    setSlugCustomized(false);
+    imageFileRef.current = null;
                         setEditingBlog((prev) => (prev ? { ...prev, slug: buildSlugPreview(prev.title) } : prev));
                       }}
                       className="text-primary-600 hover:underline"
@@ -589,7 +679,7 @@ const BlogAdmin: React.FC = () => {
                       }}
                       onChange={(_, editor) => {
                         const data = editor.getData();
-                        setEditingBlog({ ...editingBlog, content: data });
+                        setEditingBlog((prev) => (prev ? { ...prev, content: data } : prev));
                       }}
                     />
                   </div>
@@ -607,17 +697,20 @@ const BlogAdmin: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Sections
                   </label>
-                  {editingBlog.sections.map((section, idx) => (
-                    <div key={idx} className="mb-6 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
+                  {editingBlog.sections.map((section) => (
+                    <div key={section.clientId || section.heading} className="mb-6 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
                       <div className="mb-2">
                         <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Heading</label>
                         <input
                           type="text"
                           value={section.heading}
                           onChange={e => {
-                            const newSections = [...editingBlog.sections];
-                            newSections[idx].heading = e.target.value;
-                            setEditingBlog({ ...editingBlog, sections: newSections });
+                            const value = e.target.value;
+                            const id = section.clientId;
+                            setEditingBlog((prev) => (prev ? {
+                              ...prev,
+                              sections: prev.sections.map((s) => (s.clientId === id ? { ...s, heading: value } : s))
+                            } : prev));
                           }}
                           className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded"
                           placeholder="Section heading..."
@@ -642,9 +735,11 @@ const BlogAdmin: React.FC = () => {
                             }}
                             onChange={(_, editor) => {
                               const data = editor.getData();
-                              const newSections = [...editingBlog.sections];
-                              newSections[idx].content = data;
-                              setEditingBlog({ ...editingBlog, sections: newSections });
+                              const id = section.clientId;
+                              setEditingBlog((prev) => (prev ? {
+                                ...prev,
+                                sections: prev.sections.map((s) => (s.clientId === id ? { ...s, content: data } : s))
+                              } : prev));
                             }}
                           />
                         </div>
@@ -655,9 +750,12 @@ const BlogAdmin: React.FC = () => {
                           type="text"
                           value={section.image}
                           onChange={e => {
-                            const newSections = [...editingBlog.sections];
-                            newSections[idx].image = e.target.value;
-                            setEditingBlog({ ...editingBlog, sections: newSections });
+                            const value = e.target.value;
+                            const id = section.clientId;
+                            setEditingBlog((prev) => (prev ? {
+                              ...prev,
+                              sections: prev.sections.map((s) => (s.clientId === id ? { ...s, image: value } : s))
+                            } : prev));
                           }}
                           className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded"
                           placeholder="Section image URL..."
@@ -670,11 +768,14 @@ const BlogAdmin: React.FC = () => {
                           <input
                             type="text"
                             value={section.imageAlt || ''}
-                            onChange={e => {
-                              const newSections = [...editingBlog.sections];
-                              newSections[idx].imageAlt = e.target.value;
-                              setEditingBlog({ ...editingBlog, sections: newSections });
-                            }}
+                          onChange={e => {
+                            const value = e.target.value;
+                            const id = section.clientId;
+                            setEditingBlog((prev) => (prev ? {
+                              ...prev,
+                              sections: prev.sections.map((s) => (s.clientId === id ? { ...s, imageAlt: value } : s))
+                            } : prev));
+                          }}
                             className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded"
                             placeholder="Describe the image…"
                           />
@@ -683,8 +784,11 @@ const BlogAdmin: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          const newSections = editingBlog.sections.filter((_, i) => i !== idx);
-                          setEditingBlog({ ...editingBlog, sections: newSections });
+                          const id = section.clientId;
+                          setEditingBlog((prev) => (prev ? {
+                            ...prev,
+                            sections: prev.sections.filter((s) => s.clientId !== id)
+                          } : prev));
                         }}
                         className="text-xs text-red-600 hover:underline mt-2"
                         disabled={editingBlog.sections.length === 1}
@@ -696,10 +800,10 @@ const BlogAdmin: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => {
-                      setEditingBlog({
-                        ...editingBlog,
-                        sections: [...editingBlog.sections, { heading: '', content: '', image: '', imageAlt: '' }]
-                      });
+                      setEditingBlog((prev) => (prev ? {
+                        ...prev,
+                        sections: [...prev.sections, { clientId: newSectionId(), heading: '', content: '', image: '', imageAlt: '' }]
+                      } : prev));
                     }}
                     className="px-3 py-1 bg-primary-100 text-primary-700 rounded hover:bg-primary-200 text-xs"
                   >
@@ -732,7 +836,7 @@ const BlogAdmin: React.FC = () => {
                           <li>Excerpt: Up to 1,000 characters (increased from 300)</li>
                           <li>Content: No character limit - write as much as you need!</li>
                           <li>Comments: Up to 5,000 characters (increased from 2,000)</li>
-                          <li>File uploads: Up to 10MB for images (increased from 5MB)</li>
+                          <li>File uploads: featured images up to 5MB (10MB server max, validated before upload)</li>
                         </ul>
                       </div>
                     </div>
@@ -752,7 +856,14 @@ const BlogAdmin: React.FC = () => {
                           className="w-full h-32 object-cover rounded-lg"
                         />
                         <button
-                          onClick={() => setEditingBlog({ ...editingBlog, image: '' })}
+                          onClick={() => {
+                            if (editingBlog.image && editingBlog.image.startsWith('blob:')) {
+                              try { URL.revokeObjectURL(editingBlog.image); } catch { /* ignore */ }
+                            }
+                            imageFileRef.current = null;
+                            setEditingBlog({ ...editingBlog, image: '' });
+                          }}
+                          aria-label="Remove featured image"
                           className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
                         >
                           <X className="w-4 h-4" />
@@ -1208,13 +1319,18 @@ const BlogAdmin: React.FC = () => {
           </div>
         ) : listError && blogs.length === 0 ? (
           <ErrorState title="Unable to load posts" body={listError} onRetry={() => { fetchBlogs(); fetchStats(); }} />
-        ) : filteredBlogs.length === 0 ? (
-          <EmptyState
+        ) : filteredBlogs.length === 0 ? (          <EmptyState
             title="No blog posts found"
             body={blogs.length === 0 ? 'Create your first post to get started.' : 'No posts match your filters.'}
             action={<PrimaryButton onClick={handleNew}><Plus className="w-4 h-4" /> New post</PrimaryButton>}
           />
         ) : (
+          <>
+            {listError && (
+              <div role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {listError}
+              </div>
+            )}
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-700">
@@ -1319,7 +1435,7 @@ const BlogAdmin: React.FC = () => {
                         <div>{blog.likes || 0} likes</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                        {blog.readTime || calculateReadTime(blog.content)}
+                        {blog.readTime || (blog.content ? calculateReadTime(blog.content) : '—')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {blog.publishedAt ? new Date(blog.publishedAt).toLocaleDateString() : 'Not published'}
@@ -1328,7 +1444,9 @@ const BlogAdmin: React.FC = () => {
                         <div className="flex items-center justify-end space-x-2">
                           <button
                             onClick={() => handleEdit(blog)}
-                            className="text-primary-600 hover:text-primary-900"
+                            disabled={editLoading}
+                            aria-label={`Edit ${blog.title}`}
+                            className="text-primary-600 hover:text-primary-900 disabled:opacity-50"
                           >
                             <Edit className="w-4 h-4" />
                           </button>
@@ -1345,6 +1463,7 @@ const BlogAdmin: React.FC = () => {
                 </tbody>
               </table>
             </div>
+          </>
           )}
       </ContentCard>
 

@@ -222,10 +222,11 @@ const Comments: React.FC<CommentsProps> = ({
           }
         }));
         
-        // Also update the comments array for consistency
-        setComments(prev => prev.map(c => 
-          c._id === commentId 
-            ? { ...c, likeCount: data.data.likeCount, likedBy: data.data.likedBy }
+        // Also update the comments array for consistency (isLiked is authoritative;
+        // the toggle response no longer ships the full likedBy array)
+        setComments(prev => prev.map(c =>
+          c._id === commentId
+            ? { ...c, likeCount: data.data.likeCount }
             : c
         ));
         

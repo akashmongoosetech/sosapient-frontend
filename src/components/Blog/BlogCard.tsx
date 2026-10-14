@@ -47,6 +47,9 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, index }) => {
           src={post.image}
           alt={post.title}
           loading="lazy"
+          decoding="async"
+          width={400}
+          height={192}
           className="w-full h-48 object-cover"
           whileHover={{ scale: 1.1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
@@ -118,6 +121,10 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, index }) => {
               <img
                 src={post.authorImage}
                 alt={post.author}
+                loading="lazy"
+                decoding="async"
+                width={24}
+                height={24}
                 className="w-6 h-6 rounded-full object-cover"
               />
               <span>{post.author}</span>

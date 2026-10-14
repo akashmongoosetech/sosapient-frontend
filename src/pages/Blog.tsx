@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import BlogHero from '../components/Blog/BlogHero';
@@ -28,6 +28,7 @@ const Blog: React.FC = () => {
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [categories, setCategories] = useState<string[]>(['All']);
   const [loading, setLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(() => Math.max(1, parseInt(searchParams.get('page') || '1', 10) || 1));
   const [totalPages, setTotalPages] = useState(1);
@@ -43,17 +44,38 @@ const Blog: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, selectedCategory, currentPage]);
 
+  const abortRef = useRef<AbortController | null>(null);
+  const mountedRef = useRef(true);
   useEffect(() => {
-    fetchCategories();
-    fetchFeatured();
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      abortRef.current?.abort();
+    };
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const t = setTimeout(() => {
+      fetchCategories(controller.signal);
+      fetchFeatured(controller.signal);
+    }, 0);
+    return () => {
+      clearTimeout(t);
+      controller.abort();
+    };
   }, []);
 
   // Fetch blogs whenever page, search, or category changes (debounced to avoid double-fetch on filter reset)
   useEffect(() => {
+    const controller = new AbortController();
     const t = setTimeout(() => {
-      fetchBlogs();
+      fetchBlogs(controller.signal);
     }, 300);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      controller.abort();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, searchTerm, selectedCategory]);
 
@@ -67,9 +89,10 @@ const Blog: React.FC = () => {
     setSelectedCategory(value);
   };
 
-  const fetchFeatured = async () => {
+  const fetchFeatured = async (signal?: AbortSignal) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/blogs?featured=true&limit=1&status=published`);
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/blogs?featured=true&limit=1&status=published`, { signal });
+      if (!response.ok) return;
       const data = await response.json();
       if (data.success && Array.isArray(data.data) && data.data.length > 0) {
         const post = data.data[0];
@@ -93,9 +116,13 @@ const Blog: React.FC = () => {
     }
   };
 
-  const fetchBlogs = async () => {
+  const fetchBlogs = async (signal?: AbortSignal) => {
+    // Keep existing content mounted during refetch (no focus loss / layout shift).
+    const firstLoad = blogPosts.length === 0 && !error;
     try {
-      setLoading(true);
+      if (firstLoad) setLoading(true);
+      else setIsFetching(true);
+      setError(null);
       let url = `${import.meta.env.VITE_BASE_URL}/api/blogs?page=${currentPage}&limit=6&status=published`;
       if (selectedCategory && selectedCategory !== 'All') {
         url += `&category=${encodeURIComponent(selectedCategory)}`;
@@ -103,8 +130,12 @@ const Blog: React.FC = () => {
       if (searchTerm) {
         url += `&search=${encodeURIComponent(searchTerm)}`;
       }
-      const response = await fetch(url);
+      const response = await fetch(url, { signal });
+      if (!response.ok) {
+        throw new Error(`Request failed (${response.status})`);
+      }
       const data = await response.json();
+      if (!mountedRef.current) return;
       if (data.success) {
         const normalizeUrl = (url: string) => url?.startsWith('/uploads') ? `${import.meta.env.VITE_BASE_URL}${url}` : url;
         const transformedPosts = data.data.map((post: any) => ({
@@ -123,31 +154,46 @@ const Blog: React.FC = () => {
         setBlogPosts(transformedPosts);
         setTotalPages(data.pagination?.totalPages || 1);
       } else {
-        setError(data.error || 'Failed to fetch blogs.');
+        setError(data.error || data.message || 'Failed to fetch blogs.');
         setBlogPosts([]);
       }
-    } catch {
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      if (!mountedRef.current) return;
       setError('Error fetching blogs. Please try again later.');
       setBlogPosts([]);
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+        setIsFetching(false);
+      }
     }
   };
 
   const defaultCategories = ['All', 'Technology', 'Design', 'Mobile Development', 'Web Development', 'AI/ML', 'Cybersecurity', 'Business', 'Tutorial'];
 
-  const fetchCategories = async () => {
+  const fetchCategories = async (signal?: AbortSignal) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/categories`);
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/categories`, { signal });
+      if (!response.ok) throw new Error('categories failed');
       const data = await response.json();
+      if (!mountedRef.current) return;
       if (!data?.success || !Array.isArray(data.data) || data.data.length === 0) {
         setCategories(defaultCategories);
       } else {
         setCategories(['All', ...data.data]);
       }
-    } catch {
-      setCategories(defaultCategories);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      if (mountedRef.current) setCategories(defaultCategories);
     }
+  };
+
+  const retryLoad = () => {
+    setError(null);
+    fetchBlogs();
+    fetchCategories();
+    fetchFeatured();
   };
 
   if (loading) {
@@ -166,7 +212,7 @@ const Blog: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (error && blogPosts.length === 0) {
     return (
       <div className="bg-white dark:bg-gray-900 min-h-screen">
         <BlogHero />
@@ -175,6 +221,12 @@ const Blog: React.FC = () => {
             <div className="text-center">
               <div className="text-red-600 dark:text-red-400 text-lg font-semibold">{error}</div>
               <p className="text-gray-600 dark:text-gray-400 mt-4">Please try again later.</p>
+              <button
+                onClick={retryLoad}
+                className="mt-6 rounded-lg bg-primary-600 px-6 py-2.5 font-semibold text-white hover:bg-primary-700"
+              >
+                Retry
+              </button>
             </div>
           </div>
         </div>
@@ -214,7 +266,7 @@ const Blog: React.FC = () => {
       {featured && !searchTerm && selectedCategory === 'All' && currentPage === 1 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 mb-4" aria-label="Featured article">
           <Link to={`/blog/${featured.slug}`} className="group grid overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 md:grid-cols-2">
-            <img src={featured.image} alt={featured.title} className="h-64 w-full object-cover md:h-full" loading="lazy" />
+            <img src={featured.image} alt={featured.title} className="h-64 w-full object-cover md:h-full" fetchPriority="high" decoding="async" width={800} height={450} />
             <div className="flex flex-col justify-center p-6 sm:p-8">
               <span className="text-xs font-semibold uppercase tracking-wider text-primary-600">Featured · {featured.category}</span>
               <h2 className="mt-2 text-2xl font-bold text-gray-900 group-hover:underline dark:text-white">{featured.title}</h2>
@@ -234,6 +286,21 @@ const Blog: React.FC = () => {
         categories={categories}
       />
       <BlogGrid posts={blogPosts} />
+      {isFetching && (
+        <p role="status" className="my-4 text-center text-sm text-gray-500 dark:text-gray-400">
+          Updating results…
+        </p>
+      )}
+      {error && blogPosts.length > 0 && (
+        <div role="alert" className="mx-auto my-4 max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}{' '}
+            <button onClick={retryLoad} className="font-semibold underline">
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
       {/* Pagination Controls */}
       {totalPages > 1 && (
         <div className="flex justify-center my-8 space-x-2">

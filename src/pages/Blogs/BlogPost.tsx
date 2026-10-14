@@ -71,6 +71,7 @@ const BlogPost: React.FC = () => {
 
   // Dynamic per-post SEO with sensible fallbacks (never static placeholders).
   // Only rendered once blogPost is loaded (early returns above guard nulls).
+  // Deps cover every field resolveBlogSeo reads, so edits refresh metadata.
   const seo = useMemo(
     () =>
       resolveBlogSeo({
@@ -88,7 +89,21 @@ const BlogPost: React.FC = () => {
         seo: blogPost?.seo
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [blogPost?.slug, blogPost?.updatedAt]
+    [
+      slug,
+      blogPost?.slug,
+      blogPost?.title,
+      blogPost?.excerpt,
+      blogPost?.content,
+      blogPost?.image,
+      blogPost?.author,
+      blogPost?.category,
+      blogPost?.tags,
+      blogPost?.publishedAt,
+      blogPost?.createdAt,
+      blogPost?.updatedAt,
+      blogPost?.seo
+    ]
   );
 
   // Show notification helper
@@ -103,12 +118,18 @@ const BlogPost: React.FC = () => {
       setLoading(false);
       return;
     }
+    const controller = new AbortController();
+    window.scrollTo(0, 0);
     const fetchBlog = async () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/api/blogs/${slug}`
+          `${import.meta.env.VITE_BASE_URL}/api/blogs/${slug}`,
+          { signal: controller.signal }
         );
+        if (!response.ok) {
+          throw new Error(`Request failed (${response.status})`);
+        }
         const data = await response.json();
         if (data.success && data.redirectTo) {
           // Slug renamed: follow to the canonical URL
@@ -139,17 +160,19 @@ const BlogPost: React.FC = () => {
           setIsLiked(Boolean(localStorage.getItem(`liked:${data.data._id}`)));
           setError(null);
           // Fetch related blogs after getting the main blog
-          fetchRelatedBlogs(data.data.category, data.data._id);
+          fetchRelatedBlogs(data.data.category, data.data._id, controller.signal);
         } else {
           setError(data.message || "Blog post not found.");
         }
-      } catch {
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
         setError("Error fetching blog post.");
       } finally {
         setLoading(false);
       }
     };
     fetchBlog();
+    return () => controller.abort();
   }, [slug, navigate]);
 
   useEffect(() => {
@@ -171,21 +194,26 @@ const BlogPost: React.FC = () => {
     };
   }, [shareOpen]);
 
-  const fetchRelatedBlogs = async (category: string, currentBlogId: string) => {
+  const fetchRelatedBlogs = async (category: string, currentBlogId: string, signal?: AbortSignal) => {
     try {
       setRelatedLoading(true);
       const normalizeUrl = (url: string) =>
         url?.startsWith("/uploads")
           ? `${import.meta.env.VITE_BASE_URL}${url}`
           : url;
-      // Fetch blogs from the same category, excluding the current blog
+      // Fetch blogs from the same category, excluding the current blog.
+      // Request exactly 3 so one exclusion still leaves 2 (avoids 33-50% over-fetch).
       const response = await fetch(
         `${
           import.meta.env.VITE_BASE_URL
         }/api/blogs?category=${encodeURIComponent(
           category
-        )}&limit=4&status=published`
+        )}&limit=3&status=published`,
+        { signal }
       );
+      if (!response.ok) {
+        throw new Error(`Related request failed (${response.status})`);
+      }
       const data = await response.json();
       if (data.success) {
         // Filter out the current blog and limit to 2 related blogs
@@ -199,7 +227,7 @@ const BlogPost: React.FC = () => {
         setRelatedBlogs(filtered);
       }
     } catch (err) {
-      console.error("Error fetching related blogs:", err);
+      if (err instanceof DOMException && (err as DOMException).name === 'AbortError') return;
       // Fallback: fetch any recent blogs if category-based fetch fails
       try {
         const normalizeUrl = (url: string) =>
@@ -207,8 +235,10 @@ const BlogPost: React.FC = () => {
             ? `${import.meta.env.VITE_BASE_URL}${url}`
             : url;
         const fallbackResponse = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/api/blogs?limit=3&status=published`
+          `${import.meta.env.VITE_BASE_URL}/api/blogs?limit=3&status=published`,
+          { signal }
         );
+        if (!fallbackResponse.ok) return;
         const fallbackData = await fallbackResponse.json();
         if (fallbackData.success) {
           const filtered = fallbackData.data
@@ -221,7 +251,7 @@ const BlogPost: React.FC = () => {
           setRelatedBlogs(filtered);
         }
       } catch (fallbackErr) {
-        console.error("Error fetching fallback blogs:", fallbackErr);
+        if (fallbackErr instanceof DOMException && (fallbackErr as DOMException).name === 'AbortError') return;
       }
     } finally {
       setRelatedLoading(false);
@@ -237,8 +267,19 @@ const BlogPost: React.FC = () => {
   }
   if (error || !blogPost) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-red-600">
-        {error || "Blog post not found."}
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4 text-center">
+        <p className="text-red-600">{error || "Blog post not found."}</p>
+        <div className="flex gap-3">
+          <button
+            onClick={() => window.location.reload()}
+            className="rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
+          >
+            Retry
+          </button>
+          <Link to="/blog" className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200">
+            Back to Blog
+          </Link>
+        </div>
       </div>
     );
   }
@@ -416,57 +457,60 @@ const BlogPost: React.FC = () => {
       </Helmet>
 
       <div className="bg-white dark:bg-gray-900">
-        {/* Hero Section */}
+        {/* Article header: title, excerpt and meta laid out separately */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative h-[60vh] min-h-[500px] w-full overflow-hidden"
+          className="mx-auto max-w-4xl px-4 pt-10 sm:px-6 sm:pt-14 lg:px-8"
         >
-          <div className="absolute inset-0">
+          <div className="space-y-4">
+            {/* Meta info */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+              <span className="px-3 py-1 bg-primary-500 text-white text-xs sm:text-sm rounded-full">
+                {blogPost.category}
+              </span>
+              <span className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm flex items-center">
+                <Clock className="w-4 h-4 mr-1" />
+                {blogPost.readTime}
+              </span>
+              <span className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm flex items-center">
+                <Eye className="w-4 h-4 mr-1" />
+                {(typeof blogPost.views === "number" ? blogPost.views : 0).toLocaleString()} views
+              </span>
+            </div>
+
+            {/* Title */}
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white leading-snug sm:leading-tight">
+              {blogPost.title}
+            </h1>
+
+            {/* Excerpt */}
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-2xl sm:max-w-3xl">
+              {blogPost.excerpt}
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Featured image displayed separately below the header */}
+        {blogPost.image && (
+          <motion.figure
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="mx-auto mt-8 max-w-4xl px-4 sm:px-6 lg:px-8"
+          >
             <img
               src={blogPost.image}
               alt={blogPost.imageAlt || blogPost.title}
               fetchPriority="high"
               decoding="async"
-              className="w-full h-full object-cover"
+              loading="eager"
+              width={1200}
+              height={630}
+              className="aspect-video w-full rounded-2xl object-cover shadow-lg"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/80" />
-          </div>
-
-          <div className="relative h-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-8 sm:pb-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="space-y-4"
-            >
-              {/* Meta info */}
-              <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-                <span className="px-3 py-1 bg-primary-500 text-white text-xs sm:text-sm rounded-full">
-                  {blogPost.category}
-                </span>
-                <span className="text-white/80 text-xs sm:text-sm flex items-center">
-                  <Clock className="w-4 h-4 mr-1" />
-                  {blogPost.readTime}
-                </span>
-                <span className="text-white/80 text-xs sm:text-sm flex items-center">
-                  <Eye className="w-4 h-4 mr-1" />
-                  {blogPost.views.toLocaleString()} views
-                </span>
-              </div>
-
-              {/* Title */}
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white leading-snug sm:leading-tight">
-                {blogPost.title}
-              </h1>
-
-              {/* Excerpt */}
-              <p className="text-base sm:text-lg lg:text-xl text-white/90 max-w-2xl sm:max-w-3xl">
-                {blogPost.excerpt}
-              </p>
-            </motion.div>
-          </div>
-        </motion.div>
+          </motion.figure>
+        )}
 
         {/* Navigation Bar */}
         <div className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-800">
@@ -730,6 +774,10 @@ const BlogPost: React.FC = () => {
                 "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
               }
               alt={blogPost.author?.name || "Author"}
+              loading="lazy"
+              decoding="async"
+              width={48}
+              height={48}
               className="w-12 h-12 rounded-full object-cover ring-2 ring-primary-500"
             />
             <div>
@@ -782,6 +830,8 @@ const BlogPost: React.FC = () => {
                     <img
                       src={section.image}
                       alt={section.imageAlt || section.heading || "Section image"}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full max-h-96 object-cover rounded mb-4"
                     />
                   )}
