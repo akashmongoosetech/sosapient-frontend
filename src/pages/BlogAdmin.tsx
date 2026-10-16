@@ -297,7 +297,15 @@ const BlogAdmin: React.FC = () => {
       // Binary featured image when newly chosen; existing/data URLs stay as `image` string.
       if (imageFileRef.current) {
         formData.append('image', imageFileRef.current);
-      } else if (snapshot.image) {
+      } else if (snapshot.image && !snapshot._id) {
+        // Create path: send the image string as-is (backend accepts small
+        // data URLs and rejects oversized ones with a clear error).
+        formData.append('image', snapshot.image);
+      } else if (snapshot.image && !snapshot.image.startsWith('data:')) {
+        // Update path with an untouched URL/path image: resend it so the
+        // record keeps its value. Untouched legacy base64 images are
+        // OMITTED instead — the stored value is already in the database,
+        // and resending megabytes would trip the server's embed guard.
         formData.append('image', snapshot.image);
       }
 
@@ -530,19 +538,57 @@ const BlogAdmin: React.FC = () => {
   };
 
   const addTag = (tag: string) => {
-    if (tag.trim()) {
-      setEditingBlog(prev => {
-        if (!prev) return prev;
-        const currentTags = prev.tags || [];
-        if (!currentTags.includes(tag.trim())) {
-          return {
-            ...prev,
-            tags: [...currentTags, tag.trim()]
-          };
+    addTags([tag]);
+  };
+
+  // Split raw input on commas/newlines so pasted or typed lists like
+  // "React, Node.js" become separate chips instead of one tag or nothing.
+  const addTags = (values: string[]) => {
+    const clean = values.map((v) => v.trim()).filter((v) => v.length > 0);
+    if (clean.length === 0) return;
+    setEditingBlog(prev => {
+      if (!prev) return prev;
+      const currentTags = prev.tags || [];
+      const fresh = clean.filter((t) => !currentTags.includes(t));
+      if (fresh.length === 0) return prev;
+      return { ...prev, tags: [...currentTags, ...fresh] };
+    });
+  };
+
+  const commitTagInput = (input: HTMLInputElement) => {
+    const raw = input.value;
+    if (!raw.trim()) return;
+    addTags(raw.split(/[,\n]/));
+    input.value = '';
+  };
+
+  const addKeyword = (keyword: string) => {
+    addKeywords([keyword]);
+  };
+
+  const addKeywords = (values: string[]) => {
+    const clean = values.map((v) => v.trim()).filter((v) => v.length > 0);
+    if (clean.length === 0) return;
+    setEditingBlog(prev => {
+      if (!prev) return prev;
+      const currentKeywords = prev.seo?.keywords || [];
+      const fresh = clean.filter((k) => !currentKeywords.includes(k));
+      if (fresh.length === 0) return prev;
+      return {
+        ...prev,
+        seo: {
+          ...prev.seo,
+          keywords: [...currentKeywords, ...fresh]
         }
-        return prev;
-      });
-    }
+      };
+    });
+  };
+
+  const commitKeywordInput = (input: HTMLInputElement) => {
+    const raw = input.value;
+    if (!raw.trim()) return;
+    addKeywords(raw.split(/[,\n]/));
+    input.value = '';
   };
 
   const removeTag = (tagToRemove: string) => {
@@ -1030,17 +1076,20 @@ const BlogAdmin: React.FC = () => {
                   </div>
                   <input
                     type="text"
-                    placeholder="Add tag and press Enter"
+                    placeholder="Add tags — press Enter, comma, or click away"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === 'Enter' || e.key === ',') {
                         e.preventDefault();
-                        const input = e.currentTarget as HTMLInputElement;
-                        const value = input.value.trim();
-                        if (value) {
-                          addTag(value);
-                          input.value = '';
-                        }
+                        commitTagInput(e.currentTarget as HTMLInputElement);
+                      }
+                    }}
+                    onBlur={(e) => commitTagInput(e.currentTarget as HTMLInputElement)}
+                    onPaste={(e) => {
+                      const text = e.clipboardData?.getData('text') || '';
+                      if (/[,\n]/.test(text)) {
+                        e.preventDefault();
+                        addTags(text.split(/[,\n]/));
                       }
                     }}
                   />
@@ -1271,30 +1320,20 @@ const BlogAdmin: React.FC = () => {
                     </div>
                     <input
                       type="text"
-                      placeholder="Add SEO keyword and press Enter"
+                      placeholder="Add keywords — press Enter, comma, or click away"
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
+                        if (e.key === 'Enter' || e.key === ',') {
                           e.preventDefault();
-                          const input = e.currentTarget as HTMLInputElement;
-                          const keyword = input.value.trim();
-                          if (keyword) {
-                            setEditingBlog(prev => {
-                              if (!prev) return prev;
-                              const currentKeywords = prev.seo?.keywords || [];
-                              if (!currentKeywords.includes(keyword)) {
-                                return {
-                                  ...prev,
-                                  seo: {
-                                    ...prev.seo,
-                                    keywords: [...currentKeywords, keyword]
-                                  }
-                                };
-                              }
-                              return prev;
-                            });
-                            input.value = '';
-                          }
+                          commitKeywordInput(e.currentTarget as HTMLInputElement);
+                        }
+                      }}
+                      onBlur={(e) => commitKeywordInput(e.currentTarget as HTMLInputElement)}
+                      onPaste={(e) => {
+                        const text = e.clipboardData?.getData('text') || '';
+                        if (/[,\n]/.test(text)) {
+                          e.preventDefault();
+                          addKeywords(text.split(/[,\n]/));
                         }
                       }}
                     />
