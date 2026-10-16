@@ -69,6 +69,16 @@ const emptySeo = () => ({
   twitterImage: ''
 });
 
+// Backend stores uploads as site-relative paths ("/uploads/...") served from
+// the API origin — the same normalizeUrl helper the public pages use.
+const normalizeImageUrl = (url: string | undefined): string => {
+  if (!url) return '';
+  if (/^https?:\/\//i.test(url) || url.startsWith('data:') || url.startsWith('blob:')) return url;
+  if (url.startsWith('/uploads')) return `${import.meta.env.VITE_BASE_URL || ''}${url}`;
+  if (url.startsWith('/')) return url;
+  return url;
+};
+
 // Stable client-only section identity (never sent to the API).
 const newSectionId = () => {
   try {
@@ -409,13 +419,18 @@ const BlogAdmin: React.FC = () => {
         return;
       }
       const full: BlogPost = data.data;
+      const keywords = Array.isArray(full.seo?.keywords)
+        ? full.seo.keywords
+        : typeof full.seo?.keywords === 'string'
+          ? (full.seo.keywords as string).split(',').map((k) => k.trim()).filter(Boolean)
+          : [];
       setEditingBlog({
         ...full,
         tags: Array.isArray(full.tags) ? full.tags : [],
         sections: Array.isArray(full.sections)
           ? full.sections.map((s) => ({ clientId: newClientId(), heading: s.heading || '', content: s.content || '', image: s.image || '', imageAlt: s.imageAlt || '' }))
           : [{ clientId: newClientId(), heading: '', content: '', image: '', imageAlt: '' }],
-        seo: { ...emptySeo(), ...(full.seo || {}) },
+        seo: { ...emptySeo(), ...(full.seo || {}), keywords },
         readTime: full.readTime || ''
       });
       imageFileRef.current = null;
@@ -465,7 +480,11 @@ const BlogAdmin: React.FC = () => {
               sections: Array.isArray(backupData.sections) && backupData.sections.length > 0
                 ? backupData.sections.map((s: BlogSection) => ({ clientId: newSectionId(), heading: s.heading || '', content: s.content || '', image: s.image || '', imageAlt: s.imageAlt || '' }))
                 : newBlogState.sections,
-              seo: { ...emptySeo(), ...(backupData.seo || {}) }
+              seo: {
+                ...emptySeo(),
+                ...(backupData.seo || {}),
+                keywords: Array.isArray(backupData.seo?.keywords) ? backupData.seo.keywords : []
+              }
             };
           }
         }
@@ -869,9 +888,10 @@ const BlogAdmin: React.FC = () => {
                     {editingBlog.image ? (
                       <div className="relative">
                         <img
-                          src={editingBlog.image}
+                          src={normalizeImageUrl(editingBlog.image)}
                           alt={`Featured image preview for ${editingBlog.title || 'blog post'}`}
                           className="w-full h-32 object-cover rounded-lg"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                         />
                         <button
                           onClick={() => {
@@ -1388,9 +1408,11 @@ const BlogAdmin: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <img
-                            src={blog.image}
+                            src={normalizeImageUrl(blog.image)}
                             alt={blog.title}
                             className="w-10 h-10 rounded-lg object-cover"
+                            loading="lazy"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                           />
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1">
@@ -1515,9 +1537,10 @@ const BlogAdmin: React.FC = () => {
               <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div className="flex items-center">
                   <img
-                    src={blogToDelete.image}
+                    src={normalizeImageUrl(blogToDelete.image)}
                     alt={blogToDelete.title}
                     className="w-12 h-12 rounded-lg object-cover"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                   <div className="ml-3">
                     <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1">
