@@ -52,7 +52,7 @@ const SECTIONS: { heading: string; body: string[] }[] = [
   {
     heading: 'Contact Us About Privacy',
     body: [
-      'For any privacy question or data request, contact us through the contact page or email info.sosapient@gmail.com.',
+      'For any privacy question or data request, contact us through the contact page or email admin@sosapient.in.',
     ],
   },
 ];

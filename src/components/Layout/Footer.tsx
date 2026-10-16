@@ -102,8 +102,11 @@ const Footer: React.FC = () => {
   ];
 
   const contactRows = [
-    { icon: Mail, label: 'info.sosapient@gmail.com', href: 'mailto:info.sosapient@gmail.com' },
-    { icon: Phone, label: '+91-8815596247', href: 'tel:+918815596247' },
+    { icon: Mail, sub: 'Contact', label: 'admin@sosapient.in', href: 'mailto:admin@sosapient.in' },
+    { icon: Mail, sub: 'Sales', label: 'sales@sosapient.in', href: 'mailto:sales@sosapient.in' },
+    { icon: Mail, sub: 'HR', label: 'hrd@sosapient.in', href: 'mailto:hrd@sosapient.in' },
+    { icon: Phone, sub: 'HR', label: '+91-8815596247', href: 'tel:+918815596247' },
+    { icon: Phone, sub: 'Sales & Contact', label: '+91-9685533878', href: 'tel:+919685533878' },
     { icon: MapPin, label: 'Anand Nagar, Vasant Vihar, Ujjain (M.P.) 456010 India' },
   ];
 
@@ -219,13 +222,20 @@ const Footer: React.FC = () => {
                   <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-violet-300 ring-1 ring-white/10">
                     <row.icon className="h-4 w-4" aria-hidden="true" />
                   </span>
-                  {row.href ? (
-                    <a href={row.href} className="pt-1 transition-colors hover:text-white">
-                      {row.label}
-                    </a>
-                  ) : (
-                    <span className="pt-1 text-gray-400">{row.label}</span>
-                  )}
+                  <span className="pt-1">
+                    {'sub' in row && row.sub ? (
+                      <span className="mr-1.5 text-[11px] font-bold uppercase tracking-widest text-violet-300">
+                        {row.sub}:
+                      </span>
+                    ) : null}
+                    {row.href ? (
+                      <a href={row.href} className="transition-colors hover:text-white">
+                        {row.label}
+                      </a>
+                    ) : (
+                      <span className="text-gray-400">{row.label}</span>
+                    )}
+                  </span>
                 </li>
               ))}
             </ul>

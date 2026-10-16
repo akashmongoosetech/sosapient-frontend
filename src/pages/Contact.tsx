@@ -44,7 +44,7 @@ const Contact: React.FC = () => {
     {
       icon: Mail,
       title: 'Email Us',
-      details: 'info.sosapient@gmail.com',
+      details: 'admin@sosapient.in',
       description: 'Send us an email anytime!'
     },
     {
@@ -155,7 +155,7 @@ const Contact: React.FC = () => {
             panelTitle: 'Start a Conversation · Live',
             stats: [
               { label: 'Your Message', value: 'Hi! We need a project quote…', sub: 'typical first message' },
-              { label: 'Email Us', value: 'info.sosapient@gmail.com', sub: 'for new projects' },
+              { label: 'Email Us', value: 'admin@sosapient.in', sub: 'for new projects' },
               { label: 'Call Us', value: '+91-9685533878', sub: 'Mon–Fri, 10AM–8PM' },
             ],
             floats: [
