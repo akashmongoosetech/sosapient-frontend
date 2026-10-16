@@ -81,12 +81,12 @@ const Portfolio: React.FC = () => {
       <link rel="canonical" href="https://sosapient.in/portfolio" />
       <meta property="og:type" content="website" />
       <meta property="og:title" content="Portfolio | SoSapient" />
-      <meta property="og:description" content="Selected SoSapient projects across web, mobile, AI and cloud." />
+      <meta property="og:description" content="Illustrative sample projects showing the range of work SoSapient delivers. See case studies for detailed client outcomes." />
       <meta property="og:url" content="https://sosapient.in/portfolio" />
       <meta property="og:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content="Portfolio | SoSapient" />
-      <meta name="twitter:description" content="Selected SoSapient projects across web, mobile, AI and cloud." />
+      <meta name="twitter:description" content="Illustrative sample projects showing the range of work SoSapient delivers. See case studies for detailed client outcomes." />
       <meta name="twitter:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
     </Helmet>
     <section className="py-20 bg-white dark:bg-primary-900">

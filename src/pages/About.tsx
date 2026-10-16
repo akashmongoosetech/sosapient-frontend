@@ -28,14 +28,14 @@ const About: React.FC = () => {
         <meta property="og:title" content="About SoSapient | Web Development & AI Company" />
         <meta
           property="og:description"
-          content="Custom websites, MERN stack apps, AI automation and CRM/ERP solutions — from Ujjain, India to clients worldwide."
+          content="SoSapient is a software company in Ujjain, India building custom websites, MERN stack apps, AI automation and CRM/ERP solutions for clients worldwide."
         />
         <meta property="og:url" content="https://sosapient.in/about" />
         <meta property="og:site_name" content="SoSapient" />
         <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="About SoSapient | Web Development & AI Company" />
-        <meta name="twitter:description" content="Custom websites, MERN stack apps, AI automation and CRM/ERP solutions — from Ujjain, India to clients worldwide." />
+        <meta name="twitter:description" content="SoSapient is a software company in Ujjain, India building custom websites, MERN stack apps, AI automation and CRM/ERP solutions for clients worldwide." />
         <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta
           name="robots"

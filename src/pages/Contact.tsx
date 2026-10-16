@@ -118,11 +118,11 @@ const Contact: React.FC = () => {
         <meta property="og:locale" content="en_US" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Contact Us | SoSapient" />
-        <meta property="og:description" content="Start your project with SoSapient — web development, AI automation, CRM/ERP and digital marketing." />
+        <meta property="og:description" content="Start your project with SoSapient — web development, AI automation, CRM/ERP and digital marketing. Based in Ujjain, India, working worldwide." />
         <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Contact Us | SoSapient" />
-        <meta name="twitter:description" content="Start your project with SoSapient — web development, AI automation, CRM/ERP and digital marketing." />
+        <meta name="twitter:description" content="Start your project with SoSapient — web development, AI automation, CRM/ERP and digital marketing. Based in Ujjain, India, working worldwide." />
         <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta property="og:url" content="https://sosapient.in/contact" />
         <meta property="og:site_name" content="SoSapient" />

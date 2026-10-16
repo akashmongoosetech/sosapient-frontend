@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Calendar, Clock } from 'lucide-react';
 import BlogRichContent from '../components/Blog/BlogRichContent';
 import CaseStudyCard from '../components/case-studies/CaseStudyCard';
-import { siteUrl, stripHtml, absoluteUrl } from '../utils/blog';
+import { siteUrl, stripHtml, absoluteUrl, truncateTitle } from '../utils/blog';
 import { CaseStudy, caseStudyIcon } from '../types/caseStudy';
 
 const CaseStudyDetails: React.FC = () => {
@@ -94,14 +94,21 @@ const CaseStudyDetails: React.FC = () => {
 
   const Icon = caseStudyIcon(doc.icon);
   const overviewText = stripHtml(doc.overview || '').slice(0, 160);
-  const metaTitle = doc.seo?.metaTitle?.trim() || `${doc.title} | SoSapient`;
+  const metaTitle = truncateTitle(doc.seo?.metaTitle?.trim() || `${doc.title} | SoSapient`, 60);
   const metaDescription = doc.seo?.metaDescription?.trim() || overviewText || `${doc.title} — a SoSapient client success story.`;
   const keywords = (doc.seo?.keywords && doc.seo.keywords.length > 0
     ? doc.seo.keywords
     : [doc.category, doc.client, ...doc.technologies]
-  ).join(', ');
+  ).filter(Boolean).join(', ');
   const canonical = `${siteUrl()}/case-studies/${doc.slug}`;
   const ogImage = absoluteUrl(doc.thumbnailImageUrl);
+  const validDate = (v?: string) => {
+    if (!v) return undefined;
+    const t = Date.parse(v);
+    return Number.isNaN(t) ? undefined : new Date(t).toISOString();
+  };
+  const datePublished = validDate(doc.createdAt);
+  const dateModified = validDate(doc.updatedAt) || datePublished;
 
   return (
     <div className="bg-white dark:bg-gray-900">
@@ -127,8 +134,8 @@ const CaseStudyDetails: React.FC = () => {
             headline: doc.title,
             description: metaDescription,
             image: ogImage ? [ogImage] : undefined,
-            datePublished: doc.createdAt,
-            dateModified: doc.updatedAt,
+            ...(datePublished ? { datePublished } : {}),
+            ...(dateModified ? { dateModified } : {}),
             author: { '@type': 'Organization', name: 'SoSapient' },
             publisher: {
               '@type': 'Organization',

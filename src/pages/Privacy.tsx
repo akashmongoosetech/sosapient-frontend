@@ -68,13 +68,13 @@ const Privacy: React.FC = () => (
       <link rel="canonical" href="https://sosapient.in/privacy" />
       <meta property="og:type" content="website" />
       <meta property="og:title" content="Privacy Policy | SoSapient" />
-      <meta property="og:description" content="How SoSapient collects, uses and protects your information." />
+      <meta property="og:description" content="How SoSapient collects, uses and protects your information across contact forms, applications, accounts and analytics." />
       <meta property="og:url" content="https://sosapient.in/privacy" />
       <meta property="og:site_name" content="SoSapient" />
       <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content="Privacy Policy | SoSapient" />
-      <meta name="twitter:description" content="How SoSapient collects, uses and protects your information." />
+      <meta name="twitter:description" content="How SoSapient collects, uses and protects your information across contact forms, applications, accounts and analytics." />
       <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
     </Helmet>
     <section className="py-16 sm:py-20">

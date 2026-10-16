@@ -75,13 +75,13 @@ const CaseStudies: React.FC = () => {
         <link rel="canonical" href={canonical} />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Case Studies | SoSapient" />
-        <meta property="og:description" content="Selected SoSapient client projects: real solutions, measurable outcomes, and the technologies behind them." />
+        <meta property="og:description" content="Explore SoSapient case studies — real client projects across web, AI and cloud with challenges, solutions, tech stacks and measurable outcomes." />
         <meta property="og:url" content={canonical} />
         <meta property="og:site_name" content="SoSapient" />
         <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Case Studies | SoSapient" />
-        <meta name="twitter:description" content="Selected SoSapient client projects: real solutions, measurable outcomes, and the technologies behind them." />
+        <meta name="twitter:description" content="Explore SoSapient case studies — real client projects across web, AI and cloud with challenges, solutions, tech stacks and measurable outcomes." />
         <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
         <script type="application/ld+json">
           {JSON.stringify({

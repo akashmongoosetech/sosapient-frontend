@@ -59,14 +59,14 @@ const Services: React.FC = () => {
         <meta property="og:title" content="Services | AI, Cloud & Software | SoSapient" />
         <meta
           property="og:description"
-          content="Digital solutions built for growth: development, AI, automation, cloud, security and business software."
+          content="End-to-end development, AI automation, cloud and business software: frontend, backend, mobile, UI/UX, security, chatbots, RAG, CRM, ERP and SaaS."
         />
         <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Services | AI, Cloud & Software | SoSapient" />
         <meta
           name="twitter:description"
-          content="Digital solutions built for growth: development, AI, automation, cloud, security and business software."
+          content="End-to-end development, AI automation, cloud and business software: frontend, backend, mobile, UI/UX, security, chatbots, RAG, CRM, ERP and SaaS."
         />
         <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta property="og:url" content="https://sosapient.in/services" />

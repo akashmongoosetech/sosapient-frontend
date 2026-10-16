@@ -25,7 +25,7 @@ const Home: React.FC = () => {
         <link rel="canonical" href="https://sosapient.in/" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Full Stack Web Development & AI Solutions | SoSapient" />
-        <meta property="og:description" content="MERN stack apps, AI chatbots & automation, CRM/ERP software, SEO and social media growth — from Ujjain, India to clients worldwide." />
+        <meta property="og:description" content="SoSapient builds MERN stack apps, AI chatbots & automation, CRM/ERP software, plus SEO and social media growth — from Ujjain, India to clients worldwide." />
         <meta property="og:url" content="https://sosapient.in/" />
         <meta property="og:site_name" content="SoSapient" />
         <meta property="og:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
@@ -35,7 +35,7 @@ const Home: React.FC = () => {
         <meta property="og:image:type" content="image/png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Full Stack Web Development & AI Solutions | SoSapient" />
-        <meta name="twitter:description" content="MERN stack apps, AI chatbots & automation, CRM/ERP software, SEO and social media growth." />
+        <meta name="twitter:description" content="SoSapient builds MERN stack apps, AI chatbots & automation, CRM/ERP software, plus SEO and social media growth — from Ujjain, India to clients worldwide." />
         <meta name="twitter:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
         <meta name="twitter:image:alt" content="SoSapient — Web Development & AI Solutions" />
         <script type="application/ld+json">

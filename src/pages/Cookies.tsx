@@ -11,11 +11,13 @@ const Cookies: React.FC = () => (
       <meta name="robots" content="index, follow" />
       <meta property="og:type" content="website" />
       <meta property="og:title" content="Cookie Policy | Consent & Storage | SoSapient" />
-      <meta property="og:description" content="How SoSapient uses cookies and local storage." />
+      <meta property="og:description" content="How SoSapient uses cookies and local storage, and how to manage consent. Draft pending legal review." />
       <meta property="og:url" content="https://sosapient.in/cookies" />
       <meta property="og:site_name" content="SoSapient" />
       <meta property="og:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
       <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="Cookie Policy | Consent & Storage | SoSapient" />
+      <meta name="twitter:description" content="How SoSapient uses cookies and local storage, and how to manage consent. Draft pending legal review." />
       <meta name="twitter:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
     </Helmet>
     <section className="py-16 sm:py-20">

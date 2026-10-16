@@ -23,10 +23,20 @@ export function siteUrl(): string {
 
 export function absoluteUrl(url: string | undefined): string {
   if (!url) return '';
-  if (/^https?:\/\//i.test(url)) return url;
-  if (url.startsWith('/uploads')) return `${import.meta.env.VITE_BASE_URL || ''}${url}`;
-  if (url.startsWith('/')) return `${siteUrl()}${url}`;
-  return url;
+  const v = String(url).trim();
+  if (!v) return '';
+  if (/^https?:\/\//i.test(v)) return v;
+  if (v.startsWith('/uploads')) return `${import.meta.env.VITE_BASE_URL || ''}${v}`;
+  if (v.startsWith('/')) return `${siteUrl()}${v}`;
+  // Bare relative paths are invalid for crawlers (og:image/canonical) — drop them.
+  return '';
+}
+
+// Canonical URLs must be absolute http(s); fall back to the site default.
+export function canonicalUrl(url: string | undefined, fallback: string): string {
+  const v = String(url || '').trim();
+  if (/^https?:\/\//i.test(v)) return v;
+  return fallback;
 }
 
 export function stripHtml(html: string): string {
@@ -86,10 +96,10 @@ export function resolveBlogSeo(blog: BlogSeoSource): ResolvedBlogSeo {
     || `${blog.title} — SoSapient blog`;
   const rawTitle = blog.seo?.metaTitle?.trim() || `${blog.title} | SoSapient`;
   const title = truncateTitle(rawTitle, 60);
-  const canonical = blog.seo?.canonicalUrl?.trim() || `${siteUrl()}/blog/${blog.slug}`;
+  const canonical = canonicalUrl(blog.seo?.canonicalUrl, `${siteUrl()}/blog/${blog.slug}`);
   const cover = `${siteUrl()}/og/og-cover-1200x630.png`;
   const image = absoluteUrl(blog.seo?.ogImage) || absoluteUrl(blog.image) || cover;
-  const ogTitle = blog.seo?.ogTitle?.trim() || blog.seo?.metaTitle?.trim() || blog.title;
+  const ogTitle = truncateTitle(blog.seo?.ogTitle?.trim() || blog.seo?.metaTitle?.trim() || blog.title, 60);
   const ogDescription = blog.seo?.ogDescription?.trim() || description;
   const keywords = (blog.seo?.keywords && blog.seo.keywords.length > 0
     ? blog.seo.keywords
@@ -103,7 +113,7 @@ export function resolveBlogSeo(blog: BlogSeoSource): ResolvedBlogSeo {
     ogTitle,
     ogDescription,
     ogImage: image,
-    twitterTitle: blog.seo?.twitterTitle?.trim() || ogTitle,
+    twitterTitle: truncateTitle(blog.seo?.twitterTitle?.trim() || ogTitle, 60),
     twitterDescription: blog.seo?.twitterDescription?.trim() || ogDescription,
     twitterImage: absoluteUrl(blog.seo?.twitterImage) || image
   };

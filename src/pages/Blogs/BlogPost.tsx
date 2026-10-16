@@ -37,8 +37,8 @@ function generateUserId(): string {
 }
 
 // HTML sanitization lives in BlogRichContent (single shared renderer).
-// Helper function to safely parse date
-function getValidDateString(dateValue: any, fallback: string = "") {
+// Helper function to safely parse date (undefined when invalid → tag omitted).
+function getValidDateString(dateValue: any, fallback?: string): string | undefined {
   if (!dateValue) return fallback;
   const dateObj = new Date(dateValue);
   if (isNaN(dateObj.getTime())) return fallback;
@@ -288,7 +288,7 @@ const BlogPost: React.FC = () => {
     const url = window.location.href;
     const title = blogPost.title;
     const text = blogPost.excerpt;
-    const hashtags = blogPost.tags
+    const hashtags = (blogPost.tags || [])
       .map((tag: string) => tag.replace(/\s+/g, ""))
       .join(",");
     if (platform) {
@@ -372,23 +372,29 @@ const BlogPost: React.FC = () => {
         {seo.ogImage && <meta property="og:image" content={seo.ogImage} />}
         <meta property="og:url" content={seo.canonical} />
         <meta property="og:site_name" content="SoSapient" />
-        <meta
-          property="article:published_time"
-          content={getValidDateString(
-            blogPost.publishedAt || blogPost.createdAt
-          )}
-        />
-        <meta
-          property="article:modified_time"
-          content={getValidDateString(
+        {(() => {
+          const published = getValidDateString(blogPost.publishedAt || blogPost.createdAt);
+          const modified = getValidDateString(
             blogPost.updatedAt || blogPost.publishedAt || blogPost.createdAt
-          )}
-        />
+          );
+          return (
+            <>
+              {published && (
+                <meta property="article:published_time" content={published} />
+              )}
+              {modified && (
+                <meta property="article:modified_time" content={modified} />
+              )}
+            </>
+          );
+        })()}
         <meta
           property="article:author"
           content={blogPost.author?.name || "SoSapient"}
         />
-        <meta property="article:section" content={blogPost.category} />
+        {blogPost.category && (
+          <meta property="article:section" content={blogPost.category} />
+        )}
         {(blogPost.tags || []).map((tag: string) => (
           <meta property="article:tag" content={tag} key={tag} />
         ))}
@@ -408,12 +414,18 @@ const BlogPost: React.FC = () => {
               "@type": "Person",
               name: blogPost.author?.name || "SoSapient",
             },
-            datePublished: getValidDateString(
-              blogPost.publishedAt || blogPost.createdAt
-            ),
-            dateModified: getValidDateString(
+            ...(getValidDateString(blogPost.publishedAt || blogPost.createdAt)
+              ? { datePublished: getValidDateString(blogPost.publishedAt || blogPost.createdAt) }
+              : {}),
+            ...(getValidDateString(
               blogPost.updatedAt || blogPost.publishedAt || blogPost.createdAt
-            ),
+            )
+              ? {
+                  dateModified: getValidDateString(
+                    blogPost.updatedAt || blogPost.publishedAt || blogPost.createdAt
+                  ),
+                }
+              : {}),
             publisher: {
               "@type": "Organization",
               name: "SoSapient",
@@ -851,7 +863,7 @@ const BlogPost: React.FC = () => {
             className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800"
           >
             <div className="flex flex-wrap gap-2">
-              {blogPost.tags.map((tag: string) => (
+              {(blogPost.tags || []).map((tag: string) => (
                 <span
                   key={tag}
                   className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-full text-sm flex items-center"

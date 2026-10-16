@@ -244,13 +244,13 @@ const Blog: React.FC = () => {
         <link rel="canonical" href={canonical} />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Blog | SoSapient" />
-        <meta property="og:description" content="Insights, guides and updates on web development, AI/ML, cybersecurity and business from the SoSapient team." />
+        <meta property="og:description" content="Explore SoSapient insights on web development, AI/ML, cybersecurity and business growth — practical guides and updates from our team." />
         <meta property="og:url" content={canonical} />
         <meta property="og:site_name" content="SoSapient" />
         <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Blog | SoSapient" />
-        <meta name="twitter:description" content="Insights, guides and updates on web development, AI/ML, cybersecurity and business from the SoSapient team." />
+        <meta name="twitter:description" content="Explore SoSapient insights on web development, AI/ML, cybersecurity and business growth — practical guides and updates from our team." />
         <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
         <script type="application/ld+json">
           {JSON.stringify({
