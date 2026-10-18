@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Star, Quote, BadgeCheck } from 'lucide-react';
+import { Star, Quote } from 'lucide-react';
 import { SectionHead, fadeUp } from './shared';
 
 const reviewShots = [

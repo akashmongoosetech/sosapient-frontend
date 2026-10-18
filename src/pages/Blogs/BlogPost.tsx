@@ -24,17 +24,7 @@ import BookReaderLoader from "../../components/Loaders/BookReaderLoader";
 import RelatedArticles from "../../components/Blog/RelatedArticles";
 import Comments from "../../components/Blog/Comments";
 import BlogRichContent from "../../components/Blog/BlogRichContent";
-
-// Generate a unique user ID for this browser session
-function generateUserId(): string {
-  let userId = localStorage.getItem("sosapient_user_id");
-  if (!userId) {
-    userId =
-      "user_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem("sosapient_user_id", userId);
-  }
-  return userId;
-}
+import { useAuth } from "../../contexts/AuthContext";
 
 // HTML sanitization lives in BlogRichContent (single shared renderer).
 // Helper function to safely parse date (undefined when invalid → tag omitted).
@@ -62,7 +52,11 @@ const BlogPost: React.FC = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [relatedBlogs, setRelatedBlogs] = useState<any[]>([]);
   const [relatedLoading, setRelatedLoading] = useState(false);
-  const [currentUserId] = useState(() => generateUserId());
+  // Comment ownership keys off the authenticated user (the server sets
+  // comment.userId from the JWT). Anonymous visitors get an empty id, so the
+  // owner-only Edit/Delete controls stay hidden.
+  const { user } = useAuth();
+  const currentUserId = user?.id || "";
   const [notification, setNotification] = useState<{
     message: string;
     type: "success" | "error";
@@ -88,7 +82,6 @@ const BlogPost: React.FC = () => {
         slug: blogPost?.slug || slug || '',
         seo: blogPost?.seo
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       slug,
       blogPost?.slug,

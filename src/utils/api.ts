@@ -24,23 +24,9 @@ export function getToken(): string {
   }
 }
 
-// Legacy helper retained for migration only. New code must use Bearer JWT via authFetch.
-export function getAdminKey(): string {
-  try {
-    return sessionStorage.getItem('sosapient_admin_key') || '';
-  } catch {
-    return '';
-  }
-}
-
 export function getAuthHeaders(extra: Record<string, string> = {}): Record<string, string> {
   const token = getStoredToken() || getToken();
   return token ? { Authorization: `Bearer ${token}`, ...extra } : { ...extra };
-}
-
-// Legacy alias: previously injected X-Admin-Key. Now injects the user JWT.
-export function getAdminHeaders(extra: Record<string, string> = {}): Record<string, string> {
-  return getAuthHeaders(extra);
 }
 
 export function authFetch(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {

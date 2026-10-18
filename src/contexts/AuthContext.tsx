@@ -278,11 +278,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const rt = readRefresh();
     persist(null, null, null);
     try {
-      sessionStorage.removeItem('sosapient_admin_key');
-    } catch {
-      // ignore
-    }
-    try {
       if (t) {
         await fetch(`${baseUrl()}/api/auth/logout`, {
           method: 'POST',

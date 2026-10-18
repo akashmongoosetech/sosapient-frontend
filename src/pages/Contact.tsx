@@ -44,7 +44,7 @@ const Contact: React.FC = () => {
     {
       icon: Mail,
       title: 'Email Us',
-      details: 'admin@sosapient.in',
+      details: 'admin@sosapient.in hrd@sosapient.in',
       description: 'Send us an email anytime!'
     },
     {

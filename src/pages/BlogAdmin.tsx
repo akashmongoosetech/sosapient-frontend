@@ -537,10 +537,6 @@ const BlogAdmin: React.FC = () => {
     }
   };
 
-  const addTag = (tag: string) => {
-    addTags([tag]);
-  };
-
   // Split raw input on commas/newlines so pasted or typed lists like
   // "React, Node.js" become separate chips instead of one tag or nothing.
   const addTags = (values: string[]) => {
@@ -560,10 +556,6 @@ const BlogAdmin: React.FC = () => {
     if (!raw.trim()) return;
     addTags(raw.split(/[,\n]/));
     input.value = '';
-  };
-
-  const addKeyword = (keyword: string) => {
-    addKeywords([keyword]);
   };
 
   const addKeywords = (values: string[]) => {

@@ -19,6 +19,11 @@ async function fetchPaged(path: string, limit = 100, maxPages = 5): Promise<Coun
       const data = await res.json();
       const arr = Array.isArray(data) ? data : (data.data || []);
       items.push(...arr);
+      // Prefer the server-reported total (authoritative) over heuristics.
+      const reported = data?.pagination?.total;
+      if (typeof reported === 'number') {
+        return { items, total: reported, failed: false };
+      }
       if (arr.length < limit) return { items, total: items.length, failed: false };
     }
     return { items, total: null, failed: false };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -6,6 +6,7 @@ import { MapPin, Clock, IndianRupee, Send, CheckCircle, AlertCircle, Share2, Cop
 import { siteUrl } from '../utils/blog';
 import { trackFormSubmit } from '../utils/analytics';
 import BlogRichContent from '../components/Blog/BlogRichContent';
+import RecaptchaCheckbox, { type RecaptchaHandle } from '../components/RecaptchaCheckbox';
 
 // Plain text for SEO/schema. Rich HTML is stripped to readable text.
 function stripRichText(html: unknown): string {
@@ -77,6 +78,10 @@ const JobDetails: React.FC = () => {
     website: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const recaptchaRef = useRef<RecaptchaHandle>(null);
+  const [recaptchaToken, setRecaptchaToken] = useState('');
+  const [captchaError, setCaptchaError] = useState('');
+  const siteKey = (import.meta.env.VITE_RECAPTCHA_SITE_KEY as string) || '';
 
   const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
   const shareTitle = job ? `${job.title} at SoSapient` : 'Job at SoSapient';
@@ -135,6 +140,7 @@ const JobDetails: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setNotification(null);
+    setCaptchaError('');
     try {
       const currentErrors: Record<string, string> = {};
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -150,6 +156,12 @@ const JobDetails: React.FC = () => {
         setErrors(currentErrors);
         throw new Error('Please fill in all required fields');
       }
+      const captchaToken = recaptchaRef.current?.getToken() || recaptchaToken;
+      if (!captchaToken) {
+        setCaptchaError('Please complete the reCAPTCHA challenge.');
+        return;
+      }
+
       const formData = new FormData();
       Object.entries(applicationData).forEach(([key, value]) => {
         if (value !== null && value !== undefined) {
@@ -160,15 +172,28 @@ const JobDetails: React.FC = () => {
           }
         }
       });
+      formData.append('recaptchaToken', captchaToken);
       const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/career`, {
         method: 'POST',
         body: formData
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data?.message || 'Failed to submit application');
+      if (!response.ok) {
+        if (data?.captchaExpired) {
+          // One-time token already consumed — make the user solve it again.
+          recaptchaRef.current?.reset();
+          setRecaptchaToken('');
+          setCaptchaError(data.message || 'Your CAPTCHA expired. Please complete it again.');
+          return;
+        }
+        throw new Error(data?.message || 'Failed to submit application');
+      }
       trackFormSubmit('career_application');
       navigate('/thank-you');
     } catch (err: any) {
+      // Tokens are single-use; reset so a retry gets a fresh challenge.
+      recaptchaRef.current?.reset();
+      setRecaptchaToken('');
       setNotification({ type: 'error', message: err?.message || 'Failed to submit application' });
     } finally {
       setIsSubmitting(false);
@@ -257,8 +282,8 @@ const JobDetails: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-7 space-y-6">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">About the role</h2>
                 {isRichHtml(job.description) ? (
@@ -290,8 +315,8 @@ const JobDetails: React.FC = () => {
               )}
             </div>
 
-            <div className="lg:col-span-1">
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700 shadow">
+            <div className="lg:col-span-5">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-700 shadow">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Apply for this job</h3>
 
                 {notification && (
@@ -310,9 +335,10 @@ const JobDetails: React.FC = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <input
-                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${errors.name ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${errors.name ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                       placeholder="Full Name *"
                       value={applicationData.name}
+                      autoComplete="name"
                       onChange={e => { setApplicationData({ ...applicationData, name: e.target.value }); if (errors.name) setErrors(prev => ({ ...prev, name: '' })); }}
                       aria-invalid={Boolean(errors.name)}
                     />
@@ -322,9 +348,11 @@ const JobDetails: React.FC = () => {
                   <div>
                     <input
                       type="email"
-                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${errors.email ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${errors.email ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                       placeholder="Email *"
                       value={applicationData.email}
+                      autoComplete="email"
+                      inputMode="email"
                       onChange={e => { setApplicationData({ ...applicationData, email: e.target.value }); if (errors.email) setErrors(prev => ({ ...prev, email: '' })); }}
                       aria-invalid={Boolean(errors.email)}
                     />
@@ -333,9 +361,12 @@ const JobDetails: React.FC = () => {
 
                   <div>
                     <input
-                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${errors.phone ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                      type="tel"
+                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${errors.phone ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                       placeholder="Phone *"
                       value={applicationData.phone}
+                      autoComplete="tel"
+                      inputMode="tel"
                       onChange={e => { setApplicationData({ ...applicationData, phone: e.target.value }); if (errors.phone) setErrors(prev => ({ ...prev, phone: '' })); }}
                       aria-invalid={Boolean(errors.phone)}
                     />
@@ -344,7 +375,7 @@ const JobDetails: React.FC = () => {
 
                   <div>
                     <input
-                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${errors.experience ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${errors.experience ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                       placeholder="Experience *"
                       value={applicationData.experience}
                       onChange={e => { setApplicationData({ ...applicationData, experience: e.target.value }); if (errors.experience) setErrors(prev => ({ ...prev, experience: '' })); }}
@@ -353,21 +384,22 @@ const JobDetails: React.FC = () => {
                     {errors.experience ? <p className="mt-1 text-xs text-red-600">{errors.experience}</p> : null}
                   </div>
 
-                  <input className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Current Company" value={applicationData.currentCompany} onChange={e => setApplicationData({ ...applicationData, currentCompany: e.target.value })} />
+                  <input className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Current Company" autoComplete="organization" value={applicationData.currentCompany} onChange={e => setApplicationData({ ...applicationData, currentCompany: e.target.value })} />
 
                   <div>
                     <input
-                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${errors.expectedSalary ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${errors.expectedSalary ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                       placeholder="Expected Salary"
                       value={applicationData.expectedSalary}
+                      inputMode="numeric"
                       onChange={e => { setApplicationData({ ...applicationData, expectedSalary: e.target.value }); if (errors.expectedSalary) setErrors(prev => ({ ...prev, expectedSalary: '' })); }}
                       aria-invalid={Boolean(errors.expectedSalary)}
                     />
                     {errors.expectedSalary ? <p className="mt-1 text-xs text-red-600">{errors.expectedSalary}</p> : null}
                   </div>
 
-                  <input className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Notice Period" value={applicationData.noticePeriod} onChange={e => setApplicationData({ ...applicationData, noticePeriod: e.target.value })} />
-                  <textarea rows={4} className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Cover Letter" value={applicationData.coverLetter} onChange={e => setApplicationData({ ...applicationData, coverLetter: e.target.value })} />
+                  <input className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Notice Period" value={applicationData.noticePeriod} onChange={e => setApplicationData({ ...applicationData, noticePeriod: e.target.value })} />
+                  <textarea rows={4} className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-y" placeholder="Cover Letter" value={applicationData.coverLetter} onChange={e => setApplicationData({ ...applicationData, coverLetter: e.target.value })} />
                   {/* Honeypot: hidden from humans, traps bots */}
                   <input type="text" value={applicationData.website} onChange={e => setApplicationData({ ...applicationData, website: e.target.value })} tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
                   <div className="space-y-2">
@@ -384,7 +416,7 @@ const JobDetails: React.FC = () => {
                           <p className="text-xs text-gray-500 dark:text-gray-300">PDF, DOC, DOCX up to 5MB</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         <label htmlFor="resume-upload" className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-primary-600 hover:bg-primary-700 text-white text-sm cursor-pointer">
                           <UploadCloud className="w-4 h-4" />
                           Browse
@@ -409,6 +441,20 @@ const JobDetails: React.FC = () => {
                       </div>
                     </div>
                     {errors.resume ? <p className="mt-2 text-xs text-red-600">{errors.resume}</p> : null}
+                  </div>
+
+                  <div>
+                    <RecaptchaCheckbox
+                      ref={recaptchaRef}
+                      siteKey={siteKey}
+                      theme="light"
+                      onChange={(t) => { setRecaptchaToken(t || ''); if (t) setCaptchaError(''); }}
+                      onExpired={() => setCaptchaError('CAPTCHA expired. Please complete it again.')}
+                      onError={() => setCaptchaError('CAPTCHA error: the site key is invalid or not enabled for this domain. Contact support if this persists.')}
+                    />
+                    {captchaError && (
+                      <p className="mt-2 text-xs text-red-600 dark:text-red-400" role="alert">{captchaError}</p>
+                    )}
                   </div>
 
                   <motion.button type="submit" disabled={isSubmitting} whileHover={{ scale: isSubmitting ? 1 : 1.02 }} whileTap={{ scale: isSubmitting ? 1 : 0.98 }} className="w-full py-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50">

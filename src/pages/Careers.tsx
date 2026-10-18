@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from "react-helmet-async";
 import { trackFormSubmit } from '../utils/analytics';
 import PremiumHero from '../components/heroes/PremiumHero';
+import RecaptchaCheckbox, { type RecaptchaHandle } from '../components/RecaptchaCheckbox';
 import {
   MapPin,
   Clock,
@@ -42,6 +43,10 @@ const Careers: React.FC = () => {
     noticePeriod: '',
     website: ''
   });
+  const recaptchaRef = useRef<RecaptchaHandle>(null);
+  const [recaptchaToken, setRecaptchaToken] = useState('');
+  const [captchaError, setCaptchaError] = useState('');
+  const recaptchaSiteKey = (import.meta.env.VITE_RECAPTCHA_SITE_KEY as string) || '';
   const [jobs, setJobs] = useState<any[]>([]);
   const [loadingJobs, setLoadingJobs] = useState<boolean>(false);
 
@@ -126,6 +131,7 @@ const Careers: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setNotification(null);
+    setCaptchaError('');
 
     try {
       // Validate required fields (shared rules with JobDetails)
@@ -145,6 +151,12 @@ const Careers: React.FC = () => {
         }
       }
 
+      const captchaToken = recaptchaRef.current?.getToken() || recaptchaToken;
+      if (!captchaToken) {
+        setCaptchaError('Please complete the reCAPTCHA challenge.');
+        return;
+      }
+
       const formData = new FormData();
 
       // Append all form fields
@@ -157,6 +169,7 @@ const Careers: React.FC = () => {
           }
         }
       });
+      formData.append('recaptchaToken', captchaToken);
 
       const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/career`, {
         method: 'POST',
@@ -166,6 +179,12 @@ const Careers: React.FC = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data?.captchaExpired) {
+          recaptchaRef.current?.reset();
+          setRecaptchaToken('');
+          setCaptchaError(data.message || 'Your CAPTCHA expired. Please complete it again.');
+          return;
+        }
         throw new Error(data.message || 'Failed to submit application');
       }
 
@@ -175,8 +194,9 @@ const Careers: React.FC = () => {
 
     } catch (error) {
       console.error('Application submission error:', error);
-     
-      
+      // Tokens are single-use; reset so a retry gets a fresh challenge.
+      recaptchaRef.current?.reset();
+      setRecaptchaToken('');
       setNotification({
         type: 'error',
         message: error instanceof Error ? error.message : 'Failed to submit application'
@@ -386,7 +406,7 @@ const Careers: React.FC = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto"
           >
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -555,7 +575,21 @@ const Careers: React.FC = () => {
                 />
               </div>
 
-              <div className="flex space-x-4">
+              <div>
+                <RecaptchaCheckbox
+                  ref={recaptchaRef}
+                  siteKey={recaptchaSiteKey}
+                  theme="light"
+                  onChange={(t) => { setRecaptchaToken(t || ''); if (t) setCaptchaError(''); }}
+                  onExpired={() => setCaptchaError('CAPTCHA expired. Please complete it again.')}
+                  onError={() => setCaptchaError('CAPTCHA error: the site key is invalid or not enabled for this domain. Contact support if this persists.')}
+                />
+                {captchaError && (
+                  <p className="mt-2 text-xs text-red-600 dark:text-red-400" role="alert">{captchaError}</p>
+                )}
+              </div>
+
+              <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { 
+import {
   Heart,
   MessageSquare,
   X,
 } from "lucide-react";
+import { authFetch } from "../../utils/api";
 
 interface Comment {
   _id?: string;
@@ -164,7 +165,7 @@ const Comments: React.FC<CommentsProps> = ({
     }));
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/${blogId}/comments/${commentId}/like`, {
+      const response = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/${blogId}/comments/${commentId}/like`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -279,7 +280,7 @@ const Comments: React.FC<CommentsProps> = ({
       form.append('comment', cText.trim());
       form.append('website', ''); // honeypot: must stay empty
       if (cAvatarFile) form.append('avatar', cAvatarFile);
-      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/${blogId}/comments`, {
+      const res = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/${blogId}/comments`, {
         method: 'POST',
         body: form
       });
@@ -298,7 +299,7 @@ const Comments: React.FC<CommentsProps> = ({
           likeCount: 0, 
           dislikeCount: 0, 
           _id: json.data?._id,
-          userId: currentUserId // Set userId for newly created comments
+          userId: json.data?.userId || null // ownership comes from the server (optional auth)
         }, ...prev]);
         setCommentModalOpen(false);
         setCName("");
@@ -331,7 +332,7 @@ const Comments: React.FC<CommentsProps> = ({
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/${blogId}/comments/${commentId}`, {
+      const response = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/${blogId}/comments/${commentId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -380,7 +381,7 @@ const Comments: React.FC<CommentsProps> = ({
     if (!deleteCommentId) return;
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/${blogId}/comments/${deleteCommentId}`, {
+      const response = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/${blogId}/comments/${deleteCommentId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
