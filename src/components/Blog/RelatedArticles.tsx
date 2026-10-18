@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight, Clock, Calendar } from 'lucide-react';
+import SafeImage from '../common/SafeImage';
 
 // Helper function to safely parse date
 function getValidLocaleDate(dateValue: any, fallback: string = "Unknown date"): string {
@@ -77,7 +78,7 @@ const RelatedArticles: React.FC<RelatedArticlesProps> = ({ relatedBlogs, related
               className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
             >
               <Link to={`/blog/${blog.slug}`}>
-                <img
+                <SafeImage
                   src={blog.image}
                   alt={blog.title}
                   loading="lazy"

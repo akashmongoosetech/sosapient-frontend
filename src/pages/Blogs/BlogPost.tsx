@@ -25,6 +25,8 @@ import RelatedArticles from "../../components/Blog/RelatedArticles";
 import Comments from "../../components/Blog/Comments";
 import BlogRichContent from "../../components/Blog/BlogRichContent";
 import { useAuth } from "../../contexts/AuthContext";
+import SafeImage from "../../components/common/SafeImage";
+import { resolveImageUrl } from "../../utils/imageUrl";
 
 // HTML sanitization lives in BlogRichContent (single shared renderer).
 // Helper function to safely parse date (undefined when invalid → tag omitted).
@@ -130,21 +132,17 @@ const BlogPost: React.FC = () => {
           return;
         }
         if (data.success) {
-          const normalizeUrl = (url: string) =>
-            url?.startsWith("/uploads")
-              ? `${import.meta.env.VITE_BASE_URL}${url}`
-              : url;
           const normalized = {
             ...data.data,
-            image: normalizeUrl(data.data.image),
+            image: resolveImageUrl(data.data.image),
             author: {
               ...data.data.author,
-              image: normalizeUrl(data.data.author?.image),
+              image: resolveImageUrl(data.data.author?.image),
             },
             sections: Array.isArray(data.data.sections)
               ? data.data.sections.map((s: any) => ({
                   ...s,
-                  image: s?.image ? normalizeUrl(s.image) : s?.image,
+                  image: s?.image ? resolveImageUrl(s.image) : s?.image,
                 }))
               : data.data.sections,
           };
@@ -190,10 +188,6 @@ const BlogPost: React.FC = () => {
   const fetchRelatedBlogs = async (category: string, currentBlogId: string, signal?: AbortSignal) => {
     try {
       setRelatedLoading(true);
-      const normalizeUrl = (url: string) =>
-        url?.startsWith("/uploads")
-          ? `${import.meta.env.VITE_BASE_URL}${url}`
-          : url;
       // Fetch blogs from the same category, excluding the current blog.
       // Request exactly 3 so one exclusion still leaves 2 (avoids 33-50% over-fetch).
       const response = await fetch(
@@ -214,7 +208,7 @@ const BlogPost: React.FC = () => {
           .filter((blog: any) => blog._id !== currentBlogId)
           .map((b: any) => ({
             ...b,
-            image: normalizeUrl(b.image),
+            image: resolveImageUrl(b.image),
           }))
           .slice(0, 2);
         setRelatedBlogs(filtered);
@@ -223,10 +217,6 @@ const BlogPost: React.FC = () => {
       if (err instanceof DOMException && (err as DOMException).name === 'AbortError') return;
       // Fallback: fetch any recent blogs if category-based fetch fails
       try {
-        const normalizeUrl = (url: string) =>
-          url?.startsWith("/uploads")
-            ? `${import.meta.env.VITE_BASE_URL}${url}`
-            : url;
         const fallbackResponse = await fetch(
           `${import.meta.env.VITE_BASE_URL}/api/blogs?limit=3&status=published`,
           { signal }
@@ -238,7 +228,7 @@ const BlogPost: React.FC = () => {
             .filter((blog: any) => blog._id !== currentBlogId)
             .map((b: any) => ({
               ...b,
-              image: normalizeUrl(b.image),
+              image: resolveImageUrl(b.image),
             }))
             .slice(0, 2);
           setRelatedBlogs(filtered);
@@ -504,7 +494,7 @@ const BlogPost: React.FC = () => {
             transition={{ delay: 0.15 }}
             className="mx-auto mt-8 max-w-4xl px-4 sm:px-6 lg:px-8"
           >
-            <img
+            <SafeImage
               src={blogPost.image}
               alt={blogPost.imageAlt || blogPost.title}
               fetchPriority="high"
@@ -772,7 +762,7 @@ const BlogPost: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center space-x-4 mb-8 p-6 bg-gray-50 dark:bg-gray-800 rounded-xl"
           >
-            <img
+            <SafeImage
               src={
                 blogPost.author?.image ||
                 blogPost.authorImage ||
@@ -832,7 +822,7 @@ const BlogPost: React.FC = () => {
                     </h2>
                   )}
                   {section.image && (
-                    <img
+                    <SafeImage
                       src={section.image}
                       alt={section.imageAlt || section.heading || "Section image"}
                       loading="lazy"

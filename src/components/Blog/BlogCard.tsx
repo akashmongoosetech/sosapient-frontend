@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import { formatAbsoluteDate } from '../../utils/time';
+import { useImageFallback } from '../common/imageFallback';
 
 interface BlogPost {
   id: string;
@@ -24,6 +25,8 @@ interface BlogCardProps {
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({ post, index }) => {
+  const hero = useImageFallback(post.image);
+  const authorAvatar = useImageFallback(post.authorImage);
   return (
     <motion.article
       initial={{ opacity: 0, y: 20 }}
@@ -44,7 +47,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, index }) => {
       {/* Image */}
       <div className="relative overflow-hidden">
         <motion.img
-          src={post.image}
+          src={hero.resolvedSrc}
+          onError={hero.onError}
           alt={post.title}
           loading="lazy"
           decoding="async"
@@ -119,7 +123,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, index }) => {
               whileHover={{ scale: 1.05 }}
             >
               <img
-                src={post.authorImage}
+                src={authorAvatar.resolvedSrc}
+                onError={authorAvatar.onError}
                 alt={post.author}
                 loading="lazy"
                 decoding="async"

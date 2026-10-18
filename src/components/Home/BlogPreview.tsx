@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, Clock, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import SafeImage from '../common/SafeImage';
+import { resolveImageUrl } from '../../utils/imageUrl';
 
 interface ApiBlogPost {
   _id: string;
@@ -49,7 +51,7 @@ const BlogPreview: React.FC = () => {
           id: post._id,
           title: post.title,
           excerpt: post.excerpt,
-          image: post.image,
+          image: resolveImageUrl(post.image),
           author: post?.author?.name || 'Unknown Author',
           date: post.publishedAt || post.createdAt,
           readTime: post.readTime || '5 min read',
@@ -118,7 +120,7 @@ const BlogPreview: React.FC = () => {
               >
                 {/* Image */}
                 <div className="relative overflow-hidden">
-                  <img
+                  <SafeImage
                     src={post.image}
                     alt={post.title}
                     loading="lazy"

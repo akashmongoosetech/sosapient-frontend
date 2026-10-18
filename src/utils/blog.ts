@@ -26,7 +26,7 @@ export function absoluteUrl(url: string | undefined): string {
   const v = String(url).trim();
   if (!v) return '';
   if (/^https?:\/\//i.test(v)) return v;
-  if (v.startsWith('/uploads')) return `${import.meta.env.VITE_BASE_URL || ''}${v}`;
+  if (v.startsWith('/uploads/') || v.startsWith('/api/images/')) return `${import.meta.env.VITE_BASE_URL || ''}${v}`;
   if (v.startsWith('/')) return `${siteUrl()}${v}`;
   // Bare relative paths are invalid for crawlers (og:image/canonical) — drop them.
   return '';

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import SafeImage from "../common/SafeImage";
+import { resolveImageUrl } from "../../utils/imageUrl";
 
 interface LatestBlog {
   id: string;
@@ -14,13 +16,6 @@ interface LatestBlog {
 
 const storageKey = "latest_blog_popup_dismissed_at";
 const sessionKey = "latest_blog_popup_shown_session";
-
-const normalizeUrl = (url: string) => {
-  if (!url) return url;
-  return url.startsWith("/uploads")
-    ? `${import.meta.env.VITE_BASE_URL}${url}`
-    : url;
-};
 
 const LatestBlogPopup: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -64,9 +59,9 @@ const LatestBlogPopup: React.FC = () => {
             id: post._id,
             title: post.title,
             excerpt: post.excerpt,
-            image: normalizeUrl(post.image),
+            image: resolveImageUrl(post.image),
             author: post?.author?.name || "Unknown Author",
-            authorImage: normalizeUrl(post?.author?.image),
+            authorImage: resolveImageUrl(post?.author?.image),
             slug: post.slug,
           };
           setBlog(transformed);
@@ -119,7 +114,7 @@ const LatestBlogPopup: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2">
               {/* Image */}
               <a href={`/blog/${blog.slug}`} className="block group relative">
-                <img
+                <SafeImage
                   src={blog.image}
                   alt={blog.title}
                   className="h-56 md:h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -147,7 +142,7 @@ const LatestBlogPopup: React.FC = () => {
                 {/* Author */}
                 <div className="mt-4 flex items-center gap-3">
                   {blog.authorImage && (
-                    <img
+                    <SafeImage
                       src={blog.authorImage}
                       alt={blog.author}
                       className="h-10 w-10 rounded-full object-cover ring-2 ring-primary-500"

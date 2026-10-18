@@ -7,6 +7,8 @@ import BookReaderLoader from '../components/Loaders/BookReaderLoader';
 import { authFetch } from '../utils/api';
 import { buildSlugPreview, isValidSlug } from '../utils/blog';
 import { useMemo } from 'react';
+import SafeImage from '../components/common/SafeImage';
+import { resolveImageUrl } from '../utils/imageUrl';
 import {
   ContentCard, PageHeader, PrimaryButton, AdminInput, AdminSelect,
   StatCard, EmptyState, ErrorState
@@ -68,16 +70,6 @@ const emptySeo = () => ({
   twitterDescription: '',
   twitterImage: ''
 });
-
-// Backend stores uploads as site-relative paths ("/uploads/...") served from
-// the API origin — the same normalizeUrl helper the public pages use.
-const normalizeImageUrl = (url: string | undefined): string => {
-  if (!url) return '';
-  if (/^https?:\/\//i.test(url) || url.startsWith('data:') || url.startsWith('blob:')) return url;
-  if (url.startsWith('/uploads')) return `${import.meta.env.VITE_BASE_URL || ''}${url}`;
-  if (url.startsWith('/')) return url;
-  return url;
-};
 
 // Stable client-only section identity (never sent to the API).
 const newSectionId = () => {
@@ -925,11 +917,10 @@ const BlogAdmin: React.FC = () => {
                   <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4">
                     {editingBlog.image ? (
                       <div className="relative">
-                        <img
-                          src={normalizeImageUrl(editingBlog.image)}
+                        <SafeImage
+                          src={resolveImageUrl(editingBlog.image)}
                           alt={`Featured image preview for ${editingBlog.title || 'blog post'}`}
                           className="w-full h-32 object-cover rounded-lg"
-                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                         />
                         <button
                           onClick={() => {
@@ -1438,12 +1429,11 @@ const BlogAdmin: React.FC = () => {
                     <tr key={blog._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <img
-                            src={normalizeImageUrl(blog.image)}
+                          <SafeImage
+                            src={resolveImageUrl(blog.image)}
                             alt={blog.title}
                             className="w-10 h-10 rounded-lg object-cover"
                             loading="lazy"
-                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                           />
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1">
@@ -1567,11 +1557,10 @@ const BlogAdmin: React.FC = () => {
             {blogToDelete && (
               <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div className="flex items-center">
-                  <img
-                    src={normalizeImageUrl(blogToDelete.image)}
+                  <SafeImage
+                    src={resolveImageUrl(blogToDelete.image)}
                     alt={blogToDelete.title}
                     className="w-12 h-12 rounded-lg object-cover"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                   <div className="ml-3">
                     <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1">

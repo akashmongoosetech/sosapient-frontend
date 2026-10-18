@@ -6,6 +6,8 @@ import BlogSearch from '../components/Blog/BlogSearch';
 import BlogGrid from '../components/Blog/BlogGrid';
 import BlogNewsletter from '../components/Blog/BlogNewsletter';
 import { siteUrl } from '../utils/blog';
+import SafeImage from '../components/common/SafeImage';
+import { resolveImageUrl } from '../utils/imageUrl';
 
 interface BlogPost {
   id: string;
@@ -96,15 +98,14 @@ const Blog: React.FC = () => {
       const data = await response.json();
       if (data.success && Array.isArray(data.data) && data.data.length > 0) {
         const post = data.data[0];
-        const normalizeUrl = (url: string) => url?.startsWith('/uploads') ? `${import.meta.env.VITE_BASE_URL}${url}` : url;
         setFeatured({
           id: post._id,
           slug: post.slug,
           title: post.title,
           excerpt: post.excerpt,
-          image: normalizeUrl(post.image),
+          image: resolveImageUrl(post.image),
           author: post.author.name,
-          authorImage: normalizeUrl(post.author.image),
+          authorImage: resolveImageUrl(post.author.image),
           date: post.publishedAt || post.createdAt,
           readTime: post.readTime || '5 min read',
           category: post.category,
@@ -137,15 +138,14 @@ const Blog: React.FC = () => {
       const data = await response.json();
       if (!mountedRef.current) return;
       if (data.success) {
-        const normalizeUrl = (url: string) => url?.startsWith('/uploads') ? `${import.meta.env.VITE_BASE_URL}${url}` : url;
         const transformedPosts = data.data.map((post: any) => ({
           id: post._id,
           slug: post.slug,
           title: post.title,
           excerpt: post.excerpt,
-          image: normalizeUrl(post.image),
+          image: resolveImageUrl(post.image),
           author: post.author.name,
-          authorImage: normalizeUrl(post.author.image),
+          authorImage: resolveImageUrl(post.author.image),
           date: post.publishedAt || post.createdAt,
           readTime: post.readTime || '5 min read',
           category: post.category,
@@ -266,7 +266,7 @@ const Blog: React.FC = () => {
       {featured && !searchTerm && selectedCategory === 'All' && currentPage === 1 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 mb-4" aria-label="Featured article">
           <Link to={`/blog/${featured.slug}`} className="group grid overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 md:grid-cols-2">
-            <img src={featured.image} alt={featured.title} className="h-64 w-full object-cover md:h-full" fetchPriority="high" decoding="async" width={800} height={450} />
+            <SafeImage src={featured.image} alt={featured.title} className="h-64 w-full object-cover md:h-full" fetchPriority="high" decoding="async" width={800} height={450} />
             <div className="flex flex-col justify-center p-6 sm:p-8">
               <span className="text-xs font-semibold uppercase tracking-wider text-primary-600">Featured · {featured.category}</span>
               <h2 className="mt-2 text-2xl font-bold text-gray-900 group-hover:underline dark:text-white">{featured.title}</h2>

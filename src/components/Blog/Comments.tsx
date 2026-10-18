@@ -6,6 +6,8 @@ import {
   X,
 } from "lucide-react";
 import { authFetch } from "../../utils/api";
+import { resolveImageUrl } from "../../utils/imageUrl";
+import SafeImage from "../common/SafeImage";
 
 interface Comment {
   _id?: string;
@@ -118,10 +120,9 @@ const Comments: React.FC<CommentsProps> = ({
       const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/blogs/${postSlug}/comments`);
       const json = await res.json();
       if (json.success) {
-        const normalizeUrl = (url: string) => url?.startsWith('/uploads') ? `${import.meta.env.VITE_BASE_URL}${url}` : url;
         const items = (json.data || []).map((c: any) => ({
           ...c,
-          avatar: c?.avatar ? normalizeUrl(c.avatar) : c?.avatar,
+          avatar: c?.avatar ? resolveImageUrl(c.avatar) : c?.avatar,
           likeCount: typeof c?.likeCount === 'number' ? c.likeCount : 0,
           dislikeCount: typeof c?.dislikeCount === 'number' ? c.dislikeCount : 0,
           userId: c?.userId || null, // Ensure userId is preserved
@@ -288,8 +289,7 @@ const Comments: React.FC<CommentsProps> = ({
       if (json.success) {
         // Optimistically prepend
         const createdAt = json.data?.createdAt || new Date().toISOString();
-        const normalizeUrl = (url: string) => url?.startsWith('/uploads') ? `${import.meta.env.VITE_BASE_URL}${url}` : url;
-        const avatar = json.data?.avatar ? normalizeUrl(json.data.avatar) : undefined;
+        const avatar = json.data?.avatar ? resolveImageUrl(json.data.avatar) : undefined;
         setComments(prev => [{ 
           name: json.data.name, 
           email: json.data.email, 
@@ -450,7 +450,7 @@ const Comments: React.FC<CommentsProps> = ({
                     <div className="flex items-start gap-3 min-w-0">
                       <div className="flex-shrink-0">
                         {c.avatar ? (
-                          <img src={c.avatar} alt={c.name} className="h-10 w-10 rounded-full object-cover shadow-sm" />
+                          <SafeImage src={c.avatar} alt={c.name} className="h-10 w-10 rounded-full object-cover shadow-sm" />
                         ) : (
                           <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary-500 to-purple-600 text-white flex items-center justify-center font-semibold shadow-sm">
                             {getInitials(c.name)}
