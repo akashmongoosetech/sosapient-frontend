@@ -1,10 +1,18 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { CheckCircle2, Home, Phone } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
 
 const ThankYou: React.FC = () => {
+  const location = useLocation();
+  // Set by the contact form after the backend confirms the submission. The
+  // confirmation email is only mentioned when delivery was actually reported
+  // as sent — never as an assumption.
+  const state = (location.state || {}) as { confirmationSent?: boolean; email?: string };
+  const confirmationSent = state.confirmationSent === true;
+  const confirmationEmail = typeof state.email === 'string' ? state.email : '';
+
   useEffect(() => {
     trackEvent('thank_you_view', { page: '/thank-you' });
   }, []);
@@ -35,6 +43,15 @@ const ThankYou: React.FC = () => {
           Your submission was received successfully. Our team reviews every enquiry and
           will get back to you within one business day.
         </p>
+        {confirmationSent && (
+          <p className="mx-auto mt-3 max-w-md text-sm text-gray-600 dark:text-gray-300" role="status">
+            We&rsquo;ve emailed a confirmation to{' '}
+            <span className="font-semibold text-gray-900 dark:text-white">
+              {confirmationEmail || 'your inbox'}
+            </span>
+            . If it isn&rsquo;t there within a few minutes, please check your spam or junk folder.
+          </p>
+        )}
         <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-5 text-left dark:border-gray-700 dark:bg-gray-800/60">
           <p className="text-sm font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
             What happens next

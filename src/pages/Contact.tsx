@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Helmet } from "react-helmet-async";
 import PremiumHero from "../components/heroes/PremiumHero";
+import RecaptchaCheckbox, { type RecaptchaHandle } from '../components/RecaptchaCheckbox';
 
 interface ContactFormData {
   name: string;
@@ -38,6 +39,10 @@ const Contact: React.FC = () => {
     type: 'success' | 'error';
     message: string;
   } | null>(null);
+  const recaptchaRef = useRef<RecaptchaHandle>(null);
+  const [recaptchaToken, setRecaptchaToken] = useState('');
+  const [captchaError, setCaptchaError] = useState('');
+  const recaptchaSiteKey = (import.meta.env.VITE_RECAPTCHA_SITE_KEY as string) || '';
   const { register, handleSubmit, formState: { errors }, reset } = useForm<ContactFormData>();
 
   const contactInfo = [
@@ -75,8 +80,19 @@ const Contact: React.FC = () => {
   ];
 
   const onSubmit = async (data: ContactFormData) => {
+    // The button is disabled while submitting, but guard anyway so a fast
+    // double-click or an Enter press cannot fire a second request.
+    if (isSubmitting) return;
+
+    const captchaToken = recaptchaRef.current?.getToken() || recaptchaToken;
+    if (!captchaToken) {
+      setCaptchaError('Please complete the reCAPTCHA challenge.');
+      return;
+    }
+
     setIsSubmitting(true);
     setNotification(null);
+    setCaptchaError('');
 
     try {
       const { getBaseUrl } = await import('../utils/api');
@@ -85,20 +101,39 @@ const Contact: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, recaptchaToken: captchaToken }),
       });
 
-      const responseData = await response.json();
+      const responseData = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(responseData.message || 'Failed to send message');
+        if (responseData?.captchaExpired) {
+          recaptchaRef.current?.reset();
+          setRecaptchaToken('');
+          setCaptchaError(responseData.message || 'Your CAPTCHA expired. Please complete it again.');
+          return;
+        }
+        throw new Error(responseData?.message || 'Failed to send message');
       }
+
+      // A 2xx only means the enquiry was stored. The confirmation email is
+      // mentioned on the next page only when the backend says it was sent.
+      const confirmationSent = responseData?.delivery?.visitor === 'sent';
+      const submittedEmail = data.email;
+
+      // reCAPTCHA tokens are single-use.
+      recaptchaRef.current?.reset();
+      setRecaptchaToken('');
 
       reset();
       trackFormSubmit('contact');
-      navigate('/thank-you');
+      navigate('/thank-you', { state: { confirmationSent, email: submittedEmail } });
 
     } catch (error) {
+      // Keep what the visitor typed so they can simply retry, and hand them a
+      // fresh challenge because the previous token is now spent.
+      recaptchaRef.current?.reset();
+      setRecaptchaToken('');
       setNotification({
         type: 'error',
         message: error instanceof Error ? error.message : 'Failed to send message'
@@ -396,6 +431,25 @@ const Contact: React.FC = () => {
                     {errors.message && (
                       <p id="contact-message-error" role="alert" className="mt-1 text-sm text-red-600 dark:text-red-400">
                         {errors.message.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <RecaptchaCheckbox
+                      ref={recaptchaRef}
+                      siteKey={recaptchaSiteKey}
+                      theme="light"
+                      onChange={(token) => {
+                        setRecaptchaToken(token || '');
+                        if (token) setCaptchaError('');
+                      }}
+                      onExpired={() => setCaptchaError('CAPTCHA expired. Please complete it again.')}
+                      onError={() => setCaptchaError('CAPTCHA error: the site key is invalid or not enabled for this domain. Contact support if this persists.')}
+                    />
+                    {captchaError && (
+                      <p className="mt-2 text-xs text-red-600 dark:text-red-400" role="alert">
+                        {captchaError}
                       </p>
                     )}
                   </div>
