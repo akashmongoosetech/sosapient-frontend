@@ -408,6 +408,7 @@ const CareerTable: React.FC = () => {
               <Th>Applicant</Th>
               <Th>Position</Th>
               <Th>Experience</Th>
+              <Th>Address</Th>
               <Th>Status</Th>
               <Th>Applied</Th>
               <Th className="text-right">Actions</Th>
@@ -421,6 +422,7 @@ const CareerTable: React.FC = () => {
                   </td>
                   <td className="max-w-[200px] truncate px-4 py-3 text-sm text-gray-900 dark:text-white">{application.position}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-900 dark:text-white">{application.experience}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-900 dark:text-white">{application.city}, {application.state}</td>
                   <td className="px-4 py-3">{statusSelect(application)}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                     {new Date(application.createdAt).toLocaleDateString()}
