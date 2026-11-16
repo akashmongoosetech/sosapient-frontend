@@ -41,6 +41,10 @@ const Careers: React.FC = () => {
     currentCompany: '',
     expectedSalary: '',
     noticePeriod: '',
+    currentAddress: '',
+    city: '',
+    state: '',
+    country: '',
     website: ''
   });
   const recaptchaRef = useRef<RecaptchaHandle>(null);
@@ -135,7 +139,16 @@ const Careers: React.FC = () => {
 
     try {
       // Validate required fields (shared rules with JobDetails)
-      if (!applicationData.name || !applicationData.email || !applicationData.experience || !applicationData.resume) {
+      if (
+        !applicationData.name ||
+        !applicationData.email ||
+        !applicationData.experience ||
+        !applicationData.resume ||
+        !applicationData.currentAddress.trim() ||
+        !applicationData.city.trim() ||
+        !applicationData.state.trim() ||
+        !applicationData.country.trim()
+      ) {
         throw new Error('Please fill in all required fields');
       }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(applicationData.email)) {
@@ -535,6 +548,70 @@ const Careers: React.FC = () => {
                   value={applicationData.noticePeriod}
                   onChange={(e) => setApplicationData({...applicationData, noticePeriod: e.target.value})}
                   placeholder="e.g., 30 days"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Current Address *
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Address *
+                </label>
+                <input
+                  type="text"
+                  required
+                  autoComplete="address-line1"
+                  value={applicationData.currentAddress}
+                  onChange={(e) => setApplicationData({...applicationData, currentAddress: e.target.value})}
+                  placeholder="House / street / area"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    City *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    autoComplete="address-level2"
+                    value={applicationData.city}
+                    onChange={(e) => setApplicationData({...applicationData, city: e.target.value})}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    State *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    autoComplete="address-level1"
+                    value={applicationData.state}
+                    onChange={(e) => setApplicationData({...applicationData, state: e.target.value})}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Country *
+                </label>
+                <input
+                  type="text"
+                  required
+                  autoComplete="country-name"
+                  value={applicationData.country}
+                  onChange={(e) => setApplicationData({...applicationData, country: e.target.value})}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>

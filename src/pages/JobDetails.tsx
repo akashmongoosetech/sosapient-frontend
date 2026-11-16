@@ -75,6 +75,10 @@ const JobDetails: React.FC = () => {
     currentCompany: '',
     expectedSalary: '',
     noticePeriod: '',
+    currentAddress: '',
+    city: '',
+    state: '',
+    country: '',
     website: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -151,6 +155,10 @@ const JobDetails: React.FC = () => {
       if (!applicationData.experience.trim()) currentErrors.experience = 'Experience is required';
       if (!applicationData.resume) currentErrors.resume = 'Resume is required';
       if (applicationData.expectedSalary && isNaN(Number(applicationData.expectedSalary))) currentErrors.expectedSalary = 'Expected salary must be a number';
+      if (!applicationData.currentAddress.trim()) currentErrors.currentAddress = 'Address is required';
+      if (!applicationData.city.trim()) currentErrors.city = 'City is required';
+      if (!applicationData.state.trim()) currentErrors.state = 'State is required';
+      if (!applicationData.country.trim()) currentErrors.country = 'Country is required';
 
       if (Object.keys(currentErrors).length > 0) {
         setErrors(currentErrors);
@@ -399,6 +407,60 @@ const JobDetails: React.FC = () => {
                   </div>
 
                   <input className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Notice Period" value={applicationData.noticePeriod} onChange={e => setApplicationData({ ...applicationData, noticePeriod: e.target.value })} />
+
+                  <div className="space-y-3">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Current Address *</p>
+
+                    <div>
+                      <input
+                        className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${errors.currentAddress ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                        placeholder="Address *"
+                        value={applicationData.currentAddress}
+                        autoComplete="address-line1"
+                        onChange={e => { setApplicationData({ ...applicationData, currentAddress: e.target.value }); if (errors.currentAddress) setErrors(prev => ({ ...prev, currentAddress: '' })); }}
+                        aria-invalid={Boolean(errors.currentAddress)}
+                      />
+                      {errors.currentAddress ? <p className="mt-1 text-xs text-red-600">{errors.currentAddress}</p> : null}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <input
+                          className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${errors.city ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                          placeholder="City *"
+                          value={applicationData.city}
+                          autoComplete="address-level2"
+                          onChange={e => { setApplicationData({ ...applicationData, city: e.target.value }); if (errors.city) setErrors(prev => ({ ...prev, city: '' })); }}
+                          aria-invalid={Boolean(errors.city)}
+                        />
+                        {errors.city ? <p className="mt-1 text-xs text-red-600">{errors.city}</p> : null}
+                      </div>
+                      <div>
+                        <input
+                          className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${errors.state ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                          placeholder="State *"
+                          value={applicationData.state}
+                          autoComplete="address-level1"
+                          onChange={e => { setApplicationData({ ...applicationData, state: e.target.value }); if (errors.state) setErrors(prev => ({ ...prev, state: '' })); }}
+                          aria-invalid={Boolean(errors.state)}
+                        />
+                        {errors.state ? <p className="mt-1 text-xs text-red-600">{errors.state}</p> : null}
+                      </div>
+                    </div>
+
+                    <div>
+                      <input
+                        className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${errors.country ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                        placeholder="Country *"
+                        value={applicationData.country}
+                        autoComplete="country-name"
+                        onChange={e => { setApplicationData({ ...applicationData, country: e.target.value }); if (errors.country) setErrors(prev => ({ ...prev, country: '' })); }}
+                        aria-invalid={Boolean(errors.country)}
+                      />
+                      {errors.country ? <p className="mt-1 text-xs text-red-600">{errors.country}</p> : null}
+                    </div>
+                  </div>
+
                   <textarea rows={4} className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-y" placeholder="Cover Letter" value={applicationData.coverLetter} onChange={e => setApplicationData({ ...applicationData, coverLetter: e.target.value })} />
                   {/* Honeypot: hidden from humans, traps bots */}
                   <input type="text" value={applicationData.website} onChange={e => setApplicationData({ ...applicationData, website: e.target.value })} tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
