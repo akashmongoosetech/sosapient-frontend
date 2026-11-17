@@ -79,6 +79,7 @@ const JobDetails: React.FC = () => {
     city: '',
     state: '',
     country: '',
+    linkedinUrl: '',
     website: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -159,6 +160,7 @@ const JobDetails: React.FC = () => {
       if (!applicationData.city.trim()) currentErrors.city = 'City is required';
       if (!applicationData.state.trim()) currentErrors.state = 'State is required';
       if (!applicationData.country.trim()) currentErrors.country = 'Country is required';
+      if (applicationData.linkedinUrl.trim() && !/^https?:\/\//i.test(applicationData.linkedinUrl.trim())) currentErrors.linkedinUrl = 'LinkedIn URL must start with https://';
 
       if (Object.keys(currentErrors).length > 0) {
         setErrors(currentErrors);
@@ -459,6 +461,19 @@ const JobDetails: React.FC = () => {
                       />
                       {errors.country ? <p className="mt-1 text-xs text-red-600">{errors.country}</p> : null}
                     </div>
+                  </div>
+
+                  <div>
+                    <input
+                      type="url"
+                      className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${errors.linkedinUrl ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+                      placeholder="LinkedIn Profile URL"
+                      value={applicationData.linkedinUrl}
+                      autoComplete="url"
+                      onChange={e => { setApplicationData({ ...applicationData, linkedinUrl: e.target.value }); if (errors.linkedinUrl) setErrors(prev => ({ ...prev, linkedinUrl: '' })); }}
+                      aria-invalid={Boolean(errors.linkedinUrl)}
+                    />
+                    {errors.linkedinUrl ? <p className="mt-1 text-xs text-red-600">{errors.linkedinUrl}</p> : null}
                   </div>
 
                   <textarea rows={4} className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-y" placeholder="Cover Letter" value={applicationData.coverLetter} onChange={e => setApplicationData({ ...applicationData, coverLetter: e.target.value })} />

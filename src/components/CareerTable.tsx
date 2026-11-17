@@ -35,6 +35,7 @@ interface CareerApplication {
   city: string;
   state: string;
   country: string;
+  linkedinUrl: string;
   coverLetter: string;
   status: 'pending' | 'reviewed' | 'shortlisted' | 'rejected';
   createdAt: string;
@@ -255,6 +256,7 @@ const CareerTable: React.FC = () => {
       City: app.city,
       State: app.state,
       Country: app.country,
+      LinkedIn: app.linkedinUrl,
       Status: app.status,
       'Applied On': new Date(app.createdAt).toLocaleDateString()
     }));
@@ -456,7 +458,7 @@ const CareerTable: React.FC = () => {
           <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 dark:bg-gray-900" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Application details">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Application details</h3>
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {[['Name', selectedApplication.name], ['Email', selectedApplication.email], ['Phone', selectedApplication.phone], ['Position', selectedApplication.position], ['Experience', selectedApplication.experience], ['Current company', selectedApplication.currentCompany], ['Expected salary', selectedApplication.expectedSalary], ['Notice period', selectedApplication.noticePeriod], ['Address', selectedApplication.currentAddress], ['City', selectedApplication.city], ['State', selectedApplication.state], ['Country', selectedApplication.country]].map(([k, v]) => (
+              {[['Name', selectedApplication.name], ['Email', selectedApplication.email], ['Phone', selectedApplication.phone], ['Position', selectedApplication.position], ['Experience', selectedApplication.experience], ['Current company', selectedApplication.currentCompany], ['Expected salary', selectedApplication.expectedSalary], ['Notice period', selectedApplication.noticePeriod], ['Address', selectedApplication.currentAddress], ['City', selectedApplication.city], ['State', selectedApplication.state], ['Country', selectedApplication.country], ['LinkedIn', selectedApplication.linkedinUrl]].map(([k, v]) => (
                 <div key={k}>
                   <p className="text-xs font-medium uppercase tracking-wide text-gray-400">{k}</p>
                   <p className="mt-0.5 text-sm font-medium text-gray-900 dark:text-white">{v || '—'}</p>

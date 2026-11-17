@@ -45,6 +45,7 @@ const Careers: React.FC = () => {
     city: '',
     state: '',
     country: '',
+    linkedinUrl: '',
     website: ''
   });
   const recaptchaRef = useRef<RecaptchaHandle>(null);
@@ -150,6 +151,9 @@ const Careers: React.FC = () => {
         !applicationData.country.trim()
       ) {
         throw new Error('Please fill in all required fields');
+      }
+      if (applicationData.linkedinUrl.trim() && !/^https?:\/\//i.test(applicationData.linkedinUrl.trim())) {
+        throw new Error('LinkedIn URL must start with https://');
       }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(applicationData.email)) {
         throw new Error('Please enter a valid email address');
@@ -612,6 +616,20 @@ const Careers: React.FC = () => {
                   autoComplete="country-name"
                   value={applicationData.country}
                   onChange={(e) => setApplicationData({...applicationData, country: e.target.value})}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  LinkedIn Profile URL
+                </label>
+                <input
+                  type="url"
+                  autoComplete="url"
+                  value={applicationData.linkedinUrl}
+                  onChange={(e) => setApplicationData({...applicationData, linkedinUrl: e.target.value})}
+                  placeholder="https://www.linkedin.com/in/your-profile"
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
