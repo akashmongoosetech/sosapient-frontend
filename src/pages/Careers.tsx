@@ -152,7 +152,9 @@ const Careers: React.FC = () => {
       ) {
         throw new Error('Please fill in all required fields');
       }
-      if (applicationData.linkedinUrl.trim() && !/^https?:\/\//i.test(applicationData.linkedinUrl.trim())) {
+      if (!applicationData.linkedinUrl.trim()) {
+        throw new Error('LinkedIn URL is required');
+      } else if (!/^https?:\/\//i.test(applicationData.linkedinUrl.trim())) {
         throw new Error('LinkedIn URL must start with https://');
       }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(applicationData.email)) {

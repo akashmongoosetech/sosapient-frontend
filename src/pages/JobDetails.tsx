@@ -160,7 +160,8 @@ const JobDetails: React.FC = () => {
       if (!applicationData.city.trim()) currentErrors.city = 'City is required';
       if (!applicationData.state.trim()) currentErrors.state = 'State is required';
       if (!applicationData.country.trim()) currentErrors.country = 'Country is required';
-      if (applicationData.linkedinUrl.trim() && !/^https?:\/\//i.test(applicationData.linkedinUrl.trim())) currentErrors.linkedinUrl = 'LinkedIn URL must start with https://';
+      if (!applicationData.linkedinUrl.trim()) currentErrors.linkedinUrl = 'LinkedIn URL is required';
+      else if (!/^https?:\/\//i.test(applicationData.linkedinUrl.trim())) currentErrors.linkedinUrl = 'LinkedIn URL must start with https://';
 
       if (Object.keys(currentErrors).length > 0) {
         setErrors(currentErrors);
