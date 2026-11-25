@@ -57,7 +57,7 @@ function RichList({ items, label }: { items: unknown; label: string }) {
 }
 
 const JobDetails: React.FC = () => {
-  const { jobId } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -127,7 +127,7 @@ const JobDetails: React.FC = () => {
     const fetchJob = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/jobs/${jobId}`);
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/jobs/${slug}`);
         const data = await res.json();
         if (!data?.success) throw new Error(data?.message || 'Failed to load job');
         setJob(data.data);
@@ -138,8 +138,8 @@ const JobDetails: React.FC = () => {
         setLoading(false);
       }
     };
-    if (jobId) fetchJob();
-  }, [jobId]);
+    if (slug) fetchJob();
+  }, [slug]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -218,7 +218,7 @@ const JobDetails: React.FC = () => {
     return <div className="max-w-5xl mx-auto p-6 text-red-600">{error || 'Job not found'}</div>;
   }
 
-  const canonical = `${siteUrl()}/careers/${jobId}`;
+  const canonical = `${siteUrl()}/careers/${slug}`;
   const jobTitle = `${job.title} | Careers at SoSapient`;
   const roleSummary = stripRichText(job.description).slice(0, 80);
   const jobDescription = `${job.title} (${job.type || 'Full-time'}) in ${job.location || 'Ujjain, India'}. ${roleSummary ? `${roleSummary} ` : ''}${job.experience ? `Experience: ${job.experience}. ` : ''}Apply with your resume today.`.slice(0, 160);

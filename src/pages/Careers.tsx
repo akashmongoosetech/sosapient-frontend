@@ -54,6 +54,7 @@ const Careers: React.FC = () => {
   const recaptchaSiteKey = (import.meta.env.VITE_RECAPTCHA_SITE_KEY as string) || '';
   const [jobs, setJobs] = useState<any[]>([]);
   const [loadingJobs, setLoadingJobs] = useState<boolean>(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // Plain-text excerpt for cards: strips rich HTML so tags never leak into listings.
   const stripTags = (html?: string) => {
@@ -138,59 +139,78 @@ const Careers: React.FC = () => {
     setNotification(null);
     setCaptchaError('');
 
+    // Clear previous field errors
+    setFieldErrors({});
+
+    // Per-field validation
     try {
-      // Validate required fields (shared rules with JobDetails)
-      if (
-        !applicationData.name ||
-        !applicationData.email ||
-        !applicationData.experience ||
-        !applicationData.resume ||
-        !applicationData.currentAddress.trim() ||
-        !applicationData.city.trim() ||
-        !applicationData.state.trim() ||
-        !applicationData.country.trim()
-      ) {
-        throw new Error('Please fill in all required fields');
+      const errors: Record<string, string> = {};
+
+    if (!applicationData.name.trim()) {
+      errors.name = 'Full name is required';
+    }
+    if (!applicationData.email.trim()) {
+      errors.email = 'Email address is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(applicationData.email.trim())) {
+      errors.email = 'Please enter a valid email address';
+    }
+    if (!applicationData.experience.trim()) {
+      errors.experience = 'Experience is required';
+    }
+    if (!applicationData.resume) {
+      errors.resume = 'Resume is required';
+    } else if (applicationData.resume instanceof File) {
+      const allowed = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowed.includes(applicationData.resume.type)) {
+        errors.resume = 'Resume must be PDF or Word document';
+      } else if (applicationData.resume.size > 5 * 1024 * 1024) {
+        errors.resume = 'Resume must be smaller than 5MB';
       }
-      if (!applicationData.linkedinUrl.trim()) {
-        throw new Error('LinkedIn URL is required');
-      } else if (!/^https?:\/\//i.test(applicationData.linkedinUrl.trim())) {
-        throw new Error('LinkedIn URL must start with https://');
-      }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(applicationData.email)) {
-        throw new Error('Please enter a valid email address');
-      }
-      if (applicationData.resume instanceof File) {
-        const allowed = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-        if (!allowed.includes(applicationData.resume.type)) {
-          throw new Error('Resume must be PDF or Word document');
+    }
+    if (!applicationData.currentAddress.trim()) {
+      errors.currentAddress = 'Address is required';
+    }
+    if (!applicationData.city.trim()) {
+      errors.city = 'City is required';
+    }
+    if (!applicationData.state.trim()) {
+      errors.state = 'State is required';
+    }
+    if (!applicationData.country.trim()) {
+      errors.country = 'Country is required';
+    }
+    if (!applicationData.linkedinUrl.trim()) {
+      errors.linkedinUrl = 'LinkedIn URL is required';
+    } else if (!/^https?:\/\//i.test(applicationData.linkedinUrl.trim())) {
+      errors.linkedinUrl = 'LinkedIn URL must start with https://';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+
+    const captchaToken = recaptchaRef.current?.getToken() || recaptchaToken;
+    if (!captchaToken) {
+      setCaptchaError('Please complete the reCAPTCHA challenge.');
+      return;
+    }
+
+    const formData = new FormData();
+
+    // Append all form fields
+    Object.entries(applicationData).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        if (key === 'resume' && value instanceof File) {
+          formData.append('resume', value, value.name);
+        } else {
+          formData.append(key, value.toString());
         }
-        if (applicationData.resume.size > 5 * 1024 * 1024) {
-          throw new Error('Resume must be smaller than 5MB');
-        }
       }
+    });
+    formData.append('recaptchaToken', captchaToken);
 
-      const captchaToken = recaptchaRef.current?.getToken() || recaptchaToken;
-      if (!captchaToken) {
-        setCaptchaError('Please complete the reCAPTCHA challenge.');
-        return;
-      }
-
-      const formData = new FormData();
-
-      // Append all form fields
-      Object.entries(applicationData).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
-          if (key === 'resume' && value instanceof File) {
-            formData.append('resume', value, value.name);
-          } else {
-            formData.append(key, value.toString());
-          }
-        }
-      });
-      formData.append('recaptchaToken', captchaToken);
-
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/career`, {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/career`, {
         method: 'POST',
         body: formData,
       });
@@ -399,8 +419,8 @@ const Careers: React.FC = () => {
                   </div>
                 </div>
 
-                <a
-                  href={`/careers/${job._id}`}
+                  <a
+                  href={`/careers/${job.slug || job._id}`}
                   className="block w-full"
                 >
                   <motion.div
@@ -463,7 +483,7 @@ const Careers: React.FC = () => {
                 </p>
               </motion.div>
             )}
-
+            
             <form onSubmit={handleSubmitApplication} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -474,9 +494,17 @@ const Careers: React.FC = () => {
                     type="text"
                     required
                     value={applicationData.name}
-                    onChange={(e) => setApplicationData({...applicationData, name: e.target.value})}
+                    onChange={(e) => {
+                      setApplicationData({...applicationData, name: e.target.value});
+                      if (fieldErrors.name) setFieldErrors({...fieldErrors, name: ''});
+                    }}
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
+                  {fieldErrors.name && (
+                    <p id="career-name-error" role="alert" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      {fieldErrors.name}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -486,11 +514,19 @@ const Careers: React.FC = () => {
                     type="email"
                     required
                     value={applicationData.email}
-                    onChange={(e) => setApplicationData({...applicationData, email: e.target.value})}
+                    onChange={(e) => {
+                      setApplicationData({...applicationData, email: e.target.value});
+                      if (fieldErrors.email) setFieldErrors({...fieldErrors, email: ''});
+                    }}
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
-                </div>
+                  {fieldErrors.email && (
+                    <p id="career-email-error" role="alert" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      {fieldErrors.email}
+                    </p>
+                  )}
               </div>
+            </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -512,10 +548,18 @@ const Careers: React.FC = () => {
                     type="text"
                     required
                     value={applicationData.experience}
-                    onChange={(e) => setApplicationData({...applicationData, experience: e.target.value})}
+                    onChange={(e) => {
+                      setApplicationData({...applicationData, experience: e.target.value});
+                      if (fieldErrors.experience) setFieldErrors({...fieldErrors, experience: ''});
+                    }}
                     placeholder="e.g., 5 years"
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
+                  {fieldErrors.experience && (
+                    <p id="career-experience-error" role="alert" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      {fieldErrors.experience}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -568,16 +612,24 @@ const Careers: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Address *
                 </label>
-                <input
-                  type="text"
-                  required
-                  autoComplete="address-line1"
-                  value={applicationData.currentAddress}
-                  onChange={(e) => setApplicationData({...applicationData, currentAddress: e.target.value})}
-                  placeholder="House / street / area"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
+                  <input
+                    type="text"
+                    required
+                    autoComplete="address-line1"
+                    value={applicationData.currentAddress}
+                    onChange={(e) => {
+                      setApplicationData({...applicationData, currentAddress: e.target.value});
+                      if (fieldErrors.currentAddress) setFieldErrors({...fieldErrors, currentAddress: ''});
+                    }}
+                    placeholder="House / street / area"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                  {fieldErrors.currentAddress && (
+                    <p id="career-address-error" role="alert" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      {fieldErrors.currentAddress}
+                    </p>
+                  )}
+                </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -589,9 +641,17 @@ const Careers: React.FC = () => {
                     required
                     autoComplete="address-level2"
                     value={applicationData.city}
-                    onChange={(e) => setApplicationData({...applicationData, city: e.target.value})}
+                    onChange={(e) => {
+                      setApplicationData({...applicationData, city: e.target.value});
+                      if (fieldErrors.city) setFieldErrors({...fieldErrors, city: ''});
+                    }}
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
+                  {fieldErrors.city && (
+                    <p id="career-city-error" role="alert" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      {fieldErrors.city}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -602,9 +662,17 @@ const Careers: React.FC = () => {
                     required
                     autoComplete="address-level1"
                     value={applicationData.state}
-                    onChange={(e) => setApplicationData({...applicationData, state: e.target.value})}
+                    onChange={(e) => {
+                      setApplicationData({...applicationData, state: e.target.value});
+                      if (fieldErrors.state) setFieldErrors({...fieldErrors, state: ''});
+                    }}
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
+                  {fieldErrors.state && (
+                    <p id="career-state-error" role="alert" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      {fieldErrors.state}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -617,9 +685,17 @@ const Careers: React.FC = () => {
                   required
                   autoComplete="country-name"
                   value={applicationData.country}
-                  onChange={(e) => setApplicationData({...applicationData, country: e.target.value})}
+                  onChange={(e) => {
+                    setApplicationData({...applicationData, country: e.target.value});
+                    if (fieldErrors.country) setFieldErrors({...fieldErrors, country: ''});
+                  }}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
+                {fieldErrors.country && (
+                  <p id="career-country-error" role="alert" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {fieldErrors.country}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -630,10 +706,18 @@ const Careers: React.FC = () => {
                   type="url"
                   autoComplete="url"
                   value={applicationData.linkedinUrl}
-                  onChange={(e) => setApplicationData({...applicationData, linkedinUrl: e.target.value})}
+                  onChange={(e) => {
+                    setApplicationData({...applicationData, linkedinUrl: e.target.value});
+                    if (fieldErrors.linkedinUrl) setFieldErrors({...fieldErrors, linkedinUrl: ''});
+                  }}
                   placeholder="https://www.linkedin.com/in/your-profile"
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
+                {fieldErrors.linkedinUrl && (
+                  <p id="career-linkedin-error" role="alert" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {fieldErrors.linkedinUrl}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -644,9 +728,17 @@ const Careers: React.FC = () => {
                   type="file"
                   required
                   accept=".pdf,.doc,.docx"
-                  onChange={(e) => setApplicationData({...applicationData, resume: e.target.files?.[0] || null})}
+                  onChange={(e) => {
+                    setApplicationData({...applicationData, resume: e.target.files?.[0] || null});
+                    if (fieldErrors.resume) setFieldErrors({...fieldErrors, resume: ''});
+                  }}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
+                {fieldErrors.resume && (
+                  <p id="career-resume-error" role="alert" className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {fieldErrors.resume}
+                  </p>
+                )}
               </div>
 
               <div>

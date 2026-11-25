@@ -91,7 +91,7 @@ function App() {
                   <Route path="case-studies" element={<CaseStudies />} />
                   <Route path="case-studies/:slug" element={<CaseStudyDetails />} />
                   <Route path="careers" element={<Careers />} />
-                  <Route path="careers/:jobId" element={<JobDetails />} />
+                  <Route path="careers/:slug" element={<JobDetails />} />
                   <Route path="contact" element={<Contact />} />
                   <Route path="portfolio" element={<Portfolio />} />
                   <Route path="thank-you" element={<ThankYou />} />
