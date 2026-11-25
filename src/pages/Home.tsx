@@ -24,6 +24,7 @@ const Home: React.FC = () => {
         <meta name="description" content="SoSapient builds MERN stack apps, AI chatbots & automation, CRM/ERP software, plus SEO and social media growth — from Ujjain, India to clients worldwide." />
         <link rel="canonical" href="https://sosapient.in/" />
         <meta property="og:type" content="website" />
+        <meta property="og:locale" content="en_US" />
         <meta property="og:title" content="Full Stack Web Development & AI Solutions | SoSapient" />
         <meta property="og:description" content="SoSapient builds MERN stack apps, AI chatbots & automation, CRM/ERP software, plus SEO and social media growth — from Ujjain, India to clients worldwide." />
         <meta property="og:url" content="https://sosapient.in/" />

@@ -15,10 +15,12 @@ const Cookies: React.FC = () => (
       <meta property="og:url" content="https://sosapient.in/cookies" />
       <meta property="og:site_name" content="SoSapient" />
       <meta property="og:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
+      <meta property="og:image:alt" content="SoSapient — Cookie Policy" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content="Cookie Policy | Consent & Storage | SoSapient" />
       <meta name="twitter:description" content="How SoSapient uses cookies and local storage, and how to manage consent. Draft pending legal review." />
       <meta name="twitter:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
+      <meta name="twitter:image:alt" content="SoSapient — Cookie Policy" />
     </Helmet>
     <section className="py-16 sm:py-20">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">

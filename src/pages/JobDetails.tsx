@@ -230,15 +230,18 @@ const JobDetails: React.FC = () => {
         <meta name="description" content={jobDescription} />
         <link rel="canonical" href={canonical} />
         <meta property="og:type" content="website" />
+        <meta property="og:locale" content="en_US" />
         <meta property="og:title" content={jobTitle} />
         <meta property="og:description" content={jobDescription} />
         <meta property="og:url" content={canonical} />
         <meta property="og:site_name" content="SoSapient" />
         <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <meta property="og:image:alt" content={`${jobTitle}`} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={jobTitle} />
         <meta name="twitter:description" content={jobDescription} />
         <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <meta name="twitter:image:alt" content={`${jobTitle}`} />
         <script type="application/ld+json">
           {JSON.stringify({
             '@context': 'https://schema.org',

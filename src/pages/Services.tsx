@@ -62,6 +62,7 @@ const Services: React.FC = () => {
           content="End-to-end development, AI automation, cloud and business software: frontend, backend, mobile, UI/UX, security, chatbots, RAG, CRM, ERP and SaaS."
         />
         <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <meta property="og:image:alt" content="SoSapient — Services" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Services | AI, Cloud & Software | SoSapient" />
         <meta
@@ -69,6 +70,7 @@ const Services: React.FC = () => {
           content="End-to-end development, AI automation, cloud and business software: frontend, backend, mobile, UI/UX, security, chatbots, RAG, CRM, ERP and SaaS."
         />
         <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <meta name="twitter:image:alt" content="SoSapient — Services" />
         <meta property="og:url" content="https://sosapient.in/services" />
         <meta property="og:site_name" content="SoSapient" />
         <link rel="canonical" href="https://sosapient.in/services" />

@@ -155,10 +155,12 @@ const Contact: React.FC = () => {
         <meta property="og:title" content="Contact Us | SoSapient" />
         <meta property="og:description" content="Start your project with SoSapient — web development, AI automation, CRM/ERP and digital marketing. Based in Ujjain, India, working worldwide." />
         <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <meta property="og:image:alt" content="SoSapient — Contact Us" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Contact Us | SoSapient" />
         <meta name="twitter:description" content="Start your project with SoSapient — web development, AI automation, CRM/ERP and digital marketing. Based in Ujjain, India, working worldwide." />
         <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <meta name="twitter:image:alt" content="SoSapient — Contact Us" />
         <meta property="og:url" content="https://sosapient.in/contact" />
         <meta property="og:site_name" content="SoSapient" />
         <link rel="canonical" href="https://sosapient.in/contact" />

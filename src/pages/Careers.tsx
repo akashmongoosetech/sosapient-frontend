@@ -258,10 +258,12 @@ const Careers: React.FC = () => {
         <meta property="og:url" content="https://sosapient.in/careers" />
         <meta property="og:site_name" content="SoSapient" />
         <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <meta property="og:image:alt" content="SoSapient — Careers" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Careers at SoSapient" />
         <meta name="twitter:description" content="Join SoSapient — explore open roles in web development, AI and design with a growing software company in Ujjain, India." />
         <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <meta name="twitter:image:alt" content="SoSapient — Careers" />
 
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 

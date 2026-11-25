@@ -243,15 +243,18 @@ const Blog: React.FC = () => {
         <meta name="description" content="Explore SoSapient insights on web development, AI/ML, cybersecurity and business growth — practical guides and updates from our team." />
         <link rel="canonical" href={canonical} />
         <meta property="og:type" content="website" />
+        <meta property="og:locale" content="en_US" />
         <meta property="og:title" content="Blog | SoSapient" />
         <meta property="og:description" content="Explore SoSapient insights on web development, AI/ML, cybersecurity and business growth — practical guides and updates from our team." />
         <meta property="og:url" content={canonical} />
         <meta property="og:site_name" content="SoSapient" />
         <meta property="og:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <meta property="og:image:alt" content="SoSapient — Blog" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Blog | SoSapient" />
         <meta name="twitter:description" content="Explore SoSapient insights on web development, AI/ML, cybersecurity and business growth — practical guides and updates from our team." />
         <meta name="twitter:image" content="https://sosapient.in/logo/Dlogo.png" />
+        <meta name="twitter:image:alt" content="SoSapient — Blog" />
         <script type="application/ld+json">
           {JSON.stringify({
             '@context': 'https://schema.org',

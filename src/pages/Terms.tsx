@@ -15,10 +15,12 @@ const Terms: React.FC = () => (
       <meta property="og:url" content="https://sosapient.in/terms" />
       <meta property="og:site_name" content="SoSapient" />
       <meta property="og:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
+      <meta property="og:image:alt" content="SoSapient — Terms of Service" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content="Terms of Service | Website Use | SoSapient" />
       <meta name="twitter:description" content="Terms governing use of the SoSapient website. Draft pending review by a qualified legal professional." />
       <meta name="twitter:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
+      <meta name="twitter:image:alt" content="SoSapient — Terms of Service" />
     </Helmet>
     <section className="py-16 sm:py-20">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">

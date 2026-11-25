@@ -18,6 +18,19 @@ const NotFound: React.FC = () => (
       <title>Page Not Found | SoSapient</title>
       <meta name="description" content="The page you are looking for does not exist. Return home or explore our services." />
       <meta name="robots" content="noindex, nofollow" />
+      <meta property="og:type" content="website" />
+      <meta property="og:title" content="Page Not Found | SoSapient" />
+      <meta property="og:description" content="The page you are looking for does not exist. Return home or explore our services." />
+      <meta property="og:url" content="https://sosapient.in/404" />
+      <meta property="og:site_name" content="SoSapient" />
+      <meta property="og:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
+      <meta property="og:image:alt" content="SoSapient — Page Not Found" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="Page Not Found | SoSapient" />
+      <meta name="twitter:description" content="The page you are looking for does not exist. Return home or explore our services." />
+      <meta name="twitter:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
+      <meta name="twitter:image:alt" content="SoSapient — Page Not Found" />
+      <link rel="canonical" href="https://sosapient.in/404" />
     </Helmet>
     <section className="relative overflow-hidden py-20 sm:py-28">
       <div

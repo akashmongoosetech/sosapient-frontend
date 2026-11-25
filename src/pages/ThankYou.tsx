@@ -22,6 +22,19 @@ const ThankYou: React.FC = () => {
       <title>Thank You | SoSapient</title>
       <meta name="description" content="Thanks for reaching out to SoSapient. Our team will get back to you shortly." />
       <meta name="robots" content="noindex, nofollow" />
+      <meta property="og:type" content="website" />
+      <meta property="og:title" content="Thank You | SoSapient" />
+      <meta property="og:description" content="Thanks for reaching out to SoSapient. Our team will get back to you shortly." />
+      <meta property="og:url" content="https://sosapient.in/thank-you" />
+      <meta property="og:site_name" content="SoSapient" />
+      <meta property="og:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
+      <meta property="og:image:alt" content="SoSapient — Thank You" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="Thank You | SoSapient" />
+      <meta name="twitter:description" content="Thanks for reaching out to SoSapient. Our team will get back to you shortly." />
+      <meta name="twitter:image" content="https://sosapient.in/og/og-cover-1200x630.png" />
+      <meta name="twitter:image:alt" content="SoSapient — Thank You" />
+      <link rel="canonical" href="https://sosapient.in/thank-you" />
     </Helmet>
     <section className="relative overflow-hidden py-20 sm:py-28">
       <div
