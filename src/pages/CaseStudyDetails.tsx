@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Calendar, Clock } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Clock } from 'lucide-react';
 import BlogRichContent from '../components/Blog/BlogRichContent';
 import CaseStudyCard from '../components/case-studies/CaseStudyCard';
 import { siteUrl, stripHtml, absoluteUrl, truncateTitle } from '../utils/blog';
@@ -191,9 +191,10 @@ const CaseStudyDetails: React.FC = () => {
                 </span>
               )}
               {doc.createdAt && (
-                <span className="inline-flex items-center gap-1.5">
-                  <Calendar className="h-4 w-4" /> {new Date(doc.createdAt).toLocaleDateString()}
-                </span>
+                // <span className="inline-flex items-center gap-1.5">
+                //   <Calendar className="h-4 w-4" /> {new Date(doc.createdAt).toLocaleDateString()}
+                // </span>
+                <></>
               )}
             </div>
             {doc.technologies.length > 0 && (

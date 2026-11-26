@@ -219,15 +219,18 @@ const LeadsPage: React.FC = () => {
 
   const fetchMeta = useCallback(async () => {
     try {
-      const res = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/leads/filter-options`);
-      if (res.ok) {
-        const data = await res.json();
+      // Run both metadata requests in parallel instead of sequentially.
+      const [fres, sres] = await Promise.all([
+        authFetch(`${import.meta.env.VITE_BASE_URL}/api/leads/filter-options`),
+        authFetch(`${import.meta.env.VITE_BASE_URL}/api/leads/stats`),
+      ]);
+      if (fres.ok) {
+        const data = await fres.json();
         if (data.success) {
           setCities(data.data.cities || []);
           setCategories(data.data.categories || []);
         }
       }
-      const sres = await authFetch(`${import.meta.env.VITE_BASE_URL}/api/leads/stats`);
       if (sres.ok) {
         const sdata = await sres.json();
         if (sdata.success) setStats(sdata.data);

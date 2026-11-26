@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Clock } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { CaseStudy, caseStudyIcon } from '../../types/caseStudy';
 import { stripHtml } from '../../utils/blog';
 
@@ -89,10 +89,10 @@ const CaseStudyCard: React.FC<CaseStudyCardProps> = ({ item, index = 0 }) => {
         )}
 
         <div className="mt-auto flex items-center justify-between pt-4">
-          <span className="inline-flex items-center gap-1 text-xs text-gray-400">
+          {/* <span className="inline-flex items-center gap-1 text-xs text-gray-400">
             <Clock className="h-3.5 w-3.5" />
             {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ''}
-          </span>
+          </span> */}
           <Link
             to={`/case-studies/${item.slug}`}
             aria-label={`View case study: ${item.title}`}

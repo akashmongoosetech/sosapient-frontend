@@ -92,10 +92,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
   const [token, setToken] = useState<string | null>(() => readToken());
   const [loading, setLoading] = useState(true);
+  // Track when the current access token was issued to skip redundant
+  // /api/auth/me revalidation on app mount when the session is fresh.
+  const [tokenIssuedAt, setTokenIssuedAt] = useState<number | null>(() => {
+    try {
+      const raw = localStorage.getItem('sosapient_token_issued_at');
+      return raw ? parseInt(raw, 10) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const persist = useCallback((nextToken: string | null, nextUser: AuthUser | null, nextRefresh?: string | null) => {
     setToken(nextToken);
     setUser(nextUser);
+    if (nextToken) {
+      setTokenIssuedAt(Date.now());
+      try {
+        localStorage.setItem('sosapient_token_issued_at', String(Date.now()));
+      } catch {
+        /* ignore storage errors */
+      }
+    } else {
+      setTokenIssuedAt(null);
+      try {
+        localStorage.removeItem('sosapient_token_issued_at');
+      } catch {
+        /* ignore storage errors */
+      }
+    }
     try {
       if (nextToken) localStorage.setItem(TOKEN_KEY, nextToken);
       else localStorage.removeItem(TOKEN_KEY);
@@ -135,6 +160,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
       return;
     }
+    // Skip revalidation if the token was issued recently (within 5 min).
+    // Access tokens live 15 min, so a fresh token is almost certainly valid.
+    // This avoids an unnecessary /api/auth/me round-trip on every app load.
+    const now = Date.now();
+    if (tokenIssuedAt && now - tokenIssuedAt < 5 * 60 * 1000) {
+      setLoading(false);
+      return;
+    }
     // Cached session is usable immediately; revalidate in background.
     setLoading(false);
     const controller = new AbortController();
@@ -160,7 +193,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       clearTimeout(timeout);
     }
-  }, [persist, tryRefreshTokens]);
+  }, [persist, tryRefreshTokens, tokenIssuedAt]);
 
   useEffect(() => {
     void refresh();

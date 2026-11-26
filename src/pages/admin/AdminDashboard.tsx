@@ -61,9 +61,9 @@ const AdminDashboard: React.FC = () => {
     setFailed(false);
     try {
       const [c, a, s] = await Promise.all([
-        fetchPaged('/api/contact'),
-        fetchPaged('/api/career'),
-        fetchPaged('/api/subscribers')
+        fetchPaged('/api/contact', 5),
+        fetchPaged('/api/career', 5),
+        fetchPaged('/api/subscribers', 5)
       ]);
       setContacts(c);
       setCareers(a);
