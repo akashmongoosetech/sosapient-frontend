@@ -15,6 +15,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { authFetch } from '../utils/api';
+import { CareerViewModal } from './admin/CareerViewModal';
 import {
   ContentCard, PageHeader, SecondaryButton, IconButton, AdminInput, AdminSelect,
   AdminTableShell, TableHead, Th, StatusBadge, careerTone,
@@ -454,36 +455,12 @@ const CareerTable: React.FC = () => {
 
       {/* View modal */}
       {isViewModalOpen && selectedApplication && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setIsViewModalOpen(false)}>
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 dark:bg-gray-900" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Application details">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Application details</h3>
-            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {[['Name', selectedApplication.name], ['Email', selectedApplication.email], ['Phone', selectedApplication.phone], ['Position', selectedApplication.position], ['Experience', selectedApplication.experience], ['Current company', selectedApplication.currentCompany], ['Expected salary', selectedApplication.expectedSalary], ['Notice period', selectedApplication.noticePeriod], ['Address', selectedApplication.currentAddress], ['City', selectedApplication.city], ['State', selectedApplication.state], ['Country', selectedApplication.country], ['LinkedIn', selectedApplication.linkedinUrl]].map(([k, v]) => (
-                <div key={k}>
-                  <p className="text-xs font-medium uppercase tracking-wide text-gray-400">{k}</p>
-                  <p className="mt-0.5 text-sm font-medium text-gray-900 dark:text-white">{v || '—'}</p>
-                </div>
-              ))}
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Status</p>
-                <div className="mt-1"><StatusBadge label={selectedApplication.status} tone={careerTone(selectedApplication.status)} /></div>
-              </div>
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Resume</p>
-                <button onClick={() => handleDownload(selectedApplication._id)} className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-primary-600 hover:underline">
-                  <Download className="h-4 w-4" /> {selectedApplication.resume?.filename || 'Download resume'}
-                </button>
-              </div>
-            </div>
-            <div className="mt-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Cover letter</p>
-              <p className="mt-1 whitespace-pre-wrap text-sm text-gray-900 dark:text-white">{selectedApplication.coverLetter || '—'}</p>
-            </div>
-            <div className="mt-6 flex justify-end">
-              <SecondaryButton onClick={() => setIsViewModalOpen(false)}>Close</SecondaryButton>
-            </div>
-          </div>
-        </div>
+        <CareerViewModal
+          open={isViewModalOpen}
+          application={selectedApplication}
+          onClose={() => setIsViewModalOpen(false)}
+          handleDownload={handleDownload}
+        />
       )}
 
       {/* Status editor modal (backend PATCH honors status only) */}

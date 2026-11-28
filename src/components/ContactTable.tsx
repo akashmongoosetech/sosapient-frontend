@@ -14,6 +14,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { authFetch } from '../utils/api';
+import { ContactViewModal } from './admin/ContactViewModal';
 import {
   ContentCard, PageHeader, SecondaryButton, IconButton, AdminInput, AdminSelect,
   AdminTableShell, TableHead, Th, StatusBadge, contactTone,
@@ -434,30 +435,12 @@ const ContactTable: React.FC = () => {
 
       {/* View modal */}
       {isViewModalOpen && selectedSubmission && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setIsViewModalOpen(false)}>
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 dark:bg-gray-900" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Contact details">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Contact details</h3>
-            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {[['Name', selectedSubmission.name], ['Email', selectedSubmission.email], ['Phone', selectedSubmission.phone], ['Company', selectedSubmission.company], ['Subject', selectedSubmission.subject], ['Budget', selectedSubmission.budget], ['Timeline', selectedSubmission.timeline]].map(([k, v]) => v ? (
-                <div key={k}>
-                  <p className="text-xs font-medium uppercase tracking-wide text-gray-400">{k}</p>
-                  <p className="mt-0.5 text-sm font-medium text-gray-900 dark:text-white">{v}</p>
-                </div>
-              ) : null)}
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Status</p>
-                <div className="mt-1"><StatusBadge label={selectedSubmission.status} tone={contactTone(selectedSubmission.status)} /></div>
-              </div>
-            </div>
-            <div className="mt-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Message</p>
-              <p className="mt-1 whitespace-pre-wrap text-sm text-gray-900 dark:text-white">{selectedSubmission.message}</p>
-            </div>
-            <div className="mt-6 flex justify-end">
-              <SecondaryButton onClick={() => setIsViewModalOpen(false)}>Close</SecondaryButton>
-            </div>
-          </div>
-        </div>
+        <ContactViewModal
+          open={isViewModalOpen}
+          submission={selectedSubmission}
+          onClose={() => setIsViewModalOpen(false)}
+          handleStatusUpdate={handleStatusUpdate}
+        />
       )}
 
       {/* Status editor modal (backend PATCH honors status only) */}
