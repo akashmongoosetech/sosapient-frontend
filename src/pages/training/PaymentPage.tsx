@@ -191,10 +191,17 @@ const PaymentPage: React.FC = () => {
         setOrder(orderData);
       }
 
-      await loadRazorpayScript();
-      if (!mounted.current) return;
-      setRazorpayLoaded(true);
-      setStatus('processing');
+      // Load Razorpay script and initialize checkout
+      try {
+        await loadRazorpayScript();
+        setRazorpayLoaded(true);
+      } catch {
+        if (!mounted.current) return;
+        setError('Could not load the payment gateway. Check your connection and retry.');
+        setStatus('failed');
+        checkoutInitiated.current = false;
+        return;
+      }
 
       const RazorpayCtor = window.Razorpay;
       if (!RazorpayCtor) throw new Error('Payment gateway is unavailable');
@@ -462,12 +469,7 @@ const PaymentPage: React.FC = () => {
 
             {enrollment.paymentType === 'Paid' && enrollment.paymentStatus !== 'paid' && (
               <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
-                {!razorpayLoaded ? (
-                  <div className="w-full py-3 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    <span>Loading payment gateway...</span>
-                  </div>
-                ) : (
+                {razorpayLoaded ? (
                   <button
                     onClick={startPayment}
                     disabled={status === 'processing' || status === 'creating-order'}
@@ -485,6 +487,14 @@ const PaymentPage: React.FC = () => {
                       </>
                     )}
                   </button>
+                ) : (
+                  <div className="w-full py-3 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    <span>Loading payment gateway...</span>
+                  </div>
+                )}
+                {error && (
+                  <div className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</div>
                 )}
               </div>
             )}
