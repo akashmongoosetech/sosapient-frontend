@@ -20,6 +20,7 @@ const titles: Record<string, string> = {
   '/admin/deals': 'Deals',
   '/admin/leads/new': 'Add Lead',
   '/admin/leads/import': 'Import Leads',
+  '/admin/candidates': 'Candidates Management',
   '/admin/profile': 'Profile'
 };
 

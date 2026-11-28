@@ -69,7 +69,7 @@ const TrainingNewPage = lazy(() => import('./pages/admin/TrainingNewPage'));
 const TrainingEditPage = lazy(() => import('./pages/admin/TrainingEditPage'));
 const TrainingDetailPage = lazy(() => import('./pages/admin/TrainingDetailPage'));
 const PaymentPage = lazy(() => import('./pages/training/PaymentPage'));
-const TrainingEnrollmentPage = lazy(() => import('./pages/admin/TrainingEnrollmentPage'));
+const CandidatePage = lazy(() => import('./pages/admin/CandidatePage'));
 const CertificateVerify = lazy(() => import('./pages/CertificateVerify'));
 
 const RouteFallback: React.FC = () => (
@@ -148,7 +148,7 @@ function App() {
 <Route path="trainings/new" element={<TrainingNewPage />} />
 <Route path="trainings/:id" element={<TrainingDetailPage />} />
 <Route path="trainings/:id/edit" element={<TrainingEditPage />} />
-<Route path="trainings/enrollments" element={<TrainingEnrollmentPage />} />
+<Route path="candidates" element={<CandidatePage />} />
 <Route path="profile" element={<AdminProfile />} />
                 </Route>
 

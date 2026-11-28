@@ -208,3 +208,108 @@ export interface EnrollmentStats {
   totalPendingPayments: number;
   courseWiseCount: Array<{ course: string; count: number }>;
 }
+
+export interface CandidatePayment {
+  _id?: string;
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  razorpaySignatureVerified: boolean;
+  paymentMethod: string;
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'cancelled';
+  failureReason: string;
+  transactionId: string;
+  paidAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CandidateTraining {
+  _id: string;
+  title: string;
+  slug: string;
+  featuredImage?: string;
+  category: string;
+  duration: string;
+  trainingMode: string;
+  level: string;
+  technologies: string[];
+  price: number;
+  paymentType: 'Free' | 'Paid';
+  amount: number;
+  currency: string;
+  isFree: boolean;
+  startDate?: string;
+  endDate?: string;
+  trainer?: any;
+  certification?: any;
+  description?: string;
+  shortDescription?: string;
+}
+
+export interface CandidateListItem {
+  _id: string;
+  candidateName: string;
+  email: string;
+  mobile: string;
+  qualification: string;
+  organization: string;
+  message?: string;
+  trainingId: string | { _id: string; title: string };
+  courseTitleSnapshot: string;
+  amount: number;
+  currency: string;
+  paymentType: 'Free' | 'Paid';
+  enrollmentStatus: 'pending' | 'confirmed' | 'cancelled';
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'cancelled';
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  transactionId: string;
+  enrolledAt: string;
+  paidAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  training?: CandidateTraining | null;
+}
+
+export interface CandidateDetail {
+  _id: string;
+  candidateName: string;
+  email: string;
+  mobile: string;
+  qualification: string;
+  organization: string;
+  message?: string;
+  trainingId: string;
+  courseTitleSnapshot: string;
+  amount: number;
+  currency: string;
+  paymentType: 'Free' | 'Paid';
+  enrollmentStatus: 'pending' | 'confirmed' | 'cancelled';
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'cancelled';
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  transactionId: string;
+  enrolledAt: string;
+  paidAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  training: CandidateTraining | null;
+  payment: CandidatePayment | null;
+}
+
+export interface CandidatesResponse {
+  success: boolean;
+  data: CandidateListItem[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+}
+
+export interface CandidateDetailResponse {
+  success: boolean;
+  data: CandidateDetail;
+}

@@ -48,7 +48,7 @@ export const adminNavSections: { heading: string; items: AdminNavItem[] }[] = [
       { to: '/admin/case-studies', label: 'Case Studies', icon: <Briefcase className="h-5 w-5" /> },
       { to: '/admin/certificates', label: 'Certificates', icon: <Award className="h-5 w-5" /> },
       { to: '/admin/trainings', label: 'Trainings', icon: <BookOpen className="h-5 w-5" />, end: true },
-      { to: '/admin/trainings/enrollments', label: 'Enrollments', icon: <ClipboardList className="h-5 w-5" /> }
+      { to: '/admin/candidates', label: 'Candidates', icon: <Users className="h-5 w-5" /> }
     ]
   },
   {
