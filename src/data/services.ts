@@ -1223,6 +1223,7 @@ export const SERVICES: Service[] = [
       'Creative reels and video editing for brand storytelling',
       'Platform-optimized assets for each social media channel',
     ],
+    techIntro: 'Promotional storytelling runs on a production stack: professional cameras and lighting for capture, Premiere Pro and After Effects for cinematic edits and motion graphics, Lightroom and Photoshop for finishing, and Meta Business Suite plus LinkedIn Campaign Manager for scheduling, publishing and measuring every asset on the platform it was made for.',
     technologies: [
       { name: 'Adobe Premiere Pro', category: 'Video Editing', blurb: 'Industry-standard editing for cinematic and social-video formats.' },
       { name: 'Adobe After Effects', category: 'Motion Graphics', blurb: 'Creative transitions, titles and visual effects for reels and promos.' },

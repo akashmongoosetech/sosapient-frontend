@@ -48,6 +48,8 @@ const Industries = lazy(() => import('./pages/Industries'));
 const IndustryDetail = lazy(() => import('./pages/IndustryDetail'));
 const CaseStudies = lazy(() => import('./pages/CaseStudies'));
 const CaseStudyDetails = lazy(() => import('./pages/CaseStudyDetails'));
+const TrainingList = lazy(() => import('./pages/training/TrainingList'));
+const TrainingDetails = lazy(() => import('./pages/training/TrainingDetails'));
 const CaseStudiesPage = lazy(() => import('./pages/admin/CaseStudiesPage'));
 const CaseStudyNewPage = lazy(() => import('./pages/admin/CaseStudyNewPage'));
 const CaseStudyDetailPage = lazy(() => import('./pages/admin/CaseStudyDetailPage'));
@@ -62,6 +64,12 @@ const LeadDetailPage = lazy(() => import('./pages/admin/LeadDetailPage'));
 const LeadEditPage = lazy(() => import('./pages/admin/LeadEditPage'));
 const LeadImportPage = lazy(() => import('./pages/admin/LeadImportPage'));
 const DealsPage = lazy(() => import('./pages/admin/DealsPage'));
+const TrainingPage = lazy(() => import('./pages/admin/TrainingPage'));
+const TrainingNewPage = lazy(() => import('./pages/admin/TrainingNewPage'));
+const TrainingEditPage = lazy(() => import('./pages/admin/TrainingEditPage'));
+const TrainingDetailPage = lazy(() => import('./pages/admin/TrainingDetailPage'));
+const PaymentPage = lazy(() => import('./pages/training/PaymentPage'));
+const TrainingEnrollmentPage = lazy(() => import('./pages/admin/TrainingEnrollmentPage'));
 const CertificateVerify = lazy(() => import('./pages/CertificateVerify'));
 
 const RouteFallback: React.FC = () => (
@@ -92,6 +100,9 @@ function App() {
                   <Route path="case-studies/:slug" element={<CaseStudyDetails />} />
                   <Route path="careers" element={<Careers />} />
                   <Route path="careers/:slug" element={<JobDetails />} />
+                  <Route path="training" element={<TrainingList />} />
+                  <Route path="training/:slug" element={<TrainingDetails />} />
+                  <Route path="training/payment/:enrollmentId" element={<PaymentPage />} />
                   <Route path="contact" element={<Contact />} />
                   <Route path="portfolio" element={<Portfolio />} />
                   <Route path="thank-you" element={<ThankYou />} />
@@ -132,8 +143,13 @@ function App() {
                   <Route path="leads/import" element={<LeadImportPage />} />
                   <Route path="leads/:id" element={<LeadDetailPage />} />
                   <Route path="leads/:id/edit" element={<LeadEditPage />} />
-                  <Route path="deals" element={<DealsPage />} />
-                  <Route path="profile" element={<AdminProfile />} />
+<Route path="deals" element={<DealsPage />} />
+<Route path="trainings" element={<TrainingPage />} />
+<Route path="trainings/new" element={<TrainingNewPage />} />
+<Route path="trainings/:id" element={<TrainingDetailPage />} />
+<Route path="trainings/:id/edit" element={<TrainingEditPage />} />
+<Route path="trainings/enrollments" element={<TrainingEnrollmentPage />} />
+<Route path="profile" element={<AdminProfile />} />
                 </Route>
 
                 {/* Public certificate verification (no login). Preferred canonical path: */}

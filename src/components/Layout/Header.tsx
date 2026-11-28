@@ -134,6 +134,7 @@ const Header: React.FC = () => {
     { name: 'Industries', path: '/industries', hasIndustriesMenu: true },
     { name: 'Case Studies', path: '/case-studies' },
     { name: 'Blog', path: '/blog' },
+    { name: 'Training', path: '/training' },
   ];
 
   const isActive = (path: string) => {
